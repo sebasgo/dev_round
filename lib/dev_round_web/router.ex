@@ -1,3 +1,5 @@
+import Backpex.Router
+
 defmodule DevRoundWeb.Router do
   use DevRoundWeb, :router
 
@@ -19,6 +21,19 @@ defmodule DevRoundWeb.Router do
 
     get "/", PageController, :home
   end
+
+  scope "/admin", DevRoundWeb do
+    pipe_through :browser
+
+    backpex_routes()
+
+    live_session :default, on_mount: Backpex.InitAssigns do
+      # add this line
+      live_resources "/langs", Admin.EventLangAdmin
+    end
+   end
+
+
 
   # Other scopes may use custom stacks.
   # scope "/api", DevRoundWeb do
