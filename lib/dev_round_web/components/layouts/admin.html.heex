@@ -1,6 +1,10 @@
 <Backpex.HTML.Layout.app_shell fluid={@fluid?}>
   <:topbar>
-    <Backpex.HTML.Layout.topbar_branding />
+    <Backpex.HTML.Layout.topbar_branding title="DevRound Admin Panel">
+      <:logo>
+        <img src={~p"/images/logo.svg"}/>
+      </:logo>
+    </Backpex.HTML.Layout.topbar_branding>
 
     <Backpex.HTML.Layout.topbar_dropdown>
       <:label>
@@ -18,7 +22,7 @@
   </:topbar>
   <:sidebar>
     <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate={~p"/admin/langs"}>
-      <.icon name="hero-book-open" class="h-5 w-5" /> Langs
+      <.icon name="hero-language" class="h-5 w-5" /> Programming Languages
     </Backpex.HTML.Layout.sidebar_item>
   </:sidebar>
   <Backpex.HTML.Layout.flash_messages flash={@flash} />
