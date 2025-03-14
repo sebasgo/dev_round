@@ -21,8 +21,11 @@
     </Backpex.HTML.Layout.topbar_dropdown>
   </:topbar>
   <:sidebar>
+    <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate={~p"/admin/users"}>
+      <.icon name="hero-users" class="h-5 w-5" /> Users
+    </Backpex.HTML.Layout.sidebar_item>
     <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate={~p"/admin/langs"}>
-      <.icon name="hero-language" class="h-5 w-5" /> Programming Languages
+      <.icon name="hero-language" class="h-5 w-5" /> Languages
     </Backpex.HTML.Layout.sidebar_item>
   </:sidebar>
   <Backpex.HTML.Layout.flash_messages flash={@flash} />

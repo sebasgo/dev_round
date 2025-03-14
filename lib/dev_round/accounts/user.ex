@@ -7,7 +7,7 @@ defmodule DevRound.Accounts.User do
     field :email, :string
     field :full_name, :string
     field :avatar_url, :string
-    field :expierence_level, :integer, default: 5
+    field :experience_level, :integer, default: 5
 
     timestamps(type: :utc_datetime)
   end
@@ -30,7 +30,7 @@ defmodule DevRound.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:name, :email, :full_name, :avatar_url, :expierence_level])
+    |> cast(attrs, [:name, :email, :full_name, :avatar_url, :experience_level])
     |> validate_name(opts)
     |> validate_email(opts)
   end
@@ -39,6 +39,13 @@ defmodule DevRound.Accounts.User do
     user
     |> cast(attrs, [:full_name])
     |> validate_required(:full_name)
+  end
+
+  def admin_changeset(user, attrs, _opts \\ []) do
+    user
+    |> cast(attrs, [:experience_level])
+    |> validate_required(:experience_level)
+    |> validate_experience_level()
   end
 
   defp validate_name(changeset, opts) do
@@ -54,6 +61,11 @@ defmodule DevRound.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
+  end
+
+  defp validate_experience_level(changeset) do
+    changeset
+    |> validate_number(:experience_level, greater_than_or_equal_to: 0, less_than: 10, message: "Must be between 0 and 9 inclusive.")
   end
 
   defp maybe_validate_unique_name(changeset, opts) do

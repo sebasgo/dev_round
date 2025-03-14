@@ -30,8 +30,8 @@ defmodule DevRoundWeb.Router do
 
     backpex_routes()
 
-    live_session :default, on_mount: Backpex.InitAssigns do
-      # add this line
+    live_session :default, on_mount: [Backpex.InitAssigns] do
+      live_resources "/users", Admin.User, except: [:show]
       live_resources "/langs", Admin.EventLangAdmin
     end
    end
