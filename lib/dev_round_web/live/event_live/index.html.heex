@@ -1,0 +1,46 @@
+<.header>
+  Listing Events
+  <:actions>
+    <.link patch={~p"/events/new"}>
+      <.button>New Event</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="events"
+  rows={@streams.events}
+  row_click={fn {_id, event} -> JS.navigate(~p"/events/#{event}") end}
+>
+  <:col :let={{_id, event}} label="Title">{event.title}</:col>
+  <:col :let={{_id, event}} label="Body">{event.body}</:col>
+  <:col :let={{_id, event}} label="Begin">{event.begin}</:col>
+  <:col :let={{_id, event}} label="End">{event.end}</:col>
+  <:col :let={{_id, event}} label="Location">{event.location}</:col>
+  <:col :let={{_id, event}} label="Published">{event.published}</:col>
+  <:action :let={{_id, event}}>
+    <div class="sr-only">
+      <.link navigate={~p"/events/#{event}"}>Show</.link>
+    </div>
+    <.link patch={~p"/events/#{event}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, event}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: event.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="event-modal" show on_cancel={JS.patch(~p"/events")}>
+  <.live_component
+    module={DevRoundWeb.EventLive.FormComponent}
+    id={@event.id || :new}
+    title={@page_title}
+    action={@live_action}
+    event={@event}
+    patch={~p"/events"}
+  />
+</.modal>

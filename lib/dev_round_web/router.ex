@@ -23,6 +23,12 @@ defmodule DevRoundWeb.Router do
     pipe_through [:browser]
 
     get "/", PageController, :home
+
+    live "/events", EventLive.Index, :index
+    live "/events/new", EventLive.Index, :new
+    live "/events/:id/edit", EventLive.Index, :edit
+    live "/events/:id", EventLive.Show, :show
+    live "/events/:id/show/edit", EventLive.Show, :edit
   end
 
   scope "/admin", DevRoundWeb do
@@ -31,6 +37,7 @@ defmodule DevRoundWeb.Router do
     backpex_routes()
 
     live_session :default, on_mount: [Backpex.InitAssigns] do
+      live_resources "/events", Admin.Event
       live_resources "/users", Admin.User, except: [:show]
       live_resources "/langs", Admin.EventLangAdmin
     end
