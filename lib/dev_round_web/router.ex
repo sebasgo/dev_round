@@ -23,12 +23,6 @@ defmodule DevRoundWeb.Router do
     pipe_through [:browser]
 
     get "/", PageController, :home
-
-    live "/events", EventLive.Index, :index
-    live "/events/new", EventLive.Index, :new
-    live "/events/:id/edit", EventLive.Index, :edit
-    live "/events/:id", EventLive.Show, :show
-    live "/events/:id/show/edit", EventLive.Show, :edit
   end
 
   scope "/admin", DevRoundWeb do
@@ -87,6 +81,11 @@ defmodule DevRoundWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
+      live "/events", EventLive.Index, :index
+      live "/events/new", EventLive.Index, :new
+      live "/events/:id/edit", EventLive.Index, :edit
+      live "/events/:id", EventLive.Show, :show
+      live "/events/:id/show/edit", EventLive.Show, :edit
     end
   end
 

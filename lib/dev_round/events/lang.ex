@@ -2,7 +2,7 @@ defmodule DevRound.Events.Lang do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "event_langs" do
+  schema "langs" do
     field :name, :string
     field :icon_path, :string
 

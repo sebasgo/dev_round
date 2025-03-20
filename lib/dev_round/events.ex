@@ -7,6 +7,7 @@ defmodule DevRound.Events do
   alias DevRound.Repo
 
   alias DevRound.Events.Event
+  alias DevRound.Events.Langs
 
   @doc """
   Returns the list of events.
@@ -99,6 +100,16 @@ defmodule DevRound.Events do
 
   """
   def change_event(%Event{} = event, attrs \\ %{}) do
-    Event.changeset(event, attrs)
+    langs = list_langs_by_id(attrs["lang_ids"])
+
+    event
+    |> Repo.preload(:langs)
+    |> Event.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:langs, langs)
+  end
+
+  def list_langs_by_id(nil), do: []
+  def list_langs_by_id(lang_ids) do
+    Repo.all(from l in Langs, where: l.id in ^lang_ids)
   end
 end
