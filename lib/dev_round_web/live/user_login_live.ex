@@ -22,7 +22,7 @@ defmodule DevRoundWeb.UserLoginLive do
           <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
         </:actions>
         <:actions>
-          <.button phx-disable-with="Logging in..." class="w-full">
+          <.button phx-disable-with="Logging in..." class="btn-primary btn-block">
             Log in <span aria-hidden="true">→</span>
           </.button>
         </:actions>

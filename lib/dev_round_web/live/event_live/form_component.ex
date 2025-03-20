@@ -20,7 +20,7 @@ defmodule DevRoundWeb.EventLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:title]} type="text" label="Title" />
-        <.input field={@form[:body]} type="text" label="Body" />
+        <.input field={@form[:body]} type="textarea" label="Body" />
         <.input field={@form[:begin]} type="datetime-local" label="Begin" />
         <.input field={@form[:end]} type="datetime-local" label="End" />
         <.input field={@form[:location]} type="text" label="Location" />
