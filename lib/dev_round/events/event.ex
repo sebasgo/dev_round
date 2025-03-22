@@ -33,7 +33,7 @@ defmodule DevRound.Events.Event do
   defp validate_begin_before_end(changeset) do
     begin = get_field(changeset, :begin)
     end_ = get_field(changeset, :end)
-    if begin != nil && end_ != nil && Date.compare(begin, end_) != :lt do
+    if begin != nil && end_ != nil && DateTime.compare(begin, end_) != :lt do
       add_error(changeset, :end, "Must be after begin.")
     else
       changeset
