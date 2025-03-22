@@ -59,7 +59,8 @@ defmodule DevRound.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:backpex, "~> 0.11.0"}
+      {:backpex, "~> 0.11.0"},
+      {:earmark, "~> 1.4"},
     ]
   end
 

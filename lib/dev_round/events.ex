@@ -36,7 +36,12 @@ defmodule DevRound.Events do
       ** (Ecto.NoResultsError)
 
   """
-  def get_event!(id), do: Repo.get!(Event, id)
+  def get_event!(id) do
+    Event
+    # |> Repo.get!(id)
+    |> Repo.get_by!([id: id, published: true])
+    |> Repo.preload([:langs, :hosts, :attendees])
+  end
 
   @doc """
   Creates a event.

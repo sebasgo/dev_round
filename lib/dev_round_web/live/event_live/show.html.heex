@@ -1,21 +1,63 @@
 <.header>
-  Event {@event.id}
-  <:subtitle>This is a event record from your database.</:subtitle>
   <:actions>
     <.link patch={~p"/events/#{@event}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit event</.button>
+      <.button class="btn-primary">Edit event</.button>
     </.link>
   </:actions>
+  {@event.title}
 </.header>
 
-<.list>
-  <:item title="Title">{@event.title}</:item>
-  <:item title="Body">{@event.body}</:item>
-  <:item title="Begin">{@event.begin}</:item>
-  <:item title="End">{@event.end}</:item>
-  <:item title="Location">{@event.location}</:item>
-  <:item title="Published">{@event.published}</:item>
-</.list>
+<div class="card bg-base-300 shadow-xl my-8">
+  <div class="card-body">
+    <dl class="grid grid-cols-[auto_1fr] gap-4">
+      <dt>
+        <.icon name="hero-calendar" class="" />
+        Date and Time:
+      </dt>
+      <dd class="font-semibold">
+        {@event.begin} - {@event.end}
+      </dd>
+      <dt>
+        <.icon name="hero-map-pin" class="" />
+        Location:
+      </dt>
+      <dd class="font-semibold">
+        {@event.location}
+      </dd>
+      <dt>
+        <.icon name="hero-language" class="" />
+        Languages:
+      </dt>
+      <dd>
+        <%= for lang <- @event.langs do %>
+          <.lang_badge lang={lang} />
+        <% end %>
+      </dd>
+      <dt>
+        <.icon name="hero-academic-cap" class="" />
+        Hosts:
+      </dt>
+      <dd>
+        <%= for user <- @event.hosts do %>
+          {user.full_name}
+        <% end %>
+      </dd>
+      <dt class="col-span-2">
+        <.icon name="hero-user-group" class="" />
+        Participants:
+      </dt>
+      <dd class="col-span-2">
+        <%= for user <- @event.attendees do %>
+          {user.full_name}
+        <% end %>
+      </dd>
+    </dl>
+  </div>
+</div>
+
+<article class="prose">
+  <.markdown markdown={@event.body} />
+</article>
 
 <.back navigate={~p"/events"}>Back to events</.back>
 

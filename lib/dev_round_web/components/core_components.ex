@@ -426,10 +426,10 @@ defmodule DevRoundWeb.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8">
+        <h1 class="text-4xl font-semibold leading-8">
           {render_slot(@inner_block)}
         </h1>
-        <p :if={@subtitle != []} class="mt-2 text-sm leading-6">
+        <p :if={@subtitle != []} class="mt-2 text-lg">
           {render_slot(@subtitle)}
         </p>
       </div>
@@ -669,5 +669,42 @@ defmodule DevRoundWeb.CoreComponents do
   """
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
+  end
+
+  @doc """
+  Renders markdown to HTML.
+  """
+  attr :markdown, :string, required: true
+  def markdown(assigns) do
+    markdown = if assigns.markdown == nil, do: "", else: assigns.markdown
+
+    markdown_html =
+      String.trim(markdown)
+      |> Earmark.as_html!(code_class_prefix: "lang- language-")
+      |> Phoenix.HTML.raw()
+
+    assigns = assign(assigns, :markdown_html, markdown_html)
+
+    ~H"""
+    <%= @markdown_html %>
+    """
+  end
+
+  @doc """
+  Renders a programming language badge.
+  """
+  attr :lang, DevRound.Events.Lang, required: true
+
+  def lang_badge(assigns) do
+    static_path = Path.join(["uploads", "langs", "icon", assigns.lang.icon_path])
+    icon_url = Phoenix.VerifiedRoutes.static_url(DevRoundWeb.Endpoint, "/" <> static_path)
+    assigns = assign(assigns, :icon_url, icon_url)
+    ~H"""
+    <div class="badge xbadge-outline badge-lg">
+      <img src={@icon_url} class="h-full" alt="" />
+      <p>{@lang.name}</p>
+    </div>
+    """
+
   end
 end
