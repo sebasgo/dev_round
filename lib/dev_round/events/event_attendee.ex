@@ -12,6 +12,7 @@ defmodule DevRound.Events.EventAttendee do
 
     belongs_to :event, Event
     belongs_to :user, User
+    many_to_many :langs, Lang, join_through: "event_attendees_langs", on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
