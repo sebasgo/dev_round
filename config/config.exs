@@ -9,7 +9,8 @@ import Config
 
 config :dev_round,
   ecto_repos: [DevRound.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  time_zone: "Europe/Berlin"
 
 # Configures the endpoint
 config :dev_round, DevRoundWeb.Endpoint,

@@ -15,7 +15,7 @@
         Date and Time:
       </dt>
       <dd class="font-semibold">
-        {@event.begin} - {@event.end}
+        {DevRound.Formats.format_datetime_range(@event.begin, @event.end)}
       </dd>
       <dt>
         <.icon name="hero-map-pin" class="" />

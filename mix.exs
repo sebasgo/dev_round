@@ -61,6 +61,7 @@ defmodule DevRound.MixProject do
       {:bandit, "~> 1.5"},
       {:backpex, "~> 0.11.0"},
       {:earmark, "~> 1.4"},
+      {:time_zone_info, "~> 0.7"}
     ]
   end
 
