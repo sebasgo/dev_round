@@ -47,6 +47,10 @@ defmodule DevRoundWeb.Admin.User do
         module: Backpex.Fields.Number,
         label: "Experience Level",
       },
+      avatar_url: %{
+        module: Backpex.Fields.Text,
+        label: "Avatar URL",
+      },
     ]
   end
 

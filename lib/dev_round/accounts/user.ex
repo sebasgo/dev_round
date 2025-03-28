@@ -35,7 +35,7 @@ defmodule DevRound.Accounts.User do
     |> validate_email(opts)
   end
 
-  def profile_changeset(user, attrs, opts \\ []) do
+  def profile_changeset(user, attrs, _opts \\ []) do
     user
     |> cast(attrs, [:full_name])
     |> validate_required(:full_name)
@@ -43,7 +43,7 @@ defmodule DevRound.Accounts.User do
 
   def admin_changeset(user, attrs, _opts \\ []) do
     user
-    |> cast(attrs, [:experience_level])
+    |> cast(attrs, [:experience_level, :avatar_url])
     |> validate_required(:experience_level)
     |> validate_experience_level()
   end
