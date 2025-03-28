@@ -4,6 +4,7 @@
 const plugin = require("tailwindcss/plugin")
 const fs = require("fs")
 const path = require("path")
+const { default: daisyui } = require("daisyui")
 
 module.exports = {
   content: [
@@ -13,6 +14,18 @@ module.exports = {
     "../deps/backpex/**/*.*ex",
     "../deps/backpex/assets/js/**/*.*js",
   ],
+  daisyui: {
+     themes: [
+      {
+        dark: {
+          ...require("daisyui/src/theming/themes")["dark"],
+          primary: "#ff8ea3",
+          "base-content": "c0c8d8",
+        },
+      },
+    ],
+   
+  },
   theme: {
     extend: {
       colors: {
