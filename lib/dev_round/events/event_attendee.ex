@@ -3,8 +3,9 @@ defmodule DevRound.Events.EventAttendee do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias DevRound.Events.Event
   alias DevRound.Accounts.User
+  alias DevRound.Events.Event
+  alias DevRound.Events.Lang
 
   schema "event_attendees" do
     field :is_remote, :boolean
@@ -17,7 +18,7 @@ defmodule DevRound.Events.EventAttendee do
     timestamps(type: :utc_datetime)
   end
 
-  def changeset(event_attendee, attrs,_opts \\ %{}) do
+  def changeset(event_attendee, attrs, _opts \\ %{}) do
     event_attendee
     |> cast(attrs, [:event_id, :user_id, :is_remote, :expierence_level])
   end
