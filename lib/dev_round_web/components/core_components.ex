@@ -558,7 +558,7 @@ defmodule DevRoundWeb.CoreComponents do
     <div class="mt-16">
       <.link
         navigate={@navigate}
-        class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+        class="text-sm font-semibold leading-6 hover:opacity-75"
       >
         <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
         {render_slot(@inner_block)}
@@ -700,11 +700,56 @@ defmodule DevRoundWeb.CoreComponents do
     icon_url = Phoenix.VerifiedRoutes.static_url(DevRoundWeb.Endpoint, "/" <> static_path)
     assigns = assign(assigns, :icon_url, icon_url)
     ~H"""
-    <div class="badge xbadge-outline badge-lg">
+    <div class="badge xbadge-outline badge-lg pd-0">
       <img src={@icon_url} class="h-full" alt="" />
       <p>{@lang.name}</p>
     </div>
     """
+  end
 
+  @doc """
+  Renders a user badge.
+  """
+  attr :user, DevRound.Accounts.User, required: true
+  slot :inner_block
+
+  def user_badge(assigns) do
+    ~H"""
+    <div class="inline-flex items-center bg-neutral-content text-neutral rounded-full border border-neutral-content">
+      <.user_avatar user={@user} />
+      <div class="ml-2 mr-4">
+        {@user.full_name}
+        {render_slot(@inner_block)}
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
+  Renders a user avatar.
+  """
+  attr :user, DevRound.Accounts.User, required: true
+
+  def user_avatar(%{user: %DevRound.Accounts.User{avatar_url: nil}} = assigns) do
+    parts = String.split(assigns.user.full_name, " ")
+    placeholder = String.first(hd(parts)) <> String.first(List.last(parts))
+    assigns = assign(assigns, :placeholder, placeholder)
+    ~H"""
+    <div class="avatar placeholder">
+      <div class="bg-neutral text-neutral-content w-12 rounded-full">
+         <span>{placeholder}</span>
+      </div>
+    </div>
+    """
+  end
+
+  def user_avatar(assigns) do
+    ~H"""
+    <div class="avatar">
+      <div class="w-12 rounded-full">
+         <img class="inline" src={@user.avatar_url} alt=""/>
+      </div>
+    </div>
+    """
   end
 end

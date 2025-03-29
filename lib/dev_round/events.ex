@@ -38,9 +38,9 @@ defmodule DevRound.Events do
   """
   def get_event!(id) do
     Event
-    # |> Repo.get!(id)
     |> Repo.get_by!([id: id, published: true])
     |> Repo.preload([:langs, :hosts, :attendees])
+    |> Repo.preload([events_attendees: [:user, :langs]])
   end
 
   @doc """
