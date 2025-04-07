@@ -231,7 +231,7 @@ defmodule DevRoundWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 btn",
+        "phx-submit-loading:opacity-75 btn font-mono uppercase",
         @class
       ]}
       {@rest}
@@ -426,7 +426,7 @@ defmodule DevRoundWeb.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
-        <h1 class="text-4xl font-semibold leading-8">
+        <h1 class="text-4xl font-mono font-semibold">
           {render_slot(@inner_block)}
         </h1>
         <p :if={@subtitle != []} class="mt-2 text-lg">

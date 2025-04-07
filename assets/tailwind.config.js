@@ -15,12 +15,13 @@ module.exports = {
     "../deps/backpex/assets/js/**/*.*js",
   ],
   daisyui: {
-     themes: [
+      themes: [
       {
         dark: {
           ...require("daisyui/src/theming/themes")["dark"],
           primary: "#ff8ea3",
-          "base-content": "c0c8d8",
+          "base-content": "#d9e2f4", // "#c0c8d8",
+          "accent": "#ffffff",
         },
       },
     ],
@@ -30,6 +31,9 @@ module.exports = {
     extend: {
       colors: {
         brand: "#FD4F00",
+      },
+      fontFamily: {
+        mono: ['Iosevka', 'monospace'],
       }
     },
   },

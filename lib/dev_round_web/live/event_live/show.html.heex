@@ -70,12 +70,12 @@
   </div>
 </div>
 
-<article class="prose max-w-none">
+<article class="prose max-w-none prose-h1:font-mono prose-h2:font-mono prose-h3:font-mono prose-h4:font-mono">
   <.markdown markdown={@event.body} />
 </article>
 
-<p class="my-4 text-sm italic opacity-75">
-  Last updated at {@event.updated_at |> DateTime.shift_zone!(DevRound.Formats.time_zone())  |> DevRound.Formats.format_datetime()}.
+<p class="my-8 text-sm italic opacity-75">
+  Last updated on {@event.updated_at |> DateTime.shift_zone!(DevRound.Formats.time_zone())  |> DevRound.Formats.format_datetime()}
 </p>
 
 <.back navigate={~p"/events"}>Back to events</.back>
