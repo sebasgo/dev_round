@@ -1,4 +1,5 @@
 defmodule DevRoundWeb.EventLive.Show do
+
   use DevRoundWeb, :live_view
 
   alias DevRound.Events
@@ -38,8 +39,14 @@ defmodule DevRoundWeb.EventLive.Show do
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action, event))
     |> assign(:event, event)
+    |> assign(:attendence, attendence(event, socket.assigns.current_user))
   end
 
   defp page_title(:show, event), do: event.title
-  defp page_title(:edit, event), do: "#{event.title} · Edit"
+  defp page_title(:new_registration, event), do: "#{event.title} · Register"
+  defp page_title(:edit_registration, event), do: "#{event.title} · Manage Registration"
+
+  defp attendence(event, user) do
+    Enum.find(event.events_attendees, fn a -> a.user.id == user.id end)
+  end
 end

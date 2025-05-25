@@ -1,30 +1,47 @@
-<.header>
-  <:actions>
-    <.link patch={~p"/events/#{@event}/show/edit"} phx-click={JS.push_focus()}>
-      <.button class="btn-primary">Edit event</.button>
-    </.link>
-  </:actions>
-  {@event.title}
-</.header>
+<%= if @attendence == nil do %>
+  <.header>
+    <:actions>
+      <.link patch={~p"/events/#{@event}/show/registration/new"} phx-click={JS.push_focus()}>
+        <.button class="btn-primary">Register</.button>
+      </.link>
+    </:actions>
+    {@event.title}
+  </.header>
+<% else %>
+  <.header>
+    <:actions>
+      <.link patch={~p"/events/#{@event}/show/registration/edit"} phx-click={JS.push_focus()}>
+        <.button class="btn-primary">Manage Registration</.button>
+      </.link>
+    </:actions>
+    <:subtitle>
+      <div class="badge badge-success gap-2">
+        <.icon name="hero-check" class="inline-block h-4 w-4" />
+        You have registered on {@attendence.inserted_at|> DateTime.shift_zone!(DevRound.Formats.time_zone()) |> DevRound.Formats.format_datetime()}
+      </div>
+    </:subtitle>
+    {@event.title}
+  </.header>
+<% end %>
 
 <div class="card bg-base-300 shadow-xl my-8">
   <div class="card-body">
     <dl class="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4 items-center">
-      <dt>
+      <dt class="flex gap-1">
         <.icon name="hero-calendar" class="" />
         Date and Time:
       </dt>
       <dd class="font-semibold mb-4 md:mb-0">
         {DevRound.Formats.format_datetime_range(@event.begin, @event.end)}
       </dd>
-      <dt>
+      <dt class="flex gap-1">
         <.icon name="hero-map-pin" class="" />
         Location:
       </dt>
       <dd class="font-semibold mb-4 md:mb-0">
         {@event.location}
       </dd>
-      <dt>
+      <dt class="flex gap-1">
         <.icon name="hero-language" class="" />
         <%= if Enum.empty?(tl(@event.langs)) do %>
           Language:
@@ -37,7 +54,7 @@
           <.lang_badge lang={lang} />
         <% end %>
       </dd>
-      <dt>
+      <dt class="flex gap-1">
         <.icon name="hero-academic-cap" class="" />
         <%= if Enum.empty?(tl(@event.hosts)) do %>
           Host:
@@ -50,7 +67,7 @@
           <.user_badge user={user} />
         <% end %>
       </dd>
-      <dt class="md:col-span-2 md:mt-4">
+      <dt class="flex gap-1 md:col-span-2 md:mt-4">
         <.icon name="hero-user-group" class="" />
         Participants:
       </dt>
@@ -59,7 +76,7 @@
           None yet. Be the first to register.
         </p>
         <%= for attendee <- @event.events_attendees do %>
-          <.user_badge user={attendee.user} >
+          <.user_badge user={attendee.user} remote={attendee.is_remote}>
             <p :if={!Enum.empty?(tl(@event.langs))} class="text-sm">
               <%= Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ") %>
             </p>
@@ -75,18 +92,20 @@
 </article>
 
 <p class="my-8 text-sm italic opacity-75">
-  Last updated on {@event.updated_at |> DateTime.shift_zone!(DevRound.Formats.time_zone())  |> DevRound.Formats.format_datetime()}
+  Last updated on {@event.updated_at |> DateTime.shift_zone!(DevRound.Formats.time_zone()) |> DevRound.Formats.format_datetime()}
 </p>
 
 <.back navigate={~p"/events"}>Back to events</.back>
 
-<.modal :if={@live_action == :edit} id="event-modal" show on_cancel={JS.patch(~p"/events/#{@event}")}>
+<.modal :if={@live_action in [:new_registration, :edit_registration]} id="event-modal" show on_cancel={JS.patch(~p"/events/#{@event}")}>
   <.live_component
-    module={DevRoundWeb.EventLive.FormComponent}
+    module={DevRoundWeb.EventLive.RegistrationComponent}
     id={@event.id}
     title={@page_title}
     action={@live_action}
     event={@event}
+    attendence={@attendence}
     patch={~p"/events/#{@event}"}
+    current_user={@current_user}
   />
 </.modal>

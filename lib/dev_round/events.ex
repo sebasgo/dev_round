@@ -5,9 +5,10 @@ defmodule DevRound.Events do
 
   import Ecto.Query, warn: false
   alias DevRound.Repo
-
+  alias DevRound.Accounts.User
   alias DevRound.Events.Event
-  alias DevRound.Events.Langs
+  alias DevRound.Events.Lang
+  alias DevRound.Events.EventAttendee
 
   @doc """
   Returns the list of events.
@@ -113,8 +114,52 @@ defmodule DevRound.Events do
     |> Ecto.Changeset.put_assoc(:langs, langs)
   end
 
+  def change_event_attendee(%EventAttendee{} = attendee, %Event{} = event, %User{} = user, attrs \\ %{}) do
+    event = Repo.preload(event, :langs)
+    langs_ids = attrs["lang_ids"]
+    changeset = attendee
+    |> Repo.preload([:langs, :event, :user])
+    |> EventAttendee.changeset(attrs)
+    if langs_ids != nil do
+      langs = list_langs_by_id(attrs["lang_ids"])
+      changeset
+      |> Ecto.Changeset.put_assoc(:langs, langs)
+    else
+      changeset
+    end
+    |> Ecto.Changeset.change(event: event, user: user, expierence_level: user.experience_level)
+    |> validate_event_attendee_langs(event)
+  end
+
+  def create_event_attendee(%Event{} = event, %User{} = user, attrs \\ %{}) do
+    change_event_attendee(%EventAttendee{}, event, user, attrs)
+    |> Repo.insert()
+  end
+
+  def update_event_attendee(%EventAttendee{} = attendee, attrs \\ %{}) do
+    attendee = Repo.preload(attendee, [:event, :user])
+    change_event_attendee(attendee, attendee.event, attendee.user, attrs)
+    |> Repo.update()
+  end
+
+  def delete_event_attendee(%EventAttendee{} = attendee) do
+    Repo.delete(attendee)
+  end
+
+  defp validate_event_attendee_langs(changeset, event) do
+    langs = Ecto.Changeset.get_field(changeset, :langs)
+    cond do
+      is_nil(langs) || Enum.empty?(langs) ->
+        Ecto.Changeset.add_error(changeset, :lang_ids, "Please select at least one language.")
+      !Enum.empty?(langs -- event.langs) ->
+        Ecto.Changeset.add_error(changeset, :lang_ids, "Invalid language for this event.")
+      true ->
+        changeset
+    end
+  end
+
   def list_langs_by_id(nil), do: []
   def list_langs_by_id(lang_ids) do
-    Repo.all(from l in Langs, where: l.id in ^lang_ids)
+    Repo.all(from l in Lang, where: l.id in ^lang_ids)
   end
 end

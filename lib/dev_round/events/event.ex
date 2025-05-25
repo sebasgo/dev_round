@@ -1,6 +1,7 @@
 defmodule DevRound.Events.Event do
   use Ecto.Schema
   import Ecto.Changeset
+  import DevRound.Validation
   alias DevRound.Events.Lang
   alias DevRound.Events.EventAttendee
   alias DevRound.Accounts.User
@@ -39,17 +40,4 @@ defmodule DevRound.Events.Event do
       changeset
     end
   end
-
-  defp validate_option_selected(changeset, [field | remaining]) do
-    options = get_field(changeset, field)
-    new_changeset = if is_nil(options) || Enum.empty?(options) do
-      add_error(changeset, field, "Required.")
-    else
-      changeset
-    end
-    validate_option_selected(new_changeset, remaining)
-  end
-
-  defp validate_option_selected(changeset, []), do: changeset
-
 end

@@ -700,8 +700,8 @@ defmodule DevRoundWeb.CoreComponents do
     icon_url = Phoenix.VerifiedRoutes.static_url(DevRoundWeb.Endpoint, "/" <> static_path)
     assigns = assign(assigns, :icon_url, icon_url)
     ~H"""
-    <div class="badge xbadge-outline badge-lg pd-0">
-      <img src={@icon_url} class="h-full" alt="" />
+    <div class="badge xbadge-outline badge-lg pd-0 gap-2">
+      <img src={@icon_url} class="h-4 w-4" alt="" />
       <p>{@lang.name}</p>
     </div>
     """
@@ -711,12 +711,20 @@ defmodule DevRoundWeb.CoreComponents do
   Renders a user badge.
   """
   attr :user, DevRound.Accounts.User, required: true
+  attr :remote, :boolean, default: false
   slot :inner_block
 
   def user_badge(assigns) do
     ~H"""
     <div class="inline-flex items-center bg-neutral-content text-neutral rounded-full border border-neutral-content">
-      <.user_avatar user={@user} />
+      <div class="relative w-12 h-12">
+        <.user_avatar user={@user} />
+        <%= if @remote do %>
+          <div class="absolute top-0 right-0 w-4 h-4 bg-white rounded-full flex">
+          <.icon name="hero-globe-alt" class="w-4 h-4"/>
+          </div>
+        <% end %>
+      </div>
       <div class="ml-2 mr-4">
         {@user.full_name}
         {render_slot(@inner_block)}
