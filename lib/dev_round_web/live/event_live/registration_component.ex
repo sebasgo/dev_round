@@ -3,6 +3,8 @@ alias DevRound.Events.EventAttendee
   use DevRoundWeb, :live_component
 
   alias DevRound.Events
+  alias DevRound.Mailer
+  alias DevRoundWeb.UserMail
 
   @impl true
   def render(assigns) do
@@ -117,7 +119,9 @@ alias DevRound.Events.EventAttendee
 
   defp save_event_attendee(socket, :new_registration, event_attendee_params) do
     case Events.create_event_attendee(socket.assigns.event, socket.assigns.current_user, event_attendee_params) do
-      {:ok, event} ->
+      {:ok, _} ->
+        event = socket.assigns.event
+        UserMail.confirm_registration(socket.assigns.current_user, event) |> Mailer.deliver()
         notify_parent({:saved, event})
 
         {:noreply,

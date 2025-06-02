@@ -1,7 +1,7 @@
 <%= if @attendence == nil do %>
   <.header>
     <:actions>
-      <.link patch={~p"/events/#{@event}/show/registration/new"} phx-click={JS.push_focus()}>
+      <.link patch={~p"/events/#{@event}/registration/new"} phx-click={JS.push_focus()}>
         <.button class="btn-primary">Register</.button>
       </.link>
     </:actions>
@@ -10,7 +10,7 @@
 <% else %>
   <.header>
     <:actions>
-      <.link patch={~p"/events/#{@event}/show/registration/edit"} phx-click={JS.push_focus()}>
+      <.link patch={~p"/events/#{@event}/registration/edit"} phx-click={JS.push_focus()}>
         <.button class="btn-primary">Manage Registration</.button>
       </.link>
     </:actions>
@@ -32,7 +32,7 @@
         Date and Time:
       </dt>
       <dd class="font-semibold mb-4 md:mb-0">
-        {DevRound.Formats.format_datetime_range(@event.begin, @event.end)}
+        {DevRound.Formats.format_datetime_range(@event.begin |> DateTime.shift_zone!(DevRound.Formats.time_zone()) , @event.end |> DateTime.shift_zone!(DevRound.Formats.time_zone()))}
       </dd>
       <dt class="flex gap-1">
         <.icon name="hero-map-pin" class="" />
