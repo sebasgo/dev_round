@@ -7,11 +7,11 @@ defmodule DevRoundWeb.EventLive.Show do
   @impl true
   def mount(_params, _session, socket) do
     DevRoundWeb.Endpoint.subscribe("events")
+    DevRoundWeb.Endpoint.subscribe("registrations")
     {:ok, socket}
   end
 
   @impl true
-  @spec handle_params(map(), any(), map()) :: {:noreply, map()}
   def handle_params(%{"id" => id}, _, socket) do
     {:noreply,
      socket
@@ -29,7 +29,15 @@ defmodule DevRoundWeb.EventLive.Show do
     end
   end
 
-  def  handle_info(_msg, socket) do
+  def handle_info(%{topic: "registrations", payload: {_op, event, _attendee}}, socket) do
+    if event.id == socket.assigns.event.id do
+      {:noreply, update_assigns(socket)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_info(_msg, socket) do
     {:noreply, socket}
   end
 

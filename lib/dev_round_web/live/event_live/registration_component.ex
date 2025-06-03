@@ -92,7 +92,10 @@ alias DevRound.Events.EventAttendee
   end
 
   def handle_event("delete", _, socket) do
-    {:ok, _} = Events.delete_event_attendee(socket.assigns.attendence)
+    {:ok, attendee} = Events.delete_event_attendee(socket.assigns.attendence)
+    event = socket.assigns.event
+    broadcast_registration("registration", {:delete, event, attendee})
+    notify_parent({:saved, event})
     {:noreply,
       socket
       |> put_flash(:info, "Registration canceled.")
@@ -104,9 +107,10 @@ alias DevRound.Events.EventAttendee
 
   defp save_event_attendee(socket, :edit_registration, event_attendee_params) do
     case Events.update_event_attendee(socket.assigns.attendence, event_attendee_params) do
-      {:ok, event} ->
+      {:ok, attendee} ->
+        event = socket.assigns.event
+        broadcast_registration("registration", {:edit, event, attendee})
         notify_parent({:saved, event})
-
         {:noreply,
          socket
          |> put_flash(:info, "Registration updated.")
@@ -119,8 +123,9 @@ alias DevRound.Events.EventAttendee
 
   defp save_event_attendee(socket, :new_registration, event_attendee_params) do
     case Events.create_event_attendee(socket.assigns.event, socket.assigns.current_user, event_attendee_params) do
-      {:ok, _} ->
+      {:ok, attendee} ->
         event = socket.assigns.event
+        broadcast_registration("registration", {:new, event, attendee})
         UserMail.confirm_registration(socket.assigns.current_user, event) |> Mailer.deliver()
         notify_parent({:saved, event})
 
@@ -151,5 +156,9 @@ alias DevRound.Events.EventAttendee
       |> Enum.map(& &1.id)
       for lang <- event.langs,
         do: [key: lang.name, value: lang.id, lang: lang, selected: lang.id in existing_ids]
+  end
+
+  defp broadcast_registration(event, payload) do
+    DevRoundWeb.Endpoint.broadcast_from(self(), "registrations", event, payload)
   end
 end
