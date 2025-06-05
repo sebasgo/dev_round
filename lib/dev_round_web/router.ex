@@ -35,6 +35,7 @@ defmodule DevRoundWeb.Router do
       live_resources "/event_attendees", Admin.EventAttendees
       live_resources "/users", Admin.User
       live_resources "/langs", Admin.EventLangAdmin
+      live_resources "/team_names", Admin.TeamName
     end
    end
 

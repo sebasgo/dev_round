@@ -33,6 +33,9 @@
     <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate={~p"/admin/langs"}>
       <.icon name="hero-language" class="h-5 w-5" /> Languages
     </Backpex.HTML.Layout.sidebar_item>
+    <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate={~p"/admin/team_names"}>
+      <.icon name="hero-tag" class="h-5 w-5" /> Team Names
+    </Backpex.HTML.Layout.sidebar_item>
   </:sidebar>
   <Backpex.HTML.Layout.flash_messages flash={@flash} />
   <%= @inner_content %>
