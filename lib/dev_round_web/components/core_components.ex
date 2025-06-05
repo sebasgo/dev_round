@@ -275,7 +275,7 @@ defmodule DevRoundWeb.CoreComponents do
   attr :type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file month number password
-               range search select tel text textarea time url week)
+               range search select tel text textarea time url week hidden langs)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -361,6 +361,43 @@ defmodule DevRoundWeb.CoreComponents do
       >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
+    """
+  end
+
+  def input(%{type: "langs"} = assigns) do
+    ~H"""
+    <div id={@id}>
+      <input
+        type="hidden"
+        name={@name}
+        value={-1}
+      />
+      <%= for opt <- @options do %>
+        <label class="flex items-center gap-4 text-sm my-2">
+          <input
+            type="checkbox"
+            name={@name}
+            value={opt[:lang].id}
+            checked={opt[:selected]}
+            class="checkbox"
+          />
+          <.lang_badge lang={opt[:lang]} />
+        </label>
+      <% end %>
+      <.error :for={msg <- @errors}>{msg}</.error>
+    </div>
+    """
+  end
+
+  def input(%{type: "hidden"} = assigns) do
+    ~H"""
+      <input
+        type={@type}
+        name={@name}
+        id={@id}
+        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+        {@rest}
+      />
     """
   end
 
@@ -716,7 +753,7 @@ defmodule DevRoundWeb.CoreComponents do
 
   def user_badge(assigns) do
     ~H"""
-    <div class="inline-flex items-center bg-neutral-content text-neutral rounded-full border border-neutral-content">
+    <div class="inline-flex items-center bg-neutral-content text-neutral rounded-full border border-neutral-content whitespace-nowrap">
       <div class="relative w-12 h-12">
         <.user_avatar user={@user} />
         <%= if @remote do %>

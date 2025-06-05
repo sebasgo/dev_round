@@ -22,33 +22,10 @@ alias DevRound.Events.EventAttendee
         <p>Choose whether you want to attend in person or remotely via Skype/Pexip:</p>
         <.input field={@form[:is_remote]} type="checkbox" label="Attend remotely" />
         <%= if Enum.empty?(tl(@lang_options)) do %>
-          <input
-            type="hidden"
-            name={"#{@form[:lang_ids].name}[]"}
-            value={hd(@lang_options)[:value]}
-          />
+          <.input field={@form[:lang_ids]} type="hidden" multiple={true} value={hd(@lang_options)[:value]} />
         <% else %>
           <p> This event is offered for multiple programming languages. Select the languages you feel comfortable to use during the event:</p>
-          <div>
-            <input
-              type="hidden"
-              name={"#{@form[:lang_ids].name}[]"}
-              value={-1}
-            />
-            <%= for opt <- @lang_options do %>
-              <label class="flex items-center gap-4 text-sm my-2">
-                <input
-                  type="checkbox"
-                  name={"#{@form[:lang_ids].name}[]"}
-                  value={opt[:lang].id}
-                  checked={opt[:selected]}
-                  class="checkbox"
-                />
-                <.lang_badge lang={opt[:lang]} />
-              </label>
-            <% end %>
-            <.error :for={msg <- @form[:lang_ids].errors}>{elem(msg, 0)}</.error>
-          </div>
+          <.input field={@form[:lang_ids]} type="langs" multiple={true} options={@lang_options} />
         <% end %>
 
         <:actions>
