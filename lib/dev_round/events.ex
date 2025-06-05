@@ -40,8 +40,8 @@ defmodule DevRound.Events do
   def get_event!(id) do
     Event
     |> Repo.get_by!([id: id, published: true])
-    |> Repo.preload([:langs, :hosts, :attendees])
-    |> Repo.preload([events_attendees: [:user, :langs]])
+    |> Repo.preload([:langs, :hosts])
+    |> Repo.preload([events_attendees: {from(a in EventAttendee, order_by: a.inserted_at), [:user, :langs]}])
   end
 
   @doc """
