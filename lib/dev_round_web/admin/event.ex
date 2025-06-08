@@ -94,6 +94,10 @@ defmodule DevRoundWeb.Admin.Event do
         module: Backpex.Fields.Boolean,
         label: "Published"
       },
+      registration_deadline: %{
+        module: Backpex.Fields.DateTime,
+        label: "Registration Deadline",
+      },
     ]
   end
 

@@ -69,14 +69,21 @@ alias DevRound.Events.EventAttendee
   end
 
   def handle_event("delete", _, socket) do
-    {:ok, attendee} = Events.delete_event_attendee(socket.assigns.attendence)
-    event = socket.assigns.event
-    broadcast_registration("registration", {:delete, event, attendee})
-    notify_parent({:saved, event})
-    {:noreply,
-      socket
-      |> put_flash(:info, "Registration canceled.")
-      |> push_patch(to: socket.assigns.patch)}
+    case Events.delete_event_attendee(socket.assigns.attendence) do
+      {:ok, attendee} ->
+        event = socket.assigns.event
+        broadcast_registration("registration", {:delete, event, attendee})
+        notify_parent({:saved, event})
+        {:noreply,
+          socket
+          |> put_flash(:info, "Registration canceled.")
+          |> push_patch(to: socket.assigns.patch)}
+      {:error, :registration_closed} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Registration for this event is closed.")
+         |> push_patch(to: socket.assigns.patch)}
+    end
   end
 
   defp get_or_create_attendee(%EventAttendee{} = attendee), do: attendee
@@ -93,6 +100,11 @@ alias DevRound.Events.EventAttendee
          |> put_flash(:info, "Registration updated.")
          |> push_patch(to: socket.assigns.patch)}
 
+      {:error, :registration_closed} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Registration for this event is closed.")
+         |> push_patch(to: socket.assigns.patch)}
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
@@ -111,6 +123,11 @@ alias DevRound.Events.EventAttendee
          |> put_flash(:info, "Registered")
          |> push_patch(to: socket.assigns.patch)}
 
+      {:error, :registration_closed} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Registration for this event is closed.")
+         |> push_patch(to: socket.assigns.patch)}
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end

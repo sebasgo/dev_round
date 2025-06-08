@@ -114,6 +114,10 @@ defmodule DevRound.Events do
     |> Ecto.Changeset.put_assoc(:langs, langs)
   end
 
+  def event_open_for_registration?(%Event{registration_deadline: registration_deadline}) do
+    DateTime.compare(DateTime.utc_now(), registration_deadline) == :lt
+  end
+
   def change_event_attendee(%EventAttendee{} = attendee, %Event{} = event, %User{} = user, attrs \\ %{}) do
     event = Repo.preload(event, :langs)
     langs_ids = attrs["lang_ids"]
@@ -132,18 +136,29 @@ defmodule DevRound.Events do
   end
 
   def create_event_attendee(%Event{} = event, %User{} = user, attrs \\ %{}) do
-    change_event_attendee(%EventAttendee{}, event, user, attrs)
-    |> Repo.insert()
+    case event_open_for_registration?(event) do
+      true -> change_event_attendee(%EventAttendee{}, event, user, attrs)
+              |> Repo.insert()
+      _ -> {:error, :registration_closed}
+    end
+
   end
 
   def update_event_attendee(%EventAttendee{} = attendee, attrs \\ %{}) do
     attendee = Repo.preload(attendee, [:event, :user])
-    change_event_attendee(attendee, attendee.event, attendee.user, attrs)
-    |> Repo.update()
+    case event_open_for_registration?(attendee.event) do
+      true -> change_event_attendee(attendee, attendee.event, attendee.user, attrs)
+              |> Repo.update()
+      _ -> {:error, :registration_closed}
+    end
   end
 
   def delete_event_attendee(%EventAttendee{} = attendee) do
-    Repo.delete(attendee)
+    attendee = Repo.preload(attendee, [:event])
+    case event_open_for_registration?(attendee.event) do
+      true -> Repo.delete(attendee)
+      _ -> {:error, :registration_closed}
+    end
   end
 
   defp validate_event_attendee_langs(changeset, event) do
