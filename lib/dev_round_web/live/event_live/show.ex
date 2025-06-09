@@ -13,10 +13,16 @@ defmodule DevRoundWeb.EventLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
-    {:noreply,
-     socket
-     |> assign(:id, id)
-     |> update_assigns()}
+    socket = socket
+    |> assign(:id, id)
+    |> update_assigns()
+    if socket.assigns.live_action in [:new_registration, :edit_registration] and !socket.assigns.registration_open? do
+      {:noreply, socket
+        |> put_flash(:error, "Registration for this event is closed.")
+        |> push_patch(to: ~p"/events/#{socket.assigns.event}")}
+    else
+      {:noreply, socket}
+    end
   end
 
   @impl Phoenix.LiveView
