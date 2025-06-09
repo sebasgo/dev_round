@@ -1,9 +1,9 @@
 defmodule DevRoundWeb.UserMail do
   import Swoosh.Email
-  alias DevRoundWeb.UserMailView
+  alias DevRoundWeb.UserMailComponents
 
   def confirm_registration(user, event) do
-    html = UserMailView.confirm_registration_html(%{user: user, event: event}) |> heex_to_html()
+    html = UserMailComponents.confirm_registration_html(%{user: user, event: event}) |> heex_to_html()
     new()
     |> to({user.full_name, user.email})
     |> from(Application.get_env(:dev_round, :mail_from))

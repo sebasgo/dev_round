@@ -16,7 +16,9 @@
     </dl>
 
     <p>
-    You can update your registration details or cancel your registration at any time via the
+    You can update your registration details or cancel your registration until
+    {@event.registration_deadline |> DateTime.shift_zone!(DevRound.Formats.time_zone()) |> DevRound.Formats.format_datetime()}
+    via the
     <.link href={url(~p"/events/#{@event}/registration/edit")}>registration form</.link>.
     </p>
 
