@@ -30,11 +30,11 @@ defmodule DevRoundWeb.Admin.Event do
         module: Backpex.Fields.Text,
         label: "Title",
       },
-      begin: %{
+      begin_local: %{
         module: Backpex.Fields.DateTime,
         label: "Begin",
       },
-      end: %{
+      end_local: %{
         module: Backpex.Fields.DateTime,
         label: "End",
       },
@@ -94,7 +94,7 @@ defmodule DevRoundWeb.Admin.Event do
         module: Backpex.Fields.Boolean,
         label: "Published"
       },
-      registration_deadline: %{
+      registration_deadline_local: %{
         module: Backpex.Fields.DateTime,
         label: "Registration Deadline",
       },
