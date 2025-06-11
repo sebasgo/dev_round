@@ -37,9 +37,13 @@ defmodule DevRound.Events do
       ** (Ecto.NoResultsError)
 
   """
-  def get_event!(id) do
+  def get_event!(slug_or_id) do
+    query = case(slug_or_id) do
+      id when is_integer(id) -> [id: id, published: true]
+      slug when is_binary(slug) -> [slug: slug, published: true]
+    end
     Event
-    |> Repo.get_by!([id: id, published: true])
+    |> Repo.get_by!(query)
     |> Repo.preload([:langs, :hosts])
     |> Repo.preload([events_attendees: {from(a in EventAttendee, order_by: a.inserted_at), [:user, :langs]}])
   end

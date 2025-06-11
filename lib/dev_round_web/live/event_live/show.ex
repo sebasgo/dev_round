@@ -12,9 +12,9 @@ defmodule DevRoundWeb.EventLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _, socket) do
+  def handle_params(%{"slug" => slug}, _, socket) do
     socket = socket
-    |> assign(:id, id)
+    |> assign(:slug, slug)
     |> update_assigns()
     if socket.assigns.live_action in [:new_registration, :edit_registration] and !socket.assigns.registration_open? do
       {:noreply, socket
@@ -48,8 +48,8 @@ defmodule DevRoundWeb.EventLive.Show do
   end
 
   defp update_assigns(socket) do
-    id  = socket.assigns.id
-    event = Events.get_event!(id)
+    slug  = socket.assigns.slug
+    event = Events.get_event!(slug)
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action, event))
     |> assign(:event, event)

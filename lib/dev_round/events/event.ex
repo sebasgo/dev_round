@@ -17,6 +17,7 @@ defmodule DevRound.Events.Event do
     field :published, :boolean, default: false
     field :registration_deadline, :utc_datetime
     field :registration_deadline_local, :naive_datetime
+    field :slug, :string
 
     many_to_many :langs, Lang, join_through: "event_langs", on_replace: :delete
     many_to_many :hosts, User, join_through: "event_hosts", on_replace: :delete
@@ -35,6 +36,8 @@ defmodule DevRound.Events.Event do
     |> validate_begin_before_end()
     |> validate_registration_deadline_before_begin()
     |> validate_option_selected([:langs, :hosts])
+    |> generate_slug()
+    |> unique_constraint(:slug)
   end
 
   defp validate_begin_before_end(changeset) do
@@ -68,6 +71,22 @@ defmodule DevRound.Events.Event do
 
   defp fill_utc_dates(changeset, opts) do
     Enum.reduce(opts, changeset, fn opt, changeset -> fill_utc_dates(changeset, opt) end)
+  end
+
+  defp generate_slug(changeset) do
+    case get_field(changeset, :title) do
+      nil -> changeset
+      title -> case(get_field(changeset, :begin_local)) do
+        nil -> changeset
+        begin ->
+          slug_data = "#{Calendar.strftime(begin, "%Y-%m-%d")}-#{title}"
+          put_change(changeset, :slug, Slug.slugify(slug_data))
+      end
+    end
+  end
+
+  defimpl Phoenix.Param, for: DevRound.Events.Event do
+    def to_param(%{slug: slug}), do: slug
   end
 
 end

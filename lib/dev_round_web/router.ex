@@ -84,9 +84,9 @@ defmodule DevRoundWeb.Router do
       on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/events", EventLive.Index, :index
-      live "/events/:id", EventLive.Show, :show
-      live "/events/:id/registration/new", EventLive.Show, :new_registration
-      live "/events/:id/registration/edit", EventLive.Show, :edit_registration
+      live "/events/:slug", EventLive.Show, :show
+      live "/events/:slug/registration/new", EventLive.Show, :new_registration
+      live "/events/:slug/registration/edit", EventLive.Show, :edit_registration
     end
   end
 
