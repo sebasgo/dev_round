@@ -46,6 +46,21 @@
         {@event.location}
       </dd>
       <dt class="flex gap-1">
+        <.icon name="hero-pencil-square" class="" />
+        Registration:
+      </dt>
+      <dd class="mb-4 md:mb-0">
+        <%= if @registration_open?  do %>
+          <div class="badge badge-success">
+            Open until {@event.registration_deadline |> DateTime.shift_zone!(DevRound.Formats.time_zone()) |> DevRound.Formats.format_datetime()}
+          </div>
+        <% else %>
+          <div class="badge badge-neutral">
+            Closed
+          </div>
+        <% end %>
+      </dd>
+      <dt class="flex gap-1">
         <.icon name="hero-language" class="" />
         <%= if Enum.empty?(tl(@event.langs)) do %>
           Language:
