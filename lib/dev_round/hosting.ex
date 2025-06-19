@@ -6,7 +6,7 @@ defmodule DevRound.Sessions do
   import Ecto.Query, warn: false
   alias DevRound.Repo
 
-  alias DevRound.Sessions.TeamName
+  alias DevRound.Hosting.TeamName
 
   @doc """
   Returns the list of team_names.

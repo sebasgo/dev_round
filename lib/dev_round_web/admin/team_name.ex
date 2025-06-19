@@ -1,10 +1,10 @@
 defmodule DevRoundWeb.Admin.TeamName do
   use Backpex.LiveResource,
   adapter_config: [
-    schema: DevRound.Sessions.TeamName,
+    schema: DevRound.Hosting.TeamName,
     repo: DevRound.Repo,
-    update_changeset: &DevRound.Sessions.TeamName.changeset/3,
-    create_changeset: &DevRound.Sessions.TeamName.changeset/3
+    update_changeset: &DevRound.Hosting.TeamName.changeset/3,
+    create_changeset: &DevRound.Hosting.TeamName.changeset/3
   ],
   layout: {DevRoundWeb.Layouts, :admin},
   pubsub: [

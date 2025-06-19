@@ -1,4 +1,4 @@
-defmodule DevRound.Sessions.TeamName do
+defmodule DevRound.Hosting.TeamName do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -19,7 +19,7 @@ defmodule DevRound.Sessions.TeamName do
   end
 
   defp generate_slug(changeset) do
-    case get_change(changeset, :name) do
+    case get_field(changeset, :name) do
       nil -> changeset
       name -> put_change(changeset, :slug, Slug.slugify(name))
     end
