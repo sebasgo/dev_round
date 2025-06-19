@@ -1,3 +1,20 @@
 <.header>
   Host «{@event.title}»
 </.header>
+
+<.table id="attendees" rows={@event.events_attendees}>
+  <:col :let={attendee} label="Name">{attendee.user.full_name}</:col>
+  <:col :let={attendee} label="Langs">
+    <%= Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ") %>
+  </:col>
+  <:col :let={attendee} label="Expierence Level">
+    {attendee.expierence_level}
+  </:col>
+  <:action :let={attendee}>
+    <.button class="btn-sm btn-neutral"
+      phx-click={JS.push("confirm", value: %{id: attendee.id})}
+    >
+      Confirm
+    </.button>
+  </:action>
+</.table>
