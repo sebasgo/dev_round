@@ -1,7 +1,10 @@
 defmodule DevRoundWeb.HostLive.Show do
+
   use DevRoundWeb, :live_view
 
   alias DevRound.Events
+  alias DevRound.Events.Event
+  alias DevRound.Hosting
 
   @impl true
   def mount(_params, _session, socket) do
@@ -11,15 +14,53 @@ defmodule DevRoundWeb.HostLive.Show do
   end
 
   @impl true
-  def handle_params(params, _, socket) do
+  def handle_params(%{"slug" => slug}, _, socket) do
     socket = socket
-    |> fetch_event(params)
-    |> ensure_current_user_is_host!()
+    |> assign(:slug, slug)
+    |> update_assigns()
+    {:noreply, socket |> update_assigns}
+  end
+
+  @impl true
+  def handle_event("checkin", %{"id" => id}, socket) do
+    {:noreply, assign(socket, :event, update_attendee_confirmation(socket.assigns.event, id, true))}
+  end
+
+  @impl true
+  def handle_event("checkout", %{"id" => id}, socket) do
+    {:noreply, assign(socket, :event, update_attendee_confirmation(socket.assigns.event, id, false))}
+  end
+
+  @impl Phoenix.LiveView
+  def  handle_info({"event_updated", event}, socket) do
+    if event.id == socket.assigns.event.id do
+      socket = put_flash(socket, :info, "This page has been reloaded to reflect the latest update.")
+      {:noreply, update_assigns(socket)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_info(%{topic: "registrations", payload: {_op, event, _attendee}}, socket) do
+    if event.id == socket.assigns.event.id do
+      {:noreply, update_assigns(socket)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_info(_msg, socket) do
     {:noreply, socket}
   end
 
-  defp fetch_event(socket, params) do
-    assign(socket, :event, Events.get_event!(params["slug"]))
+  defp update_assigns(socket) do
+    socket
+    |> fetch_event()
+    |> ensure_current_user_is_host!()
+  end
+
+  defp fetch_event(socket) do
+    assign(socket, :event, Events.get_event!(socket.assigns.slug))
   end
 
   defp ensure_current_user_is_host!(socket) do
@@ -28,5 +69,22 @@ defmodule DevRoundWeb.HostLive.Show do
       raise DevRoundWeb.PermissionError, message: "\"#{user.name}\" is not an event host"
     end
     socket
+  end
+
+  defp update_attendee_confirmation(%Event{} = event, id, checked) do
+    attendees = Enum.map(event.events_attendees, fn attendee ->
+      case(attendee.id) do
+        ^id ->
+          {:ok, attendee} = Hosting.update_event_attendee_checked(attendee, checked)
+          broadcast_registration("registration", {checked && :checkin || :checkout, event, attendee})
+          attendee
+        _ -> attendee
+      end
+    end)
+    %{event | events_attendees: attendees}
+  end
+
+  defp broadcast_registration(event, payload) do
+    DevRoundWeb.Endpoint.broadcast_from(self(), "registrations", event, payload)
   end
 end

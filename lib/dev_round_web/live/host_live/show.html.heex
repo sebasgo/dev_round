@@ -3,18 +3,34 @@
 </.header>
 
 <.table id="attendees" rows={@event.events_attendees}>
-  <:col :let={attendee} label="Name">{attendee.user.full_name}</:col>
-  <:col :let={attendee} label="Langs">
-    <%= Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ") %>
+  <:col :let={attendee} label="Status">
+    <.icon :if={attendee.checked} name="hero-check-circle" class="w-8 h-8 text-success" aria-label="Checked"/>
   </:col>
-  <:col :let={attendee} label="Expierence Level">
-    {attendee.expierence_level}
+  <:col :let={attendee} label="Participant">
+    <.user_badge user={attendee.user} remote={attendee.is_remote} expierence_level={attendee.expierence_level}>
+      <p :if={!Enum.empty?(tl(@event.langs))} class="text-sm">
+        <%= Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ") %>
+      </p>
+    </.user_badge>
   </:col>
   <:action :let={attendee}>
-    <.button class="btn-sm btn-neutral"
-      phx-click={JS.push("confirm", value: %{id: attendee.id})}
+    <.button 
+      class="btn btn-success flex gap-2"
+      disabled={attendee.checked}
+      phx-click={JS.push("checkin", value: %{id: attendee.id})}
     >
-      Confirm
+      <.icon name="hero-check-circle" class="w-4 h-4"/>
+      Check in
+    </.button>
+  </:action>
+  <:action :let={attendee}>
+    <.button 
+      class="btn btn-warning flex gap-2"
+      disabled={!attendee.checked}
+      phx-click={JS.push("checkout", value: %{id: attendee.id})}
+    >
+      <.icon name="hero-x-circle" class="w-4 h-4"/>
+      Check out
     </.button>
   </:action>
 </.table>

@@ -1,9 +1,12 @@
-defmodule DevRound.Sessions do
+defmodule DevRound.Hosting do
   @moduledoc """
   The Sessions context.
   """
 
   import Ecto.Query, warn: false
+  alias DevRoundWeb.Admin.EventAttendees
+  alias DevRound.Events.Event
+  alias DevRound.Events.EventAttendee
   alias DevRound.Repo
 
   alias DevRound.Hosting.TeamName
@@ -100,5 +103,15 @@ defmodule DevRound.Sessions do
   """
   def change_team_name(%TeamName{} = team_name, attrs \\ %{}) do
     TeamName.changeset(team_name, attrs)
+  end
+
+  def update_event_attendee_checked(%EventAttendee{} = attendee, checked) do
+    attendee
+    |> EventAttendee.check_changeset(%{checked: checked})
+    |> Repo.update()
+  end
+
+  def change_event_attendee_checked(%EventAttendee{} = attendee, checked) do
+    EventAttendee.check_changeset(attendee, %{checked: checked})
   end
 end

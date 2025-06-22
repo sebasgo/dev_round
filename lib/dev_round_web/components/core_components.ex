@@ -507,7 +507,7 @@ defmodule DevRoundWeb.CoreComponents do
       end
 
     ~H"""
-    <table class="table table-zebra">
+    <table class="table">
       <thead>
         <tr>
           <th :for={col <- @col}>{col[:label]}</th>
@@ -734,6 +734,7 @@ defmodule DevRoundWeb.CoreComponents do
   """
   attr :user, DevRound.Accounts.User, required: true
   attr :remote, :boolean, default: false
+  attr :expierence_level, :integer, default: nil
   slot :inner_block
 
   def user_badge(assigns) do
@@ -744,6 +745,11 @@ defmodule DevRoundWeb.CoreComponents do
         <%= if @remote do %>
           <div class="absolute top-0 right-0 w-4 h-4 bg-white rounded-full flex">
           <.icon name="hero-globe-alt" class="w-4 h-4"/>
+          </div>
+        <% end %>
+        <%= if @expierence_level != nil do %>
+          <div class="absolute bottom-0 right-0 w-4 h-4 bg-primary rounded-full flex content-center justify-center text-xs">
+            {@expierence_level}
           </div>
         <% end %>
       </div>
