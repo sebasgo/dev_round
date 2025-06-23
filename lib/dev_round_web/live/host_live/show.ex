@@ -60,7 +60,7 @@ defmodule DevRoundWeb.HostLive.Show do
   end
 
   defp fetch_event(socket) do
-    assign(socket, :event, Events.get_event!(socket.assigns.slug))
+    assign(socket, :event, Events.get_event!(socket.assigns.slug, order_attendees_by: :is_remote_and_full_name))
   end
 
   defp ensure_current_user_is_host!(socket) do

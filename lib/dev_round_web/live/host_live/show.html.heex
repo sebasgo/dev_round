@@ -13,6 +13,9 @@
       </p>
     </.user_badge>
   </:col>
+  <:col :let={attendee} label="Registration">
+    {attendee.inserted_at |> DateTime.shift_zone!(DevRound.Formats.time_zone()) |> DevRound.Formats.format_datetime()}
+  </:col>
   <:action :let={attendee}>
     <.button 
       class="btn btn-success flex gap-2"

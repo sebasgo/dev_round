@@ -37,15 +37,19 @@ defmodule DevRound.Events do
       ** (Ecto.NoResultsError)
 
   """
-  def get_event!(slug_or_id) do
+  def get_event!(slug_or_id, opts \\ [order_attendees_by: :registration]) do
     query = case(slug_or_id) do
       id when is_integer(id) -> [id: id, published: true]
       slug when is_binary(slug) -> [slug: slug, published: true]
     end
+    attendee_query = case Keyword.get(opts, :order_attendees_by) do
+      :registration -> from ea in EventAttendee, order_by: [asc: ea.inserted_at]
+      :is_remote_and_full_name -> from ea in EventAttendee, join: u in assoc(ea, :user), order_by: [asc: ea.is_remote, asc: u.full_name]
+    end
     Event
     |> Repo.get_by!(query)
     |> Repo.preload([:langs, :hosts])
-    |> Repo.preload([events_attendees: {from(a in EventAttendee, order_by: a.inserted_at), [:user, :langs]}])
+    |> Repo.preload([events_attendees: {attendee_query, [:user, :langs]}])
   end
 
   @doc """
