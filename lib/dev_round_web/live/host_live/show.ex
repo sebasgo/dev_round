@@ -14,9 +14,10 @@ defmodule DevRoundWeb.HostLive.Show do
   end
 
   @impl true
-  def handle_params(%{"slug" => slug}, _, socket) do
+  def handle_params(%{"slug" => slug} = params, _, socket) do
     socket = socket
     |> assign(:slug, slug)
+    |> assign(:registration_edit_username, params["user_name"])
     |> update_assigns()
     {:noreply, socket |> update_assigns}
   end
@@ -57,6 +58,7 @@ defmodule DevRoundWeb.HostLive.Show do
     socket
     |> fetch_event()
     |> ensure_current_user_is_host!()
+    |> maybe_assign_edit_attendee()
   end
 
   defp fetch_event(socket) do
@@ -69,6 +71,15 @@ defmodule DevRoundWeb.HostLive.Show do
       raise DevRoundWeb.PermissionError, message: "\"#{user.name}\" is not an event host"
     end
     socket
+  end
+
+  defp maybe_assign_edit_attendee(socket) do
+    name = socket.assigns.registration_edit_username
+    attendee = case (socket.assigns.live_action) do
+      :edit_registration -> Enum.find(socket.assigns.event.events_attendees, fn a -> a.user.name == name end)
+      _ -> nil
+    end
+    assign(socket, :registration_edit_attendee, attendee)
   end
 
   defp update_attendee_confirmation(%Event{} = event, id, checked) do

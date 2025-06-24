@@ -1,4 +1,4 @@
-defmodule DevRoundWeb.EventLive.RegistrationComponent do
+defmodule DevRoundWeb.RegistrationComponent do
 alias DevRound.Events.EventAttendee
   use DevRoundWeb, :live_component
 
@@ -42,7 +42,7 @@ alias DevRound.Events.EventAttendee
   end
 
   @impl true
-  def update(%{event: event, attendence: attendence, current_user: user} = assigns, socket) do
+  def update(%{event: event, attendence: attendence, user: user} = assigns, socket) do
     attendence = get_or_create_attendee(attendence)
     changeset = Events.change_event_attendee(attendence, event, user)
     {:ok,
@@ -59,7 +59,7 @@ alias DevRound.Events.EventAttendee
   @impl true
   def handle_event("validate", %{"event_attendee" => event_attendee_params}, socket) do
     event = socket.assigns.event
-    user = socket.assigns.current_user
+    user = socket.assigns.user
     changeset = Events.change_event_attendee(socket.assigns.attendence, event, user, event_attendee_params)
     {:noreply, assign(socket, %{form: to_form(changeset, action: :validate), lang_options: lang_opts(changeset, event)})}
   end
@@ -111,11 +111,11 @@ alias DevRound.Events.EventAttendee
   end
 
   defp save_event_attendee(socket, :new_registration, event_attendee_params) do
-    case Events.create_event_attendee(socket.assigns.event, socket.assigns.current_user, event_attendee_params) do
+    case Events.create_event_attendee(socket.assigns.event, socket.assigns.user, event_attendee_params) do
       {:ok, attendee} ->
         event = socket.assigns.event
         broadcast_registration("registration", {:new, event, attendee})
-        UserMail.confirm_registration(socket.assigns.current_user, event) |> Mailer.deliver()
+        UserMail.confirm_registration(socket.assigns.user, event) |> Mailer.deliver()
         notify_parent({:saved, event})
 
         {:noreply,

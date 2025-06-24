@@ -118,13 +118,13 @@
 
 <.modal :if={@live_action in [:new_registration, :edit_registration]} id="event-modal" show on_cancel={JS.patch(~p"/events/#{@event}")}>
   <.live_component
-    module={DevRoundWeb.EventLive.RegistrationComponent}
+    module={DevRoundWeb.RegistrationComponent}
     id={@event.id}
     title={@page_title}
     action={@live_action}
     event={@event}
     attendence={@attendence}
     patch={~p"/events/#{@event}"}
-    current_user={@current_user}
+    user={@current_user}
   />
 </.modal>

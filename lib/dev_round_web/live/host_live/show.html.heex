@@ -36,4 +36,26 @@
       Check out
     </.button>
   </:action>
+  <:action :let={attendee}>
+    <.link patch={~p"/host/#{@event}/registration/edit/#{attendee.user}"} phx-click={JS.push_focus()}>
+      <.button 
+        class="btn btn-neutral flex gap-2"
+      >
+        <.icon name="hero-pencil" class="w-4 h-4"/>
+        Edit
+      </.button>
+    </.link>
+  </:action>
 </.table>
+
+<.modal :if={@live_action == :edit_registration} id="event-modal" show on_cancel={JS.patch(~p"/host/#{@event}")}>
+  <.live_component
+    module={DevRoundWeb.RegistrationComponent}
+    id={@event.id}
+    action={@live_action}
+    event={@event}
+    attendence={@registration_edit_attendee}
+    patch={~p"/host/#{@event}"}
+    user={@registration_edit_attendee.user}
+  />
+</.modal>
