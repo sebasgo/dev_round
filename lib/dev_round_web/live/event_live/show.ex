@@ -29,13 +29,16 @@ defmodule DevRoundWeb.EventLive.Show do
   def  handle_info({"event_updated", event}, socket) do
     if event.id == socket.assigns.event.id do
       socket = put_flash(socket, :info, "This page has been reloaded to reflect the latest update.")
-      {:noreply, update_assigns(socket)}
+      if event.slug != socket.assigns.event.slug do
+        {:noreply, push_patch(socket, to: ~p"/events/#{event}")}
+      else
+        {:noreply, update_assigns(socket)}
+      end
     else
       {:noreply, socket}
     end
   end
 
-  @impl true
   def handle_info(%{topic: "registrations", payload: {_op, event, _attendee}}, socket) do
     if event.id == socket.assigns.event.id do
       {:noreply, update_assigns(socket)}

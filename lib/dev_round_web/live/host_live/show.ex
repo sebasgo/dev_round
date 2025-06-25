@@ -35,8 +35,11 @@ defmodule DevRoundWeb.HostLive.Show do
   @impl Phoenix.LiveView
   def  handle_info({"event_updated", event}, socket) do
     if event.id == socket.assigns.event.id do
-      socket = put_flash(socket, :info, "This page has been reloaded to reflect the latest update.")
-      {:noreply, update_assigns(socket)}
+      if event.slug != socket.assigns.event.slug do
+        {:noreply, push_patch(socket, to: ~p"/host/#{event}")}
+      else
+        {:noreply, update_assigns(socket)}
+      end
     else
       {:noreply, socket}
     end
