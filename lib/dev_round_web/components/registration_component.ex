@@ -19,18 +19,28 @@ alias DevRound.Events.EventAttendee
         phx-change="validate"
         phx-submit="save"
       >
-        <p>Choose whether you want to attend in person or remotely via Skype/Pexip:</p>
+        <%= case @mode do %>
+          <% :self_registration -> %>
+            <p>Choose whether you want to attend in person or remotely via Skype/Pexip:</p>
+          <% :host -> %>
+            <p>Remote Attendence:</p>
+        <% end %>
         <.input field={@form[:is_remote]} type="checkbox" label="Attend remotely" />
         <%= if Enum.empty?(tl(@lang_options)) do %>
           <.input field={@form[:lang_ids]} type="hidden" multiple={true} value={hd(@lang_options)[:value]} />
         <% else %>
-          <p> This event is offered for multiple programming languages. Select the languages you feel comfortable to use during the event:</p>
+          <%= case @mode do %>
+            <% :self_registration -> %>
+              <p> This event is offered for multiple programming languages. Select the languages you feel comfortable to use during the event:</p>
+            <% :host -> %>
+              <p>Programming Languages:</p>
+          <% end %>
           <.input field={@form[:lang_ids]} type="langs" multiple={true} options={@lang_options} />
         <% end %>
 
         <:actions>
           <.button class="btn-primary" phx-disable-with="Saving...">{@save_label}</.button>
-          <%= if @action == :edit_registration do %>
+          <%= if @action == :edit_registration  && @mode == :self_registration do %>
             <.button type="button" phx-click={JS.push("delete", target: @myself)}>
               Cancel Registration
             </.button>
@@ -49,7 +59,7 @@ alias DevRound.Events.EventAttendee
       socket
       |> assign(assigns)
       |> assign(:attendence, attendence)
-      |> assign(:title, title(assigns.action, event))
+      |> assign(:title, title(assigns))
       |> assign(:save_label, save_label(assigns.action))
       |> assign_new(:lang_options, fn -> lang_opts(changeset, event) end)
       |> assign_new(:form, fn -> to_form(changeset) end)
@@ -69,6 +79,7 @@ alias DevRound.Events.EventAttendee
   end
 
   def handle_event("delete", _, socket) do
+    %{:mode => :self_registration} = socket.assigns
     case Events.delete_event_attendee(socket.assigns.attendence) do
       {:ok, attendee} ->
         event = socket.assigns.event
@@ -139,9 +150,9 @@ alias DevRound.Events.EventAttendee
   defp save_label(:new_registration), do: "Register"
   defp save_label(:edit_registration), do: "Update Registration"
 
-  defp title(:new_registration, event), do: "Register for «#{event.title}»"
-  defp title(:edit_registration, event), do: "Manage Registration for «#{event.title}»"
-
+  defp title(%{mode: :host, user: user}), do: "Edit Registration · #{user.full_name}"
+  defp title(%{action: :new_registration, event: event}), do: "Register for «#{event.title}»"
+  defp title(%{action: :edit_registration, event: event}), do: "Manage Registration for «#{event.title}»"
 
   defp lang_opts(changeset, event) do
     existing_ids =
