@@ -19,11 +19,15 @@ alias DevRound.Events.EventAttendee
         phx-change="validate"
         phx-submit="save"
       >
+        <%= if @mode == :host do %>
+          <p>Experience Level:</p>
+          <.input field={@form[:experience_level]} type="experience_level"/>
+        <% end %>
         <%= case @mode do %>
           <% :self_registration -> %>
             <p>Choose whether you want to attend in person or remotely via Skype/Pexip:</p>
           <% :host -> %>
-            <p>Remote Attendence:</p>
+            <p>Remote Attendance:</p>
         <% end %>
         <.input field={@form[:is_remote]} type="checkbox" label="Attend remotely" />
         <%= if Enum.empty?(tl(@lang_options)) do %>
@@ -52,9 +56,9 @@ alias DevRound.Events.EventAttendee
   end
 
   @impl true
-  def update(%{event: event, attendence: attendence, user: user} = assigns, socket) do
+  def update(%{event: event, attendence: attendence, user: user, mode: mode} = assigns, socket) do
     attendence = get_or_create_attendee(attendence)
-    changeset = Events.change_event_attendee(attendence, event, user)
+    changeset = Events.change_event_attendee(attendence, event, user, %{}, mode)
     {:ok,
       socket
       |> assign(assigns)
@@ -68,9 +72,8 @@ alias DevRound.Events.EventAttendee
 
   @impl true
   def handle_event("validate", %{"event_attendee" => event_attendee_params}, socket) do
-    event = socket.assigns.event
-    user = socket.assigns.user
-    changeset = Events.change_event_attendee(socket.assigns.attendence, event, user, event_attendee_params)
+    %{attendence: attendence, event: event, user: user, mode: mode} = socket.assigns
+    changeset = Events.change_event_attendee(attendence, event, user, event_attendee_params, mode)
     {:noreply, assign(socket, %{form: to_form(changeset, action: :validate), lang_options: lang_opts(changeset, event)})}
   end
 
@@ -101,7 +104,7 @@ alias DevRound.Events.EventAttendee
   defp get_or_create_attendee(nil), do: %EventAttendee{}
 
   defp save_event_attendee(socket, :edit_registration, event_attendee_params) do
-    case Events.update_event_attendee(socket.assigns.attendence, event_attendee_params) do
+    case Events.update_event_attendee(socket.assigns.attendence, event_attendee_params, socket.assigns.mode) do
       {:ok, attendee} ->
         event = socket.assigns.event
         broadcast_registration("registration", {:edit, event, attendee})
@@ -122,7 +125,7 @@ alias DevRound.Events.EventAttendee
   end
 
   defp save_event_attendee(socket, :new_registration, event_attendee_params) do
-    case Events.create_event_attendee(socket.assigns.event, socket.assigns.user, event_attendee_params) do
+    case Events.create_event_attendee(socket.assigns.event, socket.assigns.user, event_attendee_params, socket.assigns.mode) do
       {:ok, attendee} ->
         event = socket.assigns.event
         broadcast_registration("registration", {:new, event, attendee})

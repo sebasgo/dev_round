@@ -126,36 +126,39 @@ defmodule DevRound.Events do
     DateTime.compare(DateTime.utc_now(), registration_deadline) == :lt
   end
 
-  def change_event_attendee(%EventAttendee{} = attendee, %Event{} = event, %User{} = user, attrs \\ %{}) do
+  def change_event_attendee(%EventAttendee{} = attendee, %Event{} = event, %User{} = user, attrs \\ %{}, mode \\ :self_registration) do
     event = Repo.preload(event, :langs)
     langs_ids = attrs["lang_ids"]
     changeset = attendee
     |> Repo.preload([:langs, :event, :user])
     |> EventAttendee.changeset(attrs)
-    if langs_ids != nil do
+    changeset = if langs_ids != nil do
       langs = list_langs_by_id(attrs["lang_ids"])
       changeset
       |> Ecto.Changeset.put_assoc(:langs, langs)
     else
       changeset
     end
-    |> Ecto.Changeset.change(event: event, user: user, expierence_level: user.experience_level)
+    changeset = case (mode) do
+      :self_registration -> changeset |> Ecto.Changeset.change(event: event, user: user, experience_level: user.experience_level)
+      :host -> changeset
+    end
+    changeset
     |> validate_event_attendee_langs(event)
   end
 
-  def create_event_attendee(%Event{} = event, %User{} = user, attrs \\ %{}) do
+  def create_event_attendee(%Event{} = event, %User{} = user, attrs \\ %{}, mode \\ :self_registration) do
     case event_open_for_registration?(event) do
-      true -> change_event_attendee(%EventAttendee{}, event, user, attrs)
+      true -> change_event_attendee(%EventAttendee{}, event, user, attrs, mode)
               |> Repo.insert()
       _ -> {:error, :registration_closed}
     end
-
   end
 
-  def update_event_attendee(%EventAttendee{} = attendee, attrs \\ %{}) do
+  def update_event_attendee(%EventAttendee{} = attendee, attrs \\ %{}, mode \\ :self_registration) do
     attendee = Repo.preload(attendee, [:event, :user])
     case event_open_for_registration?(attendee.event) do
-      true -> change_event_attendee(attendee, attendee.event, attendee.user, attrs)
+      true -> change_event_attendee(attendee, attendee.event, attendee.user, attrs, mode)
               |> Repo.update()
       _ -> {:error, :registration_closed}
     end

@@ -7,7 +7,7 @@
     <.icon :if={attendee.checked} name="hero-check-circle" class="w-8 h-8 text-success" aria-label="Checked"/>
   </:col>
   <:col :let={attendee} label="Participant">
-    <.user_badge user={attendee.user} remote={attendee.is_remote} expierence_level={attendee.expierence_level}>
+    <.user_badge user={attendee.user} remote={attendee.is_remote} expierence_level={attendee.experience_level}>
       <p :if={!Enum.empty?(tl(@event.langs))} class="text-sm">
         <%= Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ") %>
       </p>

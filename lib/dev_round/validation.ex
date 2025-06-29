@@ -14,4 +14,9 @@ defmodule DevRound.Validation do
 
   def validate_option_selected(changeset, []), do: changeset
 
+  def validate_experience_level(changeset) do
+    changeset
+    |> validate_number(:experience_level, greater_than_or_equal_to: 0, less_than: 10, message: "Must be between 0 and 9 inclusive.")
+  end
+
 end

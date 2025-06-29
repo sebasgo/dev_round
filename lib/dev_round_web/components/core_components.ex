@@ -389,6 +389,19 @@ defmodule DevRoundWeb.CoreComponents do
     """
   end
 
+  def input(%{type: "experience_level"} = assigns) do
+    ~H"""
+    <div id={@id}>
+      <div class="rating gap-1">
+        <%= for v <- 0..9 do %>
+          <input type="radio" name={@name} value={v} checked={to_string(@value) == to_string(v)} class="mask mask-circle bg-primary" />
+        <% end %>
+      </div>
+      <.error :for={msg <- @errors}>{msg}</.error>
+    </div>
+    """
+  end
+
   def input(%{type: "hidden"} = assigns) do
     ~H"""
       <input

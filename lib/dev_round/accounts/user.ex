@@ -1,6 +1,7 @@
 defmodule DevRound.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  import DevRound.Validation
 
   schema "users" do
     field :name, :string
@@ -61,11 +62,6 @@ defmodule DevRound.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
-  end
-
-  defp validate_experience_level(changeset) do
-    changeset
-    |> validate_number(:experience_level, greater_than_or_equal_to: 0, less_than: 10, message: "Must be between 0 and 9 inclusive.")
   end
 
   defp maybe_validate_unique_name(changeset, opts) do
