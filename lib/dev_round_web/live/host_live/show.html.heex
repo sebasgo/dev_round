@@ -14,61 +14,70 @@
 
 <div class="relative">
   <div class="bg-base-300 rounded-box my-4 overflow-hidden shadow-sm">
-      <div class="overflow-x-auto">
-        <table id="attendees" class="table table-fixed w-full">
-          <thead>
-            <tr>
-              <th class="w-[50px]">Status</th>
-              <th>Participant</th>
-              <th class="w-[333px]">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr 
-              :for={attendee <- @event.events_attendees} 
-              class={[attendee.checked && "bg-green-900 hover:bg-green-950" || "hover:bg-zinc-950", "transition"]}
-            >
-              <td class="">
-                <.icon :if={attendee.checked} name="hero-check-circle" class="w-8 h-8 text-success" aria-label="Checked"/>
-              </td>
-              <td>
-                <.user_badge user={attendee.user} remote={attendee.is_remote} expierence_level={attendee.experience_level}>
-                  <p :if={!Enum.empty?(tl(@event.langs))} class="text-sm">
-                    <%= Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ") %>
-                  </p>
-                </.user_badge>
-              </td>
-              <td class="flex gap-2">
+    <div class="overflow-x-auto">
+      <table id="attendees" class="table table-fixed w-full">
+        <thead>
+          <tr>
+            <th class="w-[50px]">Status</th>
+            <th>Participant</th>
+            <th class="w-[333px]">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr 
+            :for={attendee <- @event.events_attendees} 
+            class={[attendee.checked && "bg-green-900 hover:bg-green-950" || "hover:bg-zinc-950", "transition"]}
+          >
+            <td class="">
+              <.icon :if={attendee.checked} name="hero-check-circle" class="w-8 h-8 text-success" aria-label="Checked"/>
+            </td>
+            <td>
+              <.user_badge user={attendee.user} remote={attendee.is_remote} expierence_level={attendee.experience_level}>
+                <p :if={!Enum.empty?(tl(@event.langs))} class="text-sm">
+                  <%= Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ") %>
+                </p>
+              </.user_badge>
+            </td>
+            <td class="flex gap-2">
+              <.button 
+                class="btn btn btn-success flex gap-2"
+                disabled={attendee.checked}
+                phx-click={JS.push("checkin", value: %{id: attendee.id})}
+              >
+                <.icon name="hero-check-circle" class="w-4 h-4"/>
+                Check in
+              </.button>
+              <.button 
+                class="btn btn btn-warning flex gap-2"
+                disabled={!attendee.checked}
+                phx-click={JS.push("checkout", value: %{id: attendee.id})}
+              >
+                <.icon name="hero-x-circle" class="w-4 h-4"/>
+                Check out
+              </.button>
+              <.link patch={~p"/host/#{@event}/registration/edit/#{attendee.user}"} phx-click={JS.push_focus()}>
                 <.button 
-                  class="btn btn btn-success flex gap-2"
-                  disabled={attendee.checked}
-                  phx-click={JS.push("checkin", value: %{id: attendee.id})}
+                  class="btn btn btn-neutral"
                 >
-                  <.icon name="hero-check-circle" class="w-4 h-4"/>
-                  Check in
+                  <.icon name="hero-pencil" class="w-4 h-4"/>
                 </.button>
-                <.button 
-                  class="btn btn btn-warning flex gap-2"
-                  disabled={!attendee.checked}
-                  phx-click={JS.push("checkout", value: %{id: attendee.id})}
-                >
-                  <.icon name="hero-x-circle" class="w-4 h-4"/>
-                  Check out
-                </.button>
-                <.link patch={~p"/host/#{@event}/registration/edit/#{attendee.user}"} phx-click={JS.push_focus()}>
-                  <.button 
-                    class="btn btn btn-neutral"
-                  >
-                    <.icon name="hero-pencil" class="w-4 h-4"/>
-                  </.button>
-                </.link>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              </.link>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
+</div>
+
+<ul :if={not Enum.empty?(@messages)}>
+  <%= for msg <- @messages do %>
+    <li class="flex gap-2 items-center text-error">
+      <.icon name="hero-exclamation-circle-mini" class="w-5 h-5" />
+      {msg}
+    </li>
+  <% end %>
+</ul>
 
 
 <.modal :if={@live_action == :edit_registration} id="event-modal" show on_cancel={JS.patch(~p"/host/#{@event}")}>

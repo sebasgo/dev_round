@@ -24,12 +24,18 @@ defmodule DevRoundWeb.HostLive.Show do
 
   @impl true
   def handle_event("checkin", %{"id" => id}, socket) do
-    {:noreply, assign(socket, :event, update_attendee_confirmation(socket.assigns.event, id, true))}
+    {:noreply, socket
+      |> assign(:event, update_attendee_confirmation(socket.assigns.event, id, true))
+      |> assign_messages()
+    }
   end
 
   @impl true
   def handle_event("checkout", %{"id" => id}, socket) do
-    {:noreply, assign(socket, :event, update_attendee_confirmation(socket.assigns.event, id, false))}
+    {:noreply, socket
+      |> assign(:event, update_attendee_confirmation(socket.assigns.event, id, false))
+      |> assign_messages()
+    }
   end
 
   @impl Phoenix.LiveView
@@ -61,6 +67,7 @@ defmodule DevRoundWeb.HostLive.Show do
     socket
     |> fetch_event()
     |> ensure_current_user_is_host!()
+    |> assign_messages()
     |> maybe_assign_edit_attendee()
   end
 
@@ -74,6 +81,11 @@ defmodule DevRoundWeb.HostLive.Show do
       raise DevRoundWeb.PermissionError, message: "\"#{user.name}\" is not an event host"
     end
     socket
+  end
+
+  defp assign_messages(socket) do
+    {_, messages} = Hosting.validate_team_generation_constraints(socket.assigns.event.events_attendees)
+    assign(socket, :messages, messages)
   end
 
   defp maybe_assign_edit_attendee(socket) do

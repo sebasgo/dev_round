@@ -114,4 +114,34 @@ defmodule DevRound.Hosting do
   def change_event_attendee_checked(%EventAttendee{} = attendee, checked) do
     EventAttendee.check_changeset(attendee, %{checked: checked})
   end
+
+  def validate_team_generation_constraints(attendees) do
+    attendees = filter_checked(attendees)
+   if Enum.count(attendees) >= 2 do
+      messages = for attendee <- attendees do
+        potential_team_mates = Enum.filter(attendees, fn other -> attendee != other && are_compatible?(attendee, other) end)
+        if Enum.empty?(potential_team_mates) do
+          "No team mate for #{attendee.user.full_name} available wrt. remote status and selected languages."
+        else
+          nil
+        end
+      end
+      |> Enum.reject(&is_nil/1)
+      case messages do
+        [] -> {:ok, []}
+        _ -> {:error, messages}
+      end
+    else
+      {:error, ["Not enough checked participants to build teams."]}
+    end
+  end
+
+  defp filter_checked(attendees) do
+    Enum.filter(attendees, fn a -> a.checked end)
+  end
+
+  defp are_compatible?(%EventAttendee{} = a, %EventAttendee{} = b) do
+    a.is_remote == b.is_remote and not MapSet.disjoint?(MapSet.new(a.langs), MapSet.new(b.langs))
+  end
+
 end
