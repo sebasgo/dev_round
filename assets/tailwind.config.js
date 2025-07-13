@@ -33,6 +33,7 @@ module.exports = {
         brand: "#FD4F00",
       },
       fontFamily: {
+        sans: ['SourceSans3', 'sans-serif'],
         mono: ['Iosevka', 'monospace'],
       }
     },
