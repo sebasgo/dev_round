@@ -67,6 +67,7 @@ defmodule DevRoundWeb.HostLive.Show do
     socket
     |> fetch_event()
     |> ensure_current_user_is_host!()
+    |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign_messages()
     |> maybe_assign_edit_attendee()
   end
@@ -113,4 +114,7 @@ defmodule DevRoundWeb.HostLive.Show do
   defp broadcast_registration(event, payload) do
     DevRoundWeb.Endpoint.broadcast_from(self(), "registrations", event, payload)
   end
+
+  defp page_title(:show), do: "Hosting Lobby"
+  defp page_title(:edit_registration), do: "Hosting Lobby · Edit Registration"
 end
