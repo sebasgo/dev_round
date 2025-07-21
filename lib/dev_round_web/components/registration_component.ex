@@ -111,7 +111,7 @@ alias DevRound.Events.EventAttendee
         notify_parent({:saved, event})
         {:noreply,
          socket
-         |> put_flash(:info, "Registration updated.")
+         |> maybe_put_flash(:info, "Registration updated.", fn -> socket.assigns.mode == :self_registration end)
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, :registration_closed} ->
@@ -168,5 +168,13 @@ alias DevRound.Events.EventAttendee
 
   defp broadcast_registration(event, payload) do
     DevRoundWeb.Endpoint.broadcast_from(self(), "registrations", event, payload)
+  end
+
+  defp maybe_put_flash(socket, kind, msg, cond_fn) do
+    if cond_fn.() do
+      socket |> put_flash(kind, msg)
+    else
+      socket
+    end
   end
 end
