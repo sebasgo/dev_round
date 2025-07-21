@@ -157,7 +157,7 @@ defmodule DevRound.Events do
 
   def update_event_attendee(%EventAttendee{} = attendee, attrs \\ %{}, mode \\ :self_registration) do
     attendee = Repo.preload(attendee, [:event, :user])
-    case event_open_for_registration?(attendee.event) do
+    case mode == :host or event_open_for_registration?(attendee.event) do
       true -> change_event_attendee(attendee, attendee.event, attendee.user, attrs, mode)
               |> Repo.update()
       _ -> {:error, :registration_closed}
