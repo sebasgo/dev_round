@@ -26,6 +26,18 @@ defmodule DevRound.Events.EventAttendee do
     |> validate_experience_level()
   end
 
+  def registration_changeset(event_attendee, attrs, :self_registration = _mode) do
+    event_attendee
+    |> cast(attrs, [:is_remote])
+    |> validate_experience_level()
+  end
+
+  def registration_changeset(event_attendee, attrs, :host = _mode) do
+    event_attendee
+    |> cast(attrs, [:is_remote, :experience_level])
+    |> validate_experience_level()
+  end
+
   def check_changeset(event_attendee, attrs) do
     event_attendee
     |> cast(attrs, [:checked])

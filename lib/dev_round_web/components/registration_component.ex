@@ -56,9 +56,9 @@ alias DevRound.Events.EventAttendee
   end
 
   @impl true
-  def update(%{event: event, attendence: attendence, user: user, mode: mode} = assigns, socket) do
+  def update(%{event: event, attendence: attendence, mode: mode} = assigns, socket) do
     attendence = get_or_create_attendee(attendence)
-    changeset = Events.change_event_attendee(attendence, event, user, %{}, mode)
+    changeset = Events.change_event_attendee(attendence, event, %{}, mode)
     {:ok,
       socket
       |> assign(assigns)
@@ -72,8 +72,8 @@ alias DevRound.Events.EventAttendee
 
   @impl true
   def handle_event("validate", %{"event_attendee" => event_attendee_params}, socket) do
-    %{attendence: attendence, event: event, user: user, mode: mode} = socket.assigns
-    changeset = Events.change_event_attendee(attendence, event, user, event_attendee_params, mode)
+    %{attendence: attendence, event: event, mode: mode} = socket.assigns
+    changeset = Events.change_event_attendee(attendence, event, event_attendee_params, mode)
     {:noreply, assign(socket, %{form: to_form(changeset, action: :validate), lang_options: lang_opts(changeset, event)})}
   end
 
@@ -83,7 +83,7 @@ alias DevRound.Events.EventAttendee
 
   def handle_event("delete", _, socket) do
     %{:mode => :self_registration} = socket.assigns
-    case Events.delete_event_attendee(socket.assigns.attendence) do
+    case Events.delete_event_attendee(socket.assigns.attendence, :self_registration) do
       {:ok, attendee} ->
         event = socket.assigns.event
         broadcast_registration("registration", {:delete, event, attendee})
