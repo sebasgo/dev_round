@@ -21,7 +21,23 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
-import { Hooks as BackpexHooks } from 'backpex';
+import { Hooks as BackpexHooks } from 'backpex'
+
+import Prism from 'prismjs'
+import 'prismjs/components/prism-python'
+import 'prismjs/components/prism-c'
+import 'prismjs/components/prism-cpp'
+import 'prismjs/components/prism-julia'
+import 'prismjs/components/prism-toml'
+import 'prismjs/components/prism-yaml'
+
+document.addEventListener('DOMContentLoaded', function() {
+  Prism.highlightAll()
+})
+
+document.addEventListener('phx:update', function() {
+  Prism.highlightAll()
+})
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {

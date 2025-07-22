@@ -2,5 +2,8 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
     "daisyui": "^4.12.24"
+  },
+  "dependencies": {
+    "prismjs": "^1.30.0"
   }
 }

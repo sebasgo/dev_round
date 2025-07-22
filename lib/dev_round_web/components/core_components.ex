@@ -483,7 +483,7 @@ defmodule DevRoundWeb.CoreComponents do
           {render_slot(@subtitle)}
         </p>
       </div>
-      <div class="flex-none flex gap-2">{render_slot(@actions)}</div>
+      <div class="flex-none gap-4">{render_slot(@actions)}</div>
     </header>
     """
   end
@@ -715,7 +715,7 @@ defmodule DevRoundWeb.CoreComponents do
 
     markdown_html =
       String.trim(markdown)
-      |> Earmark.as_html!(code_class_prefix: "lang- language-")
+      |> Earmark.as_html!(code_class_prefix: "language-")
       |> Phoenix.HTML.raw()
 
     assigns = assign(assigns, :markdown_html, markdown_html)
