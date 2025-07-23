@@ -30,6 +30,8 @@ defmodule DevRoundWeb.Router do
 
     backpex_routes()
 
+    get "/", Admin.HomeController, :index
+
     live_session :default, on_mount: [Backpex.InitAssigns] do
       live_resources "/events", Admin.Event
       live_resources "/event_attendees", Admin.EventAttendees
