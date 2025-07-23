@@ -1,40 +1,21 @@
-<.header>
-  Listing Events
+<.header class="mb-8 text-center">
+  Events
+  <:subtitle>Discover upcoming and past events</:subtitle>
 </.header>
 
-<.table
-  id="events"
-  rows={@streams.events}
-  row_click={fn {_id, event} -> JS.navigate(~p"/events/#{event}") end}
->
-  <:col :let={{_id, event}} label="Title">{event.title}</:col>
-  <:col :let={{_id, event}} label="Body">{event.body}</:col>
-  <:col :let={{_id, event}} label="Begin">{event.begin}</:col>
-  <:col :let={{_id, event}} label="End">{event.end}</:col>
-  <:col :let={{_id, event}} label="Location">{event.location}</:col>
-  <:col :let={{_id, event}} label="Published">{event.published}</:col>
-  <:action :let={{_id, event}}>
-    <div class="sr-only">
-      <.link navigate={~p"/events/#{event}"}>Show</.link>
+<.event_list events={@upcoming_events} title="Upcoming Events" accent_class="primary">
+  <:placeholder>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body text-center py-12">
+        <div class="mb-4">
+          <img src={~p"/images/broken-heart.svg"} class="inline opacity-70 w-[128px]"/>
+        </div>
+        <h3 class="text-xl font-medium text-base-content mb-2">No upcoming events</h3>
+        <p class="text-base-content/70">Check back soon for new events!</p>
+      </div>
     </div>
-  </:action>
-  <:action :let={{id, event}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: event.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
-  </:action>
-</.table>
+  </:placeholder>
+</.event_list>
 
-<.modal :if={@live_action in [:new, :edit]} id="event-modal" show on_cancel={JS.patch(~p"/events")}>
-  <.live_component
-    module={DevRoundWeb.EventLive.FormComponent}
-    id={@event.id || :new}
-    title={@page_title}
-    action={@live_action}
-    event={@event}
-    patch={~p"/events"}
-  />
-</.modal>
+<.event_list :if={not Enum.empty?(@past_events)} events={@past_events} title="Past Events" accent_class="neutral"/>
+  

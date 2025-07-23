@@ -479,7 +479,7 @@ defmodule DevRoundWeb.CoreComponents do
         <h1 class="text-4xl font-mono font-semibold">
           {render_slot(@inner_block)}
         </h1>
-        <p :if={@subtitle != []} class="mt-2 text-lg">
+        <p :if={@subtitle != []} class="mt-2 text-lg text-base-content/70">
           {render_slot(@subtitle)}
         </p>
       </div>

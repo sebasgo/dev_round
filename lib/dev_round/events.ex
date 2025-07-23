@@ -19,8 +19,18 @@ defmodule DevRound.Events do
       [%Event{}, ...]
 
   """
-  def list_events do
+  def list_events() do
     Repo.all(Event)
+  end
+
+  def list_events(:upcoming) do
+    (from e in Event, where: e.end > ^DateTime.utc_now() and e.published, order_by: [asc: e.begin])
+    |> Repo.all()
+  end
+
+  def list_events(:past) do
+    (from e in Event, where: e.end <= ^DateTime.utc_now() and e.published, order_by: [desc: e.begin])
+    |> Repo.all()
   end
 
   @doc """
