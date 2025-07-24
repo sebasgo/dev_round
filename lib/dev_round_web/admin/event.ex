@@ -61,6 +61,12 @@ defmodule DevRoundWeb.Admin.Event do
         not_found_text: "No users found",
         except: [:index]
       },
+      teaser: %{
+        module: Backpex.Fields.Textarea,
+        label: "Teaser",
+        rows: 5,
+        except: [:index]
+      },
       body: %{
         module: Backpex.Fields.Textarea,
         label: "Body",

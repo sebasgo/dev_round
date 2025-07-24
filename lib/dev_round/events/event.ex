@@ -13,6 +13,7 @@ defmodule DevRound.Events.Event do
     field :begin_local, :naive_datetime
     field :end, :utc_datetime
     field :end_local, :naive_datetime
+    field :teaser, :string, default: ""
     field :body, :string
     field :published, :boolean, default: false
     field :registration_deadline, :utc_datetime
@@ -30,8 +31,8 @@ defmodule DevRound.Events.Event do
   @doc false
   def changeset(event, attrs, _opts \\ %{}) do
     event
-    |> cast(attrs, [:title, :body, :begin_local, :end_local, :location, :published, :registration_deadline_local])
-    |> validate_required([:title, :body, :begin_local, :end_local, :location, :published, :registration_deadline_local], message: "Required.")
+    |> cast(attrs, [:title, :teaser, :body, :begin_local, :end_local, :location, :published, :registration_deadline_local])
+    |> validate_required([:title, :teaser, :body, :begin_local, :end_local, :location, :published, :registration_deadline_local], message: "Required.")
     |> fill_utc_dates([begin_local: :begin, end_local: :end, registration_deadline_local: :registration_deadline])
     |> validate_begin_before_end()
     |> validate_registration_deadline_before_begin()

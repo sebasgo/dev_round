@@ -36,6 +36,8 @@ defmodule DevRoundWeb.EventLive.Index do
                   {event.title}
                 </h3>
 
+                <p class="mt-3 text-sm">{event.teaser}</p>
+
                 <div class="flex flex-col gap-2 mt-3">
                   <div class="flex items-center gap-2 text-sm text-base-content/70">
                     <.icon name="hero-calendar" class="w-4 h-4"/>
