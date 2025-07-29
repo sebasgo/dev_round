@@ -203,4 +203,100 @@ defmodule DevRound.Events do
   def list_langs_by_id(lang_ids) do
     Repo.all(from l in Lang, where: l.id in ^lang_ids)
   end
+
+  alias DevRound.Events.EventSession
+
+  @doc """
+  Returns the list of event_session.
+
+  ## Examples
+
+      iex> list_event_session()
+      [%EventSession{}, ...]
+
+  """
+  def list_event_session do
+    Repo.all(EventSession)
+  end
+
+  @doc """
+  Gets a single event_session.
+
+  Raises `Ecto.NoResultsError` if the Event session does not exist.
+
+  ## Examples
+
+      iex> get_event_session!(123)
+      %EventSession{}
+
+      iex> get_event_session!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_event_session!(id), do: Repo.get!(EventSession, id)
+
+  @doc """
+  Creates a event_session.
+
+  ## Examples
+
+      iex> create_event_session(%{field: value})
+      {:ok, %EventSession{}}
+
+      iex> create_event_session(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_event_session(attrs \\ %{}) do
+    %EventSession{}
+    |> EventSession.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a event_session.
+
+  ## Examples
+
+      iex> update_event_session(event_session, %{field: new_value})
+      {:ok, %EventSession{}}
+
+      iex> update_event_session(event_session, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_event_session(%EventSession{} = event_session, attrs) do
+    event_session
+    |> EventSession.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a event_session.
+
+  ## Examples
+
+      iex> delete_event_session(event_session)
+      {:ok, %EventSession{}}
+
+      iex> delete_event_session(event_session)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_event_session(%EventSession{} = event_session) do
+    Repo.delete(event_session)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking event_session changes.
+
+  ## Examples
+
+      iex> change_event_session(event_session)
+      %Ecto.Changeset{data: %EventSession{}}
+
+  """
+  def change_event_session(%EventSession{} = event_session, attrs \\ %{}) do
+    EventSession.changeset(event_session, attrs)
+  end
 end

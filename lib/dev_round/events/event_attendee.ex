@@ -3,7 +3,7 @@ defmodule DevRound.Events.EventAttendee do
 
   use Ecto.Schema
   import Ecto.Changeset
-  import DevRound.Validation
+  import DevRound.Changeset
   alias DevRound.Accounts.User
   alias DevRound.Events.Event
   alias DevRound.Events.Lang

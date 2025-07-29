@@ -22,4 +22,23 @@ defmodule DevRound.EventsFixtures do
 
     event
   end
+
+  @doc """
+  Generate a event_session.
+  """
+  def event_session_fixture(attrs \\ %{}) do
+    {:ok, event_session} =
+      attrs
+      |> Enum.into(%{
+        begin: ~U[2025-07-23 19:04:00Z],
+        begin_local: ~N[2025-07-23 19:04:00],
+        end: ~U[2025-07-23 19:04:00Z],
+        end_local: ~N[2025-07-23 19:04:00],
+        slug: "some slug",
+        title: "some title"
+      })
+      |> DevRound.Events.create_event_session()
+
+    event_session
+  end
 end

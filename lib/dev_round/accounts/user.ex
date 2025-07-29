@@ -1,7 +1,7 @@
 defmodule DevRound.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
-  import DevRound.Validation
+  import DevRound.Changeset
 
   schema "users" do
     field :name, :string

@@ -38,6 +38,10 @@ defmodule DevRoundWeb.Admin.Event do
         module: Backpex.Fields.DateTime,
         label: "End",
       },
+      registration_deadline_local: %{
+        module: Backpex.Fields.DateTime,
+        label: "Registration Deadline",
+      },
       location: %{
         module: Backpex.Fields.Text,
         label: "Location",
@@ -73,36 +77,32 @@ defmodule DevRoundWeb.Admin.Event do
         rows: 15,
         except: [:index]
       },
-      attendees: %{
-        module: Backpex.Fields.HasManyThrough,
-        label: "Attendees",
-        display_field: :full_name,
-        live_resource: DevRoundWeb.Admin.User,
-        # prompt: "Select users",
-        # not_found_text: "No users found",
-        pivot_fields: [
-          is_remote: %{
-            module: Backpex.Fields.Boolean,
-            label: "Remote Attendence",
-          },
-          expierence_level: %{
-            module: Backpex.Fields.Number,
-            label: "Expierence Level"
-          }
-        ],
+      sessions: %{
+        module: Backpex.Fields.InlineCRUD,
+        type: :assoc,
+        label: "Sessions",
+        except: [:index],
         child_fields: [
-          full_name: %{
-            module: Backpex.Fields.Text, label: "Full name"
-          }],
-        except: [:index]
+          title: %{
+            module: Backpex.Fields.Text,
+            label: "Title",
+            input_type: :text
+          },
+          begin_local: %{
+            module: Backpex.Fields.DateTime,
+            label: "Begin",
+            input_type: :date_time
+          },
+          end_local: %{
+            module: Backpex.Fields.DateTime,
+            label: "End",
+            input_type: :date_time
+          },
+        ]
       },
       published: %{
         module: Backpex.Fields.Boolean,
         label: "Published"
-      },
-      registration_deadline_local: %{
-        module: Backpex.Fields.DateTime,
-        label: "Registration Deadline",
       },
     ]
   end
