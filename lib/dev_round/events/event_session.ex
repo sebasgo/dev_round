@@ -21,7 +21,7 @@ defmodule DevRound.Events.EventSession do
   def changeset(event_session, attrs, _opts \\ %{}) do
     event_session
     |> cast(attrs, [:title, :begin_local, :end_local])
-    |> validate_required([:title, :begin_local, :end_local])
+    |> validate_required([:title, :begin_local, :end_local], message: "Required.")
     |> fill_utc_dates([begin_local: :begin, end_local: :end])
     |> validate_begin_before_end()
     |> generate_date_title_slug()

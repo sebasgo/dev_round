@@ -34,11 +34,17 @@ defmodule DevRound.Events.Event do
   def changeset(event, attrs, _opts \\ %{}) do
     event
     |> cast(attrs, [:title, :teaser, :body, :begin_local, :end_local, :location, :published, :registration_deadline_local])
-    |> cast_assoc(:sessions, with: &EventSession.changeset/2, sort_param: :sessions_order, drop_param: :sessions_delete)
+    |> cast_assoc(:sessions,
+      with: &EventSession.changeset/2,
+      required: true,
+      required_message: "At least one session is required.",
+      sort_param: :sessions_order,
+      drop_param: :sessions_delete)
     |> validate_required([:title, :teaser, :body, :begin_local, :end_local, :location, :published, :registration_deadline_local], message: "Required.")
     |> fill_utc_dates([begin_local: :begin, end_local: :end, registration_deadline_local: :registration_deadline])
     |> validate_begin_before_end()
     |> validate_registration_deadline_before_begin()
+    |> validate_sessions_within_event_dates()
     |> validate_option_selected([:langs, :hosts])
     |> generate_date_title_slug()
     |> unique_constraint(:slug)
@@ -52,6 +58,36 @@ defmodule DevRound.Events.Event do
     else
       changeset
     end
+  end
+
+  defp validate_sessions_within_event_dates(changeset) do
+    sessions = get_field(changeset, :sessions)
+    begin = get_field(changeset, :begin)
+    end_ = get_field(changeset, :end)
+    changeset = if sessions != nil && begin != nil && end_ != nil do
+      Enum.reduce(sessions, changeset, &validate_session_with_event_dates/2)
+    else
+      changeset
+    end
+    changeset
+  end
+
+  defp validate_session_with_event_dates(session, changeset) do
+    event_begin = get_field(changeset, :begin)
+    event_end = get_field(changeset, :end)
+    begin = session.begin
+    end_ = Map.fetch!(session, :end)
+    changeset = if begin != nil && DateTime.compare(event_begin, begin) == :gt do
+      add_error(changeset, :sessions, "Sessions must begin after or with event.")
+    else
+      changeset
+    end
+    changeset = if end_ != nil && DateTime.compare(event_end, end_) == :lt do
+      add_error(changeset, :sessions, "Sessions must end before or with event.")
+    else
+      changeset
+    end
+    changeset
   end
 
   defimpl Phoenix.Param, for: DevRound.Events.Event do
