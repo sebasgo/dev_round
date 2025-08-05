@@ -2,6 +2,7 @@ defmodule DevRound.Events.EventSession do
   use Ecto.Schema
   import Ecto.Changeset
   import DevRound.Changeset
+  alias DevRound.Events.EventSession
   alias DevRound.Events.Event
 
   schema "event_sessions" do
@@ -16,6 +17,9 @@ defmodule DevRound.Events.EventSession do
 
     timestamps(type: :utc_datetime)
   end
+
+  def title(%EventSession{title: <<_::binary-size(1), _::binary>> = title}), do: title
+  def title(%EventSession{}), do: "Session"
 
   @doc false
   def changeset(event_session, attrs, _opts \\ %{}) do

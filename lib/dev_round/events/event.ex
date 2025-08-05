@@ -78,12 +78,12 @@ defmodule DevRound.Events.Event do
     begin = session.begin
     end_ = Map.fetch!(session, :end)
     changeset = if begin != nil && DateTime.compare(event_begin, begin) == :gt do
-      add_error(changeset, :sessions, "Sessions must begin after or with event.")
+      add_error(changeset, :sessions, "#{EventSession.title(session)} must begin after or with event.")
     else
       changeset
     end
     changeset = if end_ != nil && DateTime.compare(event_end, end_) == :lt do
-      add_error(changeset, :sessions, "Sessions must end before or with event.")
+      add_error(changeset, :sessions, "#{EventSession.title(session)} must end before or with event.")
     else
       changeset
     end
