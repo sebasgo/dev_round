@@ -275,7 +275,7 @@ defmodule DevRoundWeb.CoreComponents do
   attr :type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file month number password
-               range search select tel text textarea time url week hidden langs)
+               range search select tel text textarea time url week hidden langs experience_level)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -622,10 +622,11 @@ defmodule DevRoundWeb.CoreComponents do
   """
   attr :name, :string, required: true
   attr :class, :string, default: nil
+  attr :rest, :global
 
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
-    <span class={[@name, @class]} />
+    <span class={[@name, @class]}  @rest/>
     """
   end
 
@@ -780,13 +781,10 @@ defmodule DevRoundWeb.CoreComponents do
   attr :user, DevRound.Accounts.User, required: true
 
   def user_avatar(%{user: %DevRound.Accounts.User{avatar_url: nil}} = assigns) do
-    parts = String.split(assigns.user.full_name, " ")
-    placeholder = String.first(hd(parts)) <> String.first(List.last(parts))
-    assigns = assign(assigns, :placeholder, placeholder)
     ~H"""
     <div class="avatar placeholder">
       <div class="bg-neutral text-neutral-content w-12 rounded-full">
-         <span>{placeholder}</span>
+         <span>{DevRound.Formats.format_avatar_placeholder(@user)}</span>
       </div>
     </div>
     """

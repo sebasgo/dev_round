@@ -56,7 +56,7 @@ defmodule DevRoundWeb.UserSettingsLive do
     %{"user" => user_params} = params
     user = socket.assigns.current_user
     case Accounts.apply_user_profile(user, user_params) do
-      {:ok, applied_user} ->
+      {:ok, _applied_user} ->
         info = "Profile updated."
         {:noreply, socket |> put_flash(:info, info)}
 

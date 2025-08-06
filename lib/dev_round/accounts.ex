@@ -6,7 +6,7 @@ defmodule DevRound.Accounts do
   import Ecto.Query, warn: false
   alias DevRound.Repo
 
-  alias DevRound.Accounts.{User, UserToken, UserNotifier}
+  alias DevRound.Accounts.{User, UserToken}
 
   ## Database getters
 

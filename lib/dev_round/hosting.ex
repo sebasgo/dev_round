@@ -4,8 +4,6 @@ defmodule DevRound.Hosting do
   """
 
   import Ecto.Query, warn: false
-  alias DevRoundWeb.Admin.EventAttendees
-  alias DevRound.Events.Event
   alias DevRound.Events.EventAttendee
   alias DevRound.Repo
 

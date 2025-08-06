@@ -20,6 +20,11 @@ defmodule DevRound.Formats do
     end
   end
 
+  def format_avatar_placeholder(%DevRound.Accounts.User{avatar_url: nil, full_name: full_name}) do
+    parts = String.split(full_name, " ")
+    String.first(hd(parts)) <> String.first(List.last(parts))
+  end
+
   def time_zone, do: Application.get_env(:dev_round, :time_zone)
 
 end
