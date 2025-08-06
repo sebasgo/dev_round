@@ -1,4 +1,4 @@
-defmodule DevRoundWeb.HostLive.Show do
+defmodule DevRoundWeb.HostingLobbyLive.Show do
   use DevRoundWeb, :live_view
 
   alias DevRound.Events
@@ -43,7 +43,7 @@ defmodule DevRoundWeb.HostLive.Show do
   def handle_info({"event_updated", event}, socket) do
     if event.id == socket.assigns.event.id do
       if event.slug != socket.assigns.event.slug do
-        {:noreply, push_patch(socket, to: ~p"/host/#{event}")}
+        {:noreply, push_patch(socket, to: ~p"/events/#{event}/hosting/lobby")}
       else
         {:noreply, update_assigns(socket)}
       end

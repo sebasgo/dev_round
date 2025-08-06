@@ -2,7 +2,7 @@
   <.header>
     <:actions>
       <%= if @current_user in @event.hosts do %>
-        <.link patch={~p"/host/#{@event}"} phx-click={JS.push_focus()}>
+        <.link patch={~p"/events/#{@event}/hosting/lobby"} phx-click={JS.push_focus()}>
           <.button class="btn-default">Host</.button>
         </.link>
       <% end %>
@@ -18,7 +18,7 @@
   <.header>
     <:actions>
       <%= if @current_user in @event.hosts do %>
-        <.link patch={~p"/host/#{@event}"} phx-click={JS.push_focus()}>
+        <.link patch={~p"/events/#{@event}/hosting/lobby"} phx-click={JS.push_focus()}>
           <.button class="btn-default">Host</.button>
         </.link>
       <% end %>

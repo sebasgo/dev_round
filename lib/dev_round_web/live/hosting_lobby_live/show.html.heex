@@ -1,11 +1,11 @@
 <div class="breadcrumbs">
   <ul>
-    <li>Host</li>
+    <li><.link patch={~p"/events"}>Events</.link></li>
     <li><.link patch={~p"/events/#{@event}"}>{@event.title}</.link></li>
   </ul>
 </div>
 <.header>
-  Lobby
+  Hosting
 </.header>
 
 <p class="my-8">
@@ -66,7 +66,7 @@
                 <.icon name="hero-x-circle" class="w-4 h-4" /> Check out
               </.button>
               <.link
-                patch={~p"/host/#{@event}/registration/edit/#{attendee.user}"}
+                patch={~p"/events/#{@event}/hosting/lobby/registration/edit/#{attendee.user}"}
                 phx-click={JS.push_focus()}
               >
                 <.button class="btn btn btn-neutral">
@@ -94,7 +94,7 @@
   :if={@live_action == :edit_registration}
   id="event-modal"
   show
-  on_cancel={JS.patch(~p"/host/#{@event}")}
+  on_cancel={JS.patch(~p"/events/#{@event}/hosting/lobby")}
 >
   <.live_component
     module={DevRoundWeb.RegistrationComponent}
@@ -102,7 +102,7 @@
     action={@live_action}
     event={@event}
     attendence={@registration_edit_attendee}
-    patch={~p"/host/#{@event}"}
+    patch={~p"/events/#{@event}/hosting/lobby"}
     user={@registration_edit_attendee.user}
     mode={:host}
   />

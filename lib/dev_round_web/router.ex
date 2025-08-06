@@ -87,11 +87,11 @@ defmodule DevRoundWeb.Router do
       live "/events/:slug", EventLive.Show, :show
       live "/events/:slug/registration/new", EventLive.Show, :new_registration
       live "/events/:slug/registration/edit", EventLive.Show, :edit_registration
+      live "/events/:slug/hosting/lobby", HostingLobbyLive.Show, :show
 
-      scope "/host" do
-        live "/:slug", HostLive.Show, :show
-        live "/:slug/registration/edit/:user_name", HostLive.Show, :edit_registration
-      end
+      live "/events/:slug/hosting/lobby/registration/edit/:user_name",
+           HostingLobbyLive.Show,
+           :edit_registration
     end
   end
 
