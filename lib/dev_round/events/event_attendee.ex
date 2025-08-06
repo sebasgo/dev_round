@@ -42,5 +42,4 @@ defmodule DevRound.Events.EventAttendee do
     event_attendee
     |> cast(attrs, [:checked])
   end
-
 end

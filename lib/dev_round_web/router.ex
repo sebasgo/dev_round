@@ -39,9 +39,7 @@ defmodule DevRoundWeb.Router do
       live_resources "/langs", Admin.EventLangAdmin
       live_resources "/team_names", Admin.TeamName
     end
-   end
-
-
+  end
 
   # Other scopes may use custom stacks.
   # scope "/api", DevRoundWeb do

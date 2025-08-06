@@ -11,8 +11,7 @@ defmodule DevRound.Application do
       DevRoundWeb.Telemetry,
       DevRound.Repo,
       {Ecto.Migrator,
-        repos: Application.fetch_env!(:dev_round, :ecto_repos),
-        skip: skip_migrations?()},
+       repos: Application.fetch_env!(:dev_round, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:dev_round, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: DevRound.PubSub},
       # Start the Finch HTTP client for sending emails

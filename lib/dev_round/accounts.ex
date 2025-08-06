@@ -114,5 +114,4 @@ defmodule DevRound.Accounts do
     Repo.delete_all(UserToken.by_token_and_context_query(token, "session"))
     :ok
   end
-
 end

@@ -1,5 +1,4 @@
 defmodule DevRound.Formats do
-
   def format_datetime(dt) do
     Calendar.strftime(dt, "%d.%m.%Y %H:%M")
   end
@@ -26,5 +25,4 @@ defmodule DevRound.Formats do
   end
 
   def time_zone, do: Application.get_env(:dev_round, :time_zone)
-
 end

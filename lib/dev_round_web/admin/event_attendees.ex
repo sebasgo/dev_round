@@ -4,7 +4,7 @@ defmodule DevRoundWeb.Admin.EventAttendees do
       schema: DevRound.Events.EventAttendee,
       repo: DevRound.Repo,
       update_changeset: &DevRound.Events.EventAttendee.changeset/3,
-      create_changeset: &DevRound.Events.EventAttendee.changeset/3,
+      create_changeset: &DevRound.Events.EventAttendee.changeset/3
     ],
     layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
@@ -31,18 +31,18 @@ defmodule DevRoundWeb.Admin.EventAttendees do
         label: "Event",
         display_field: :title,
         live_resource: DevRoundWeb.Admin.Event,
-        prompt: "Select",
+        prompt: "Select"
       },
       user: %{
         module: Backpex.Fields.BelongsTo,
         label: "User",
         display_field: :full_name,
         live_resource: DevRoundWeb.Admin.User,
-        prompt: "Select",
+        prompt: "Select"
       },
       is_remote: %{
         module: Backpex.Fields.Boolean,
-        label: "Remote Attendence",
+        label: "Remote Attendence"
       },
       expierence_level: %{
         module: Backpex.Fields.Number,
@@ -54,9 +54,8 @@ defmodule DevRoundWeb.Admin.EventAttendees do
         display_field: :name,
         live_resource: DevRoundWeb.Admin.EventLangAdmin,
         prompt: "Select",
-        not_found_text: "No languages found",
-      },
+        not_found_text: "No languages found"
+      }
     ]
   end
-
 end

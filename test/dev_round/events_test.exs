@@ -21,7 +21,14 @@ defmodule DevRound.EventsTest do
     end
 
     test "create_event/1 with valid data creates a event" do
-      valid_attrs = %{title: "some title", location: "some location", begin: ~U[2025-03-14 16:12:00Z], end: ~U[2025-03-14 16:12:00Z], body: "some body", published: true}
+      valid_attrs = %{
+        title: "some title",
+        location: "some location",
+        begin: ~U[2025-03-14 16:12:00Z],
+        end: ~U[2025-03-14 16:12:00Z],
+        body: "some body",
+        published: true
+      }
 
       assert {:ok, %Event{} = event} = Events.create_event(valid_attrs)
       assert event.title == "some title"
@@ -38,7 +45,15 @@ defmodule DevRound.EventsTest do
 
     test "update_event/2 with valid data updates the event" do
       event = event_fixture()
-      update_attrs = %{title: "some updated title", location: "some updated location", begin: ~U[2025-03-15 16:12:00Z], end: ~U[2025-03-15 16:12:00Z], body: "some updated body", published: false}
+
+      update_attrs = %{
+        title: "some updated title",
+        location: "some updated location",
+        begin: ~U[2025-03-15 16:12:00Z],
+        end: ~U[2025-03-15 16:12:00Z],
+        body: "some updated body",
+        published: false
+      }
 
       assert {:ok, %Event{} = event} = Events.update_event(event, update_attrs)
       assert event.title == "some updated title"
@@ -72,7 +87,14 @@ defmodule DevRound.EventsTest do
 
     import DevRound.EventsFixtures
 
-    @invalid_attrs %{title: nil, begin: nil, end: nil, slug: nil, begin_local: nil, end_local: nil}
+    @invalid_attrs %{
+      title: nil,
+      begin: nil,
+      end: nil,
+      slug: nil,
+      begin_local: nil,
+      end_local: nil
+    }
 
     test "list_event_session/0 returns all event_session" do
       event_session = event_session_fixture()
@@ -85,7 +107,14 @@ defmodule DevRound.EventsTest do
     end
 
     test "create_event_session/1 with valid data creates a event_session" do
-      valid_attrs = %{title: "some title", begin: ~U[2025-07-23 19:04:00Z], end: ~U[2025-07-23 19:04:00Z], slug: "some slug", begin_local: ~N[2025-07-23 19:04:00], end_local: ~N[2025-07-23 19:04:00]}
+      valid_attrs = %{
+        title: "some title",
+        begin: ~U[2025-07-23 19:04:00Z],
+        end: ~U[2025-07-23 19:04:00Z],
+        slug: "some slug",
+        begin_local: ~N[2025-07-23 19:04:00],
+        end_local: ~N[2025-07-23 19:04:00]
+      }
 
       assert {:ok, %EventSession{} = event_session} = Events.create_event_session(valid_attrs)
       assert event_session.title == "some title"
@@ -102,9 +131,19 @@ defmodule DevRound.EventsTest do
 
     test "update_event_session/2 with valid data updates the event_session" do
       event_session = event_session_fixture()
-      update_attrs = %{title: "some updated title", begin: ~U[2025-07-24 19:04:00Z], end: ~U[2025-07-24 19:04:00Z], slug: "some updated slug", begin_local: ~N[2025-07-24 19:04:00], end_local: ~N[2025-07-24 19:04:00]}
 
-      assert {:ok, %EventSession{} = event_session} = Events.update_event_session(event_session, update_attrs)
+      update_attrs = %{
+        title: "some updated title",
+        begin: ~U[2025-07-24 19:04:00Z],
+        end: ~U[2025-07-24 19:04:00Z],
+        slug: "some updated slug",
+        begin_local: ~N[2025-07-24 19:04:00],
+        end_local: ~N[2025-07-24 19:04:00]
+      }
+
+      assert {:ok, %EventSession{} = event_session} =
+               Events.update_event_session(event_session, update_attrs)
+
       assert event_session.title == "some updated title"
       assert event_session.begin == ~U[2025-07-24 19:04:00Z]
       assert event_session.end == ~U[2025-07-24 19:04:00Z]
@@ -115,7 +154,10 @@ defmodule DevRound.EventsTest do
 
     test "update_event_session/2 with invalid data returns error changeset" do
       event_session = event_session_fixture()
-      assert {:error, %Ecto.Changeset{}} = Events.update_event_session(event_session, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Events.update_event_session(event_session, @invalid_attrs)
+
       assert event_session == Events.get_event_session!(event_session.id)
     end
 

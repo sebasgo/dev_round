@@ -4,7 +4,7 @@ defmodule DevRoundWeb.Admin.Event do
       schema: DevRound.Events.Event,
       repo: DevRound.Repo,
       update_changeset: &DevRound.Events.Event.changeset/3,
-      create_changeset: &DevRound.Events.Event.changeset/3,
+      create_changeset: &DevRound.Events.Event.changeset/3
     ],
     layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
@@ -28,19 +28,19 @@ defmodule DevRoundWeb.Admin.Event do
     [
       title: %{
         module: Backpex.Fields.Text,
-        label: "Title",
+        label: "Title"
       },
       begin_local: %{
         module: Backpex.Fields.DateTime,
-        label: "Begin",
+        label: "Begin"
       },
       end_local: %{
         module: Backpex.Fields.DateTime,
-        label: "End",
+        label: "End"
       },
       registration_deadline_local: %{
         module: Backpex.Fields.DateTime,
-        label: "Registration Deadline",
+        label: "Registration Deadline"
       },
       location: %{
         module: Backpex.Fields.Text,
@@ -97,14 +97,13 @@ defmodule DevRoundWeb.Admin.Event do
             module: Backpex.Fields.DateTime,
             label: "End",
             input_type: :date_time
-          },
+          }
         ]
       },
       published: %{
         module: Backpex.Fields.Boolean,
         label: "Published"
-      },
+      }
     ]
   end
-
 end

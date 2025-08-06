@@ -3,18 +3,22 @@ defmodule DevRoundWeb.UserMail do
   alias DevRoundWeb.UserMailComponents
 
   def confirm_registration(user, event) do
-    html = UserMailComponents.confirm_registration_html(%{user: user, event: event}) |> heex_to_html()
+    html =
+      UserMailComponents.confirm_registration_html(%{user: user, event: event}) |> heex_to_html()
+
     new()
     |> to({user.full_name, user.email})
     |> from(Application.get_env(:dev_round, :mail_from))
     |> from({"DevRound", "devround@localhost"})
     |> subject("[DevRound] Registration Confirmed: #{event.title}")
     |> html_body(html)
-    |> attachment(Swoosh.Attachment.new(
-      {:data, generate_ics(event)},
-      filename: "invite.ics",
-      content_type: "text/calendar"
-    ))
+    |> attachment(
+      Swoosh.Attachment.new(
+        {:data, generate_ics(event)},
+        filename: "invite.ics",
+        content_type: "text/calendar"
+      )
+    )
   end
 
   defp heex_to_html(template) do
@@ -53,10 +57,13 @@ defmodule DevRoundWeb.UserMail do
     # Then escape semicolons
     |> String.replace(";", "\\;")
     # Handle newlines - convert actual newlines to escaped newlines
-    |> String.replace("\n", "\\\n")  # First handle literal \n in the string
-    |> String.replace("\r\n", "\\\n")  # Windows line endings
-    |> String.replace("\r", "\\\n")  # Mac line endings
-    |> String.replace("\n", "\\\n")  # Unix line endings
+    # First handle literal \n in the string
+    |> String.replace("\n", "\\\n")
+    # Windows line endings
+    |> String.replace("\r\n", "\\\n")
+    # Mac line endings
+    |> String.replace("\r", "\\\n")
+    # Unix line endings
+    |> String.replace("\n", "\\\n")
   end
-
 end

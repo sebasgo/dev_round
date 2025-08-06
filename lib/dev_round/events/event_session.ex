@@ -26,7 +26,7 @@ defmodule DevRound.Events.EventSession do
     event_session
     |> cast(attrs, [:title, :begin_local, :end_local])
     |> validate_required([:title, :begin_local, :end_local], message: "Required.")
-    |> fill_utc_dates([begin_local: :begin, end_local: :end])
+    |> fill_utc_dates(begin_local: :begin, end_local: :end)
     |> validate_begin_before_end()
     |> generate_date_title_slug()
     |> unique_constraint(:slug)

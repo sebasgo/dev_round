@@ -13,7 +13,6 @@ defmodule DevRoundWeb.Admin.EventLangAdmin do
       event_prefix: "event_lang_"
     ]
 
-
   @impl Backpex.LiveResource
   def singular_name, do: "Programming Language"
 
@@ -40,6 +39,7 @@ defmodule DevRoundWeb.Admin.EventLangAdmin do
         render: fn
           %{value: value} = assigns when value == "" or is_nil(value) ->
             ~H"<p>{Backpex.HTML.pretty_value(@value)}</p>"
+
           assigns ->
             ~H'<img class="h-10 w-auto" src={file_url(@value)} />'
         end
@@ -52,7 +52,9 @@ defmodule DevRoundWeb.Admin.EventLangAdmin do
     [edit, delete]
   end
 
-  defp list_existing_files(%{icon_path: icon} = _item) when icon != "" and not is_nil(icon), do: [icon]
+  defp list_existing_files(%{icon_path: icon} = _item) when icon != "" and not is_nil(icon),
+    do: [icon]
+
   defp list_existing_files(_item), do: []
 
   def put_upload_change(_socket, params, item, uploaded_entries, removed_entries, action) do
@@ -81,7 +83,7 @@ defmodule DevRoundWeb.Admin.EventLangAdmin do
     end
   end
 
-   defp consume_upload(_socket, _item, %{path: path} = _meta, entry) do
+  defp consume_upload(_socket, _item, %{path: path} = _meta, entry) do
     file_name = file_name(entry)
     dest = Path.join([:code.priv_dir(:dev_round), "static", upload_dir(), file_name])
 
@@ -108,6 +110,4 @@ defmodule DevRoundWeb.Admin.EventLangAdmin do
   end
 
   defp upload_dir, do: Path.join(["uploads", "langs", "icon"])
-
-
 end

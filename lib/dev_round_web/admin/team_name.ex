@@ -1,17 +1,17 @@
 defmodule DevRoundWeb.Admin.TeamName do
   use Backpex.LiveResource,
-  adapter_config: [
-    schema: DevRound.Hosting.TeamName,
-    repo: DevRound.Repo,
-    update_changeset: &DevRound.Hosting.TeamName.changeset/3,
-    create_changeset: &DevRound.Hosting.TeamName.changeset/3
-  ],
-  layout: {DevRoundWeb.Layouts, :admin},
-  pubsub: [
-    name: DevRound.PubSub,
-    topic: "team_names",
-    event_prefix: "team_name_"
-  ]
+    adapter_config: [
+      schema: DevRound.Hosting.TeamName,
+      repo: DevRound.Repo,
+      update_changeset: &DevRound.Hosting.TeamName.changeset/3,
+      create_changeset: &DevRound.Hosting.TeamName.changeset/3
+    ],
+    layout: {DevRoundWeb.Layouts, :admin},
+    pubsub: [
+      name: DevRound.PubSub,
+      topic: "team_names",
+      event_prefix: "team_name_"
+    ]
 
   @impl Backpex.LiveResource
   def singular_name, do: "Team Name"
@@ -30,14 +30,13 @@ defmodule DevRoundWeb.Admin.TeamName do
     [
       name: %{
         module: Backpex.Fields.Text,
-        label: "Name",
+        label: "Name"
       },
       slug: %{
         module: Backpex.Fields.Text,
         label: "Slug",
-        readonly: true,
-      },
+        readonly: true
+      }
     ]
   end
-
 end

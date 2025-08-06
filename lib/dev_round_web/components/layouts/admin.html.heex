@@ -2,7 +2,7 @@
   <:topbar>
     <Backpex.HTML.Layout.topbar_branding title="DevRound Admin Panel">
       <:logo>
-        <img src={~p"/images/logo.svg"}/>
+        <img src={~p"/images/logo.svg"} />
       </:logo>
     </Backpex.HTML.Layout.topbar_branding>
 
@@ -24,7 +24,10 @@
     <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate={~p"/admin/events"}>
       <.icon name="hero-calendar" class="h-5 w-5" /> Events
     </Backpex.HTML.Layout.sidebar_item>
-    <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate={~p"/admin/event_attendees"}>
+    <Backpex.HTML.Layout.sidebar_item
+      current_url={@current_url}
+      navigate={~p"/admin/event_attendees"}
+    >
       <.icon name="hero-users" class="h-5 w-5" /> Attendees
     </Backpex.HTML.Layout.sidebar_item>
     <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate={~p"/admin/users"}>
@@ -38,5 +41,5 @@
     </Backpex.HTML.Layout.sidebar_item>
   </:sidebar>
   <Backpex.HTML.Layout.flash_messages flash={@flash} />
-  <%= @inner_content %>
+  {@inner_content}
 </Backpex.HTML.Layout.app_shell>

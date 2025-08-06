@@ -24,12 +24,15 @@ defmodule DevRound.Events do
   end
 
   def list_events(:upcoming) do
-    (from e in Event, where: e.end > ^DateTime.utc_now() and e.published, order_by: [asc: e.begin])
+    from(e in Event, where: e.end > ^DateTime.utc_now() and e.published, order_by: [asc: e.begin])
     |> Repo.all()
   end
 
   def list_events(:past) do
-    (from e in Event, where: e.end <= ^DateTime.utc_now() and e.published, order_by: [desc: e.begin])
+    from(e in Event,
+      where: e.end <= ^DateTime.utc_now() and e.published,
+      order_by: [desc: e.begin]
+    )
     |> Repo.all()
   end
 
@@ -48,18 +51,27 @@ defmodule DevRound.Events do
 
   """
   def get_event!(slug_or_id, opts \\ [order_attendees_by: :registration]) do
-    query = case(slug_or_id) do
-      id when is_integer(id) -> [id: id, published: true]
-      slug when is_binary(slug) -> [slug: slug, published: true]
-    end
-    attendee_query = case Keyword.get(opts, :order_attendees_by) do
-      :registration -> from ea in EventAttendee, order_by: [asc: ea.inserted_at]
-      :is_remote_and_full_name -> from ea in EventAttendee, join: u in assoc(ea, :user), order_by: [asc: ea.is_remote, asc: u.full_name]
-    end
+    query =
+      case(slug_or_id) do
+        id when is_integer(id) -> [id: id, published: true]
+        slug when is_binary(slug) -> [slug: slug, published: true]
+      end
+
+    attendee_query =
+      case Keyword.get(opts, :order_attendees_by) do
+        :registration ->
+          from ea in EventAttendee, order_by: [asc: ea.inserted_at]
+
+        :is_remote_and_full_name ->
+          from ea in EventAttendee,
+            join: u in assoc(ea, :user),
+            order_by: [asc: ea.is_remote, asc: u.full_name]
+      end
+
     Event
     |> Repo.get_by!(query)
     |> Repo.preload([:langs, :hosts])
-    |> Repo.preload([events_attendees: {attendee_query, [:user, :langs]}])
+    |> Repo.preload(events_attendees: {attendee_query, [:user, :langs]})
   end
 
   @doc """
@@ -139,40 +151,59 @@ defmodule DevRound.Events do
   def change_event_attendee(%EventAttendee{} = attendee, %Event{} = event, attrs, mode) do
     event = Repo.preload(event, :langs)
     langs_ids = attrs["lang_ids"]
-    changeset = attendee
-    |> Repo.preload([:langs, :event, :user])
-    |> EventAttendee.registration_changeset(attrs, mode)
-    changeset = if langs_ids != nil do
-      langs = list_langs_by_id(attrs["lang_ids"])
-      changeset
-      |> Ecto.Changeset.put_assoc(:langs, langs)
-    else
-      changeset
-    end
+
+    changeset =
+      attendee
+      |> Repo.preload([:langs, :event, :user])
+      |> EventAttendee.registration_changeset(attrs, mode)
+
+    changeset =
+      if langs_ids != nil do
+        langs = list_langs_by_id(attrs["lang_ids"])
+
+        changeset
+        |> Ecto.Changeset.put_assoc(:langs, langs)
+      else
+        changeset
+      end
+
     changeset
     |> validate_event_attendee_langs(event)
   end
 
-  def create_event_attendee(%Event{} = event, %User{} = user, attrs \\ %{}, mode \\ :self_registration) do
+  def create_event_attendee(
+        %Event{} = event,
+        %User{} = user,
+        attrs \\ %{},
+        mode \\ :self_registration
+      ) do
     case can_change_event_attendee?(event, mode) do
-      true -> change_event_attendee(%EventAttendee{}, event, attrs, mode)
-              |> fill_event_attendee_initial(event, user)
-              |> Repo.insert()
-      _ -> {:error, :registration_closed}
+      true ->
+        change_event_attendee(%EventAttendee{}, event, attrs, mode)
+        |> fill_event_attendee_initial(event, user)
+        |> Repo.insert()
+
+      _ ->
+        {:error, :registration_closed}
     end
   end
 
   def update_event_attendee(%EventAttendee{} = attendee, attrs \\ %{}, mode \\ :self_registration) do
     attendee = Repo.preload(attendee, [:event, :user])
+
     case can_change_event_attendee?(attendee.event, mode) do
-      true -> change_event_attendee(attendee, attendee.event, attrs, mode)
-              |> Repo.update()
-      _ -> {:error, :registration_closed}
+      true ->
+        change_event_attendee(attendee, attendee.event, attrs, mode)
+        |> Repo.update()
+
+      _ ->
+        {:error, :registration_closed}
     end
   end
 
   def delete_event_attendee(%EventAttendee{} = attendee, mode \\ :self_registration) do
     attendee = Repo.preload(attendee, [:event])
+
     case can_change_event_attendee?(attendee.event, mode) do
       true -> Repo.delete(attendee)
       _ -> {:error, :registration_closed}
@@ -181,11 +212,14 @@ defmodule DevRound.Events do
 
   defp validate_event_attendee_langs(changeset, event) do
     langs = Ecto.Changeset.get_field(changeset, :langs)
+
     cond do
       is_nil(langs) || Enum.empty?(langs) ->
         Ecto.Changeset.add_error(changeset, :lang_ids, "Please select at least one language.")
+
       !Enum.empty?(langs -- event.langs) ->
         Ecto.Changeset.add_error(changeset, :lang_ids, "Invalid language for this event.")
+
       true ->
         changeset
     end
@@ -196,10 +230,13 @@ defmodule DevRound.Events do
     |> Ecto.Changeset.change(event: event, user: user, experience_level: user.experience_level)
   end
 
-  defp can_change_event_attendee?(%Event{} = event, :self_registration = _mode), do: event_open_for_registration?(event)
+  defp can_change_event_attendee?(%Event{} = event, :self_registration = _mode),
+    do: event_open_for_registration?(event)
+
   defp can_change_event_attendee?(%Event{} = _event, :host = _mode), do: true
 
   def list_langs_by_id(nil), do: []
+
   def list_langs_by_id(lang_ids) do
     Repo.all(from l in Lang, where: l.id in ^lang_ids)
   end

@@ -367,11 +367,7 @@ defmodule DevRoundWeb.CoreComponents do
   def input(%{type: "langs"} = assigns) do
     ~H"""
     <div id={@id}>
-      <input
-        type="hidden"
-        name={@name}
-        value={-1}
-      />
+      <input type="hidden" name={@name} value={-1} />
       <%= for opt <- @options do %>
         <label class="flex items-center gap-4 text-sm my-2">
           <input
@@ -394,7 +390,13 @@ defmodule DevRoundWeb.CoreComponents do
     <div id={@id}>
       <div class="rating gap-1">
         <%= for v <- 0..9 do %>
-          <input type="radio" name={@name} value={v} checked={to_string(@value) == to_string(v)} class="mask mask-circle bg-primary" />
+          <input
+            type="radio"
+            name={@name}
+            value={v}
+            checked={to_string(@value) == to_string(v)}
+            class="mask mask-circle bg-primary"
+          />
         <% end %>
       </div>
       <.error :for={msg <- @errors}>{msg}</.error>
@@ -404,13 +406,13 @@ defmodule DevRoundWeb.CoreComponents do
 
   def input(%{type: "hidden"} = assigns) do
     ~H"""
-      <input
-        type={@type}
-        name={@name}
-        id={@id}
-        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-        {@rest}
-      />
+    <input
+      type={@type}
+      name={@name}
+      id={@id}
+      value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+      {@rest}
+    />
     """
   end
 
@@ -525,7 +527,7 @@ defmodule DevRoundWeb.CoreComponents do
         <tr>
           <th :for={col <- @col}>{col[:label]}</th>
           <th :if={@action != []}>
-            <span class="sr-only"><%= gettext("Actions") %></span>
+            <span class="sr-only">{gettext("Actions")}</span>
           </th>
         </tr>
       </thead>
@@ -591,10 +593,7 @@ defmodule DevRoundWeb.CoreComponents do
   def back(assigns) do
     ~H"""
     <div class="mt-16">
-      <.link
-        navigate={@navigate}
-        class="text-sm font-semibold leading-6 hover:opacity-75"
-      >
+      <.link navigate={@navigate} class="text-sm font-semibold leading-6 hover:opacity-75">
         <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
         {render_slot(@inner_block)}
       </.link>
@@ -626,7 +625,7 @@ defmodule DevRoundWeb.CoreComponents do
 
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
-    <span class={[@name, @class]}  @rest/>
+    <span class={[@name, @class]} @rest />
     """
   end
 
@@ -711,6 +710,7 @@ defmodule DevRoundWeb.CoreComponents do
   Renders markdown to HTML.
   """
   attr :markdown, :string, required: true
+
   def markdown(assigns) do
     markdown = if assigns.markdown == nil, do: "", else: assigns.markdown
 
@@ -722,7 +722,7 @@ defmodule DevRoundWeb.CoreComponents do
     assigns = assign(assigns, :markdown_html, markdown_html)
 
     ~H"""
-    <%= @markdown_html %>
+    {@markdown_html}
     """
   end
 
@@ -735,6 +735,7 @@ defmodule DevRoundWeb.CoreComponents do
     static_path = Path.join(["uploads", "langs", "icon", assigns.lang.icon_path])
     icon_url = Phoenix.VerifiedRoutes.static_url(DevRoundWeb.Endpoint, "/" <> static_path)
     assigns = assign(assigns, :icon_url, icon_url)
+
     ~H"""
     <div class="badge xbadge-outline badge-lg pd-0 gap-2">
       <img src={@icon_url} class="h-4 w-4" alt="" />
@@ -758,7 +759,7 @@ defmodule DevRoundWeb.CoreComponents do
         <.user_avatar user={@user} />
         <%= if @remote do %>
           <div class="absolute top-0 right-0 w-4 h-4 bg-white rounded-full flex">
-          <.icon name="hero-globe-alt" class="w-4 h-4"/>
+            <.icon name="hero-globe-alt" class="w-4 h-4" />
           </div>
         <% end %>
         <%= if @expierence_level != nil do %>
@@ -784,7 +785,7 @@ defmodule DevRoundWeb.CoreComponents do
     ~H"""
     <div class="avatar placeholder">
       <div class="bg-neutral text-neutral-content w-12 rounded-full">
-         <span>{DevRound.Formats.format_avatar_placeholder(@user)}</span>
+        <span>{DevRound.Formats.format_avatar_placeholder(@user)}</span>
       </div>
     </div>
     """
@@ -794,7 +795,7 @@ defmodule DevRoundWeb.CoreComponents do
     ~H"""
     <div class="avatar">
       <div class="w-12 rounded-full">
-         <img class="inline" src={@user.avatar_url} alt=""/>
+        <img class="inline" src={@user.avatar_url} alt="" />
       </div>
     </div>
     """

@@ -102,5 +102,4 @@ defmodule DevRound.Accounts.User do
   defimpl Phoenix.Param, for: DevRound.Accounts.User do
     def to_param(%{name: name}), do: name
   end
-
 end

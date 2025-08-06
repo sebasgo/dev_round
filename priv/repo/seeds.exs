@@ -67,6 +67,6 @@ alias DevRound.Sessions
   "The Binary Trio",
   "Upgrade Required",
   "Goto Fail",
-  "Beyond Infinity",
+  "Beyond Infinity"
 ]
 |> Enum.map(fn name -> {:ok, _} = Sessions.create_team_name(%{name: name}) end)

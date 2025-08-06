@@ -1,17 +1,17 @@
 defmodule DevRoundWeb.Admin.User do
   use Backpex.LiveResource,
-  adapter_config: [
-    schema: DevRound.Accounts.User,
-    repo: DevRound.Repo,
-    update_changeset: &DevRound.Accounts.User.admin_changeset/3,
-    create_changeset: &DevRound.Accounts.User.admin_changeset/3
-  ],
-  layout: {DevRoundWeb.Layouts, :admin},
-  pubsub: [
-    name: DevRound.PubSub,
-    topic: "event_langs",
-    event_prefix: "event_lang_"
-  ]
+    adapter_config: [
+      schema: DevRound.Accounts.User,
+      repo: DevRound.Repo,
+      update_changeset: &DevRound.Accounts.User.admin_changeset/3,
+      create_changeset: &DevRound.Accounts.User.admin_changeset/3
+    ],
+    layout: {DevRoundWeb.Layouts, :admin},
+    pubsub: [
+      name: DevRound.PubSub,
+      topic: "event_langs",
+      event_prefix: "event_lang_"
+    ]
 
   @impl Backpex.LiveResource
   def singular_name, do: "User"
@@ -31,27 +31,26 @@ defmodule DevRoundWeb.Admin.User do
       name: %{
         module: Backpex.Fields.Text,
         label: "Username",
-        readonly: true,
+        readonly: true
       },
       email: %{
         module: Backpex.Fields.Text,
         label: "Email",
-        readonly: true,
+        readonly: true
       },
       full_name: %{
         module: Backpex.Fields.Text,
         label: "Full Name",
-        readonly: true,
+        readonly: true
       },
       experience_level: %{
         module: Backpex.Fields.Number,
-        label: "Experience Level",
+        label: "Experience Level"
       },
       avatar_url: %{
         module: Backpex.Fields.Text,
-        label: "Avatar URL",
-      },
+        label: "Avatar URL"
+      }
     ]
   end
-
 end

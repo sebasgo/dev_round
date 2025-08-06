@@ -10,7 +10,7 @@ defmodule DevRound.Hosting.TeamName do
   end
 
   @doc false
-  def changeset(team_name, attrs ,_opts \\ %{}) do
+  def changeset(team_name, attrs, _opts \\ %{}) do
     team_name
     |> cast(attrs, [:name])
     |> validate_required([:name])

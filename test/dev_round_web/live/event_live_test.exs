@@ -4,8 +4,22 @@ defmodule DevRoundWeb.EventLiveTest do
   import Phoenix.LiveViewTest
   import DevRound.EventsFixtures
 
-  @create_attrs %{title: "some title", location: "some location", begin: "2025-03-14T16:12:00Z", end: "2025-03-14T16:12:00Z", body: "some body", published: true}
-  @update_attrs %{title: "some updated title", location: "some updated location", begin: "2025-03-15T16:12:00Z", end: "2025-03-15T16:12:00Z", body: "some updated body", published: false}
+  @create_attrs %{
+    title: "some title",
+    location: "some location",
+    begin: "2025-03-14T16:12:00Z",
+    end: "2025-03-14T16:12:00Z",
+    body: "some body",
+    published: true
+  }
+  @update_attrs %{
+    title: "some updated title",
+    location: "some updated location",
+    begin: "2025-03-15T16:12:00Z",
+    end: "2025-03-15T16:12:00Z",
+    body: "some updated body",
+    published: false
+  }
   @invalid_attrs %{title: nil, location: nil, begin: nil, end: nil, body: nil, published: false}
 
   defp create_event(_) do

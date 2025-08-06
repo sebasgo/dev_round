@@ -24,42 +24,53 @@
           </tr>
         </thead>
         <tbody>
-          <tr 
-            :for={attendee <- @event.events_attendees} 
-            class={[attendee.checked && "bg-green-900 hover:bg-green-950" || "hover:bg-zinc-950", "transition"]}
+          <tr
+            :for={attendee <- @event.events_attendees}
+            class={[
+              (attendee.checked && "bg-green-900 hover:bg-green-950") || "hover:bg-zinc-950",
+              "transition"
+            ]}
           >
             <td class="">
-              <.icon :if={attendee.checked} name="hero-check-circle" class="w-8 h-8 text-success" aria-label="Checked"/>
+              <.icon
+                :if={attendee.checked}
+                name="hero-check-circle"
+                class="w-8 h-8 text-success"
+                aria-label="Checked"
+              />
             </td>
             <td>
-              <.user_badge user={attendee.user} remote={attendee.is_remote} expierence_level={attendee.experience_level}>
+              <.user_badge
+                user={attendee.user}
+                remote={attendee.is_remote}
+                expierence_level={attendee.experience_level}
+              >
                 <p :if={!Enum.empty?(tl(@event.langs))} class="text-sm">
-                  <%= Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ") %>
+                  {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
                 </p>
               </.user_badge>
             </td>
             <td class="flex gap-2">
-              <.button 
+              <.button
                 class="btn btn btn-success flex gap-2"
                 disabled={attendee.checked}
                 phx-click={JS.push("checkin", value: %{id: attendee.id})}
               >
-                <.icon name="hero-check-circle" class="w-4 h-4"/>
-                Check in
+                <.icon name="hero-check-circle" class="w-4 h-4" /> Check in
               </.button>
-              <.button 
+              <.button
                 class="btn btn btn-warning flex gap-2"
                 disabled={!attendee.checked}
                 phx-click={JS.push("checkout", value: %{id: attendee.id})}
               >
-                <.icon name="hero-x-circle" class="w-4 h-4"/>
-                Check out
+                <.icon name="hero-x-circle" class="w-4 h-4" /> Check out
               </.button>
-              <.link patch={~p"/host/#{@event}/registration/edit/#{attendee.user}"} phx-click={JS.push_focus()}>
-                <.button 
-                  class="btn btn btn-neutral"
-                >
-                  <.icon name="hero-pencil" class="w-4 h-4"/>
+              <.link
+                patch={~p"/host/#{@event}/registration/edit/#{attendee.user}"}
+                phx-click={JS.push_focus()}
+              >
+                <.button class="btn btn btn-neutral">
+                  <.icon name="hero-pencil" class="w-4 h-4" />
                 </.button>
               </.link>
             </td>
@@ -79,8 +90,12 @@
   <% end %>
 </ul>
 
-
-<.modal :if={@live_action == :edit_registration} id="event-modal" show on_cancel={JS.patch(~p"/host/#{@event}")}>
+<.modal
+  :if={@live_action == :edit_registration}
+  id="event-modal"
+  show
+  on_cancel={JS.patch(~p"/host/#{@event}")}
+>
   <.live_component
     module={DevRoundWeb.RegistrationComponent}
     id={@event.id}

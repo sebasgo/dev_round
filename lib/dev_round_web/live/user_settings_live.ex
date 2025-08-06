@@ -55,6 +55,7 @@ defmodule DevRoundWeb.UserSettingsLive do
   def handle_event("update_profile", params, socket) do
     %{"user" => user_params} = params
     user = socket.assigns.current_user
+
     case Accounts.apply_user_profile(user, user_params) do
       {:ok, _applied_user} ->
         info = "Profile updated."

@@ -1,30 +1,29 @@
 <.layout_html>
-    <p>
+  <p>
     Dear {@user.full_name},
-    </p>
+  </p>
 
-    <p>
+  <p>
     We are thrilled to confirm your registration for <.link href={url(~p"/events/#{@event}")}><em>{@event.title}</em></.link>:
-    </p>
+  </p>
 
+  <dl>
+    <dt>Date and time:</dt>
+    <dd>{DevRound.Formats.format_datetime_range(@event.begin, @event.end)}</dd>
+    <dt>Location:</dt>
+    <dd>{@event.location}</dd>
+  </dl>
 
-    <dl>
-        <dt>Date and time:</dt>
-        <dd>{DevRound.Formats.format_datetime_range(@event.begin, @event.end)}</dd>
-        <dt>Location:</dt>
-        <dd>{@event.location}</dd>
-    </dl>
+  <p>
+    You can update your registration details or cancel your registration until {@event.registration_deadline
+    |> DateTime.shift_zone!(DevRound.Formats.time_zone())
+    |> DevRound.Formats.format_datetime()} via the <.link href={
+      url(~p"/events/#{@event}/registration/edit")
+    }>registration form</.link>.
+  </p>
 
-    <p>
-    You can update your registration details or cancel your registration until
-    {@event.registration_deadline |> DateTime.shift_zone!(DevRound.Formats.time_zone()) |> DevRound.Formats.format_datetime()}
-    via the
-    <.link href={url(~p"/events/#{@event}/registration/edit")}>registration form</.link>.
-    </p>
-
-    <p>
-    Best, <br/>
-    <%= Enum.map(@event.hosts, fn host -> host.full_name end) |> Enum.intersperse(" & ") %>
-    </p>
+  <p>
+    Best, <br />
+    {Enum.map(@event.hosts, fn host -> host.full_name end) |> Enum.intersperse(" & ")}
+  </p>
 </.layout_html>
-
