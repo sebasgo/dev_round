@@ -14,6 +14,6 @@ defmodule DevRound.Repo.Migrations.CreateEventSessions do
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:event_sessions, [:slug])
+    create unique_index(:event_sessions, [:event_id, :slug])
   end
 end

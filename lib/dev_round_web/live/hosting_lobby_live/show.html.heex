@@ -1,12 +1,4 @@
-<div class="breadcrumbs">
-  <ul>
-    <li><.link patch={~p"/events"}>Events</.link></li>
-    <li><.link patch={~p"/events/#{@event}"}>{@event.title}</.link></li>
-  </ul>
-</div>
-<.header>
-  Hosting
-</.header>
+<DevRoundWeb.HostingComponents.header event={@event} />
 
 <p class="my-8">
   Check in participants to include them in the team generation for the pair programming sessions:

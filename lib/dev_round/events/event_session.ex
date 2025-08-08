@@ -28,7 +28,18 @@ defmodule DevRound.Events.EventSession do
     |> validate_required([:title, :begin_local, :end_local], message: "Required.")
     |> fill_utc_dates(begin_local: :begin, end_local: :end)
     |> validate_begin_before_end()
-    |> generate_date_title_slug()
+    |> generate_slug()
     |> unique_constraint(:slug)
+  end
+
+  defp generate_slug(changeset) do
+    case get_field(changeset, :title) do
+      nil -> changeset
+      title -> put_change(changeset, :slug, Slug.slugify(title))
+    end
+  end
+
+  defimpl Phoenix.Param, for: DevRound.Events.EventSession do
+    def to_param(%{slug: slug}), do: slug
   end
 end

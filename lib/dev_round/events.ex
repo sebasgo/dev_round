@@ -70,7 +70,7 @@ defmodule DevRound.Events do
 
     Event
     |> Repo.get_by!(query)
-    |> Repo.preload([:langs, :hosts])
+    |> Repo.preload([:langs, :hosts, :sessions])
     |> Repo.preload(events_attendees: {attendee_query, [:user, :langs]})
   end
 

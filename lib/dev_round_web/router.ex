@@ -92,6 +92,8 @@ defmodule DevRoundWeb.Router do
       live "/events/:slug/hosting/lobby/registration/edit/:user_name",
            HostingLobbyLive.Show,
            :edit_registration
+
+      live "/events/:slug/hosting/session/:session_slug", HostingSessionLive.Show, :show
     end
   end
 

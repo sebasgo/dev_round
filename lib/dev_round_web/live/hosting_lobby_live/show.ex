@@ -1,7 +1,7 @@
 defmodule DevRoundWeb.HostingLobbyLive.Show do
   use DevRoundWeb, :live_view
+  import DevRoundWeb.HostingBase
 
-  alias DevRound.Events
   alias DevRound.Events.Event
   alias DevRound.Hosting
 
@@ -20,7 +20,7 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
       |> assign(:registration_edit_username, params["user_name"])
       |> update_assigns()
 
-    {:noreply, socket |> update_assigns}
+    {:noreply, socket}
   end
 
   @impl true
@@ -66,29 +66,11 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
 
   defp update_assigns(socket) do
     socket
-    |> fetch_event()
+    |> assign_event()
     |> ensure_current_user_is_host!()
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign_messages()
     |> maybe_assign_edit_attendee()
-  end
-
-  defp fetch_event(socket) do
-    assign(
-      socket,
-      :event,
-      Events.get_event!(socket.assigns.slug, order_attendees_by: :is_remote_and_full_name)
-    )
-  end
-
-  defp ensure_current_user_is_host!(socket) do
-    user = socket.assigns.current_user
-
-    if !Enum.member?(socket.assigns.event.hosts, user) do
-      raise DevRoundWeb.PermissionError, message: "\"#{user.name}\" is not an event host"
-    end
-
-    socket
   end
 
   defp assign_messages(socket) do
