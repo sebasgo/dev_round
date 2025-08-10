@@ -44,7 +44,7 @@ defmodule DevRoundWeb.Admin.EventAttendees do
         module: Backpex.Fields.Boolean,
         label: "Remote Attendence"
       },
-      expierence_level: %{
+      experience_level: %{
         module: Backpex.Fields.Number,
         label: "Expierence Level"
       },

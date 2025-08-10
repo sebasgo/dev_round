@@ -23,6 +23,7 @@ defmodule DevRound.Events.EventAttendee do
   def changeset(event_attendee, attrs, _opts \\ %{}) do
     event_attendee
     |> cast(attrs, [:event_id, :user_id, :is_remote, :experience_level])
+    |> unique_constraint([:event_id, :user_id], message: "User already registered for this event")
     |> validate_experience_level()
   end
 
