@@ -4,6 +4,7 @@ defmodule DevRound.Events.EventSession do
   import DevRound.Changeset
   alias DevRound.Events.EventSession
   alias DevRound.Events.Event
+  alias DevRound.Hosting.Team
 
   schema "event_sessions" do
     field :title, :string
@@ -14,6 +15,7 @@ defmodule DevRound.Events.EventSession do
     field :end_local, :naive_datetime
 
     belongs_to :event, Event
+    has_many :teams, Team, foreign_key: :session_id, on_replace: :delete, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end
