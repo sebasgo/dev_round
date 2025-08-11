@@ -31,9 +31,11 @@ defmodule DevRound.UserImport do
         case Jason.decode(content) do
           {:ok, users_data} ->
             import_users(users_data)
+
           {:error, decode_error} ->
             {:error, "Failed to decode JSON: #{inspect(decode_error)}"}
         end
+
       {:error, file_error} ->
         {:error, "Failed to read file: #{inspect(file_error)}"}
     end
@@ -49,8 +51,10 @@ defmodule DevRound.UserImport do
       case import_single_user(user_data) do
         {:ok, _user} ->
           %{acc | imported: acc.imported + 1}
+
         {:error, :unique_constraint} ->
           %{acc | skipped: acc.skipped + 1}
+
         {:error, reason} ->
           error_msg = format_error(user_data, reason)
           %{acc | errors: [error_msg | acc.errors]}
@@ -67,6 +71,7 @@ defmodule DevRound.UserImport do
     case Repo.insert(changeset) do
       {:ok, user} ->
         {:ok, user}
+
       {:error, %Changeset{errors: errors}} ->
         if has_unique_constraint_error?(errors) do
           {:error, :unique_constraint}
@@ -78,7 +83,8 @@ defmodule DevRound.UserImport do
 
   defp has_unique_constraint_error?(errors) do
     Enum.any?(errors, fn {_field, {_message, opts}} ->
-      Keyword.get(opts, :constraint) == :unique or Keyword.get(opts, :validation) == :unsafe_unique
+      Keyword.get(opts, :constraint) == :unique or
+        Keyword.get(opts, :validation) == :unsafe_unique
     end)
   end
 
@@ -101,6 +107,7 @@ defmodule DevRound.UserImport do
 
         if length(errors) > 0 do
           IO.puts("  - Errors: #{length(errors)}")
+
           Enum.each(errors, fn error ->
             IO.puts("    * #{error}")
           end)
