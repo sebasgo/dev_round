@@ -5,3 +5,22 @@
     Build Teams
   </.button>
 </div>
+
+<div>
+  <%= for team <- @teams do %>
+    <h2>{team.name}</h2>
+    <%= for attendee <- team.attendees do %>
+      <div class="mt-4">
+        <.user_badge
+          user={attendee.user}
+          remote={attendee.is_remote}
+          expierence_level={attendee.experience_level}
+        >
+          <p class="text-sm">
+            {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
+          </p>
+        </.user_badge>
+      </div>
+    <% end %>
+  <% end %>
+</div>

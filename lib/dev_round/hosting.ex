@@ -153,6 +153,15 @@ defmodule DevRound.Hosting do
     a.is_remote == b.is_remote and not MapSet.disjoint?(MapSet.new(a.langs), MapSet.new(b.langs))
   end
 
+  def list_teams_for_session(%EventSession{} = session) do
+    attendee_query =
+      from ea in EventAttendee, join: u in assoc(ea, :user), order_by: [asc: u.full_name]
+
+    from(t in Team, where: t.session_id == ^session.id)
+    |> Repo.all()
+    |> Repo.preload(attendees: {attendee_query, [:user, :langs]})
+  end
+
   def build_teams_for_session(%EventSession{} = session, attendees) do
     attendees = filter_checked(attendees)
     {:ok, []} = validate_team_generation_constraints(attendees)

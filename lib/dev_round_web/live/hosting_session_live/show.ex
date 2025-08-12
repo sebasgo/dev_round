@@ -29,14 +29,15 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
         socket.assigns.event.events_attendees
       )
 
-    {:noreply, socket}
+    {:noreply, socket |> assign_teams()}
   end
 
   defp update_assigns(socket) do
     socket
     |> assign_event()
-    |> assign_session()
     |> ensure_current_user_is_host!()
+    |> assign_session()
+    |> assign_teams()
     |> assign_page_title()
   end
 
@@ -48,6 +49,11 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
       :session,
       Enum.find(socket.assigns.event.sessions, fn session -> session.slug == session_slug end)
     )
+  end
+
+  defp assign_teams(socket) do
+    socket
+    |> assign(:teams, Hosting.list_teams_for_session(socket.assigns.session))
   end
 
   defp assign_page_title(%{assigns: %{live_action: :show, session: session}} = socket) do
