@@ -4,10 +4,14 @@ defmodule DevRound.Hosting do
   """
 
   import Ecto.Query, warn: false
+  alias Ecto.Multi
+  alias Ecto.Changeset
   alias DevRound.Events.EventAttendee
   alias DevRound.Repo
 
+  alias DevRound.Hosting.Team
   alias DevRound.Hosting.TeamName
+  alias DevRound.Events.EventSession
 
   @doc """
   Returns the list of team_names.
@@ -147,5 +151,25 @@ defmodule DevRound.Hosting do
 
   defp are_compatible?(%EventAttendee{} = a, %EventAttendee{} = b) do
     a.is_remote == b.is_remote and not MapSet.disjoint?(MapSet.new(a.langs), MapSet.new(b.langs))
+  end
+
+  def build_teams_for_session(%EventSession{} = session, attendees) do
+    attendees = filter_checked(attendees)
+    {:ok, []} = validate_team_generation_constraints(attendees)
+
+    Multi.new()
+    |> Multi.delete_all(:teams, Ecto.assoc(session, :teams))
+    |> insert_teams(session, attendees)
+    |> Repo.transaction()
+  end
+
+  defp insert_teams(multi, session, attendees) do
+    multi
+    |> Multi.insert(
+      :insert_team,
+      %Team{}
+      |> Changeset.change(name: "Test", slug: "test", is_remote: false, session: session)
+      |> Changeset.put_assoc(:attendees, attendees)
+    )
   end
 end

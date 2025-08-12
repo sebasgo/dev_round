@@ -1,6 +1,7 @@
 defmodule DevRoundWeb.HostingSessionLive.Show do
   use DevRoundWeb, :live_view
   import DevRoundWeb.HostingBase
+  alias DevRound.Hosting
 
   @impl true
   def mount(_params, _session, socket) do
@@ -16,6 +17,17 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
       |> assign(:slug, slug)
       |> assign(:session_slug, session_slug)
       |> update_assigns()
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("build_teams", _params, socket) do
+    {:ok, _} =
+      Hosting.build_teams_for_session(
+        socket.assigns.session,
+        socket.assigns.event.events_attendees
+      )
 
     {:noreply, socket}
   end
