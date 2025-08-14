@@ -9,6 +9,7 @@
 <div>
   <%= for team <- @teams do %>
     <h2>{team.name}</h2>
+    <p>{team.is_remote}</p>
     <%= for attendee <- team.attendees do %>
       <div class="mt-4">
         <.user_badge

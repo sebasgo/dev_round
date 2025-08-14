@@ -159,6 +159,7 @@ defmodule DevRound.Hosting do
 
     from(t in Team, where: t.session_id == ^session.id)
     |> Repo.all()
+    |> Repo.preload(:lang)
     |> Repo.preload(attendees: {attendee_query, [:user, :langs]})
   end
 
@@ -173,12 +174,103 @@ defmodule DevRound.Hosting do
   end
 
   defp insert_teams(multi, session, attendees) do
-    multi
-    |> Multi.insert(
-      :insert_team,
+    generate_team_changesets(session, attendees)
+    |> Enum.reduce(multi, &Multi.insert(&2, Changeset.get_change(&1, :slug), &1))
+  end
+
+  defp generate_team_changesets(session, attendees) do
+    {local_teams, local_langs} = generate_teams_langs(attendees, false)
+    {remote_teams, remote_langs} = generate_teams_langs(attendees, true)
+    create_team_changesets({local_teams ++ remote_teams, local_langs ++ remote_langs}, session)
+  end
+
+  defp generate_teams_langs(attendees, is_remote) do
+    attendees
+    |> Enum.filter(&(&1.is_remote == is_remote))
+    |> order_attendees_by_experience()
+    |> split_experience_field()
+    |> find_valid_teams_attendees()
+  end
+
+  defp order_attendees_by_experience(attendees) do
+    Enum.sort(attendees, &(&1.experience_level >= &2.experience_level))
+  end
+
+  defp split_experience_field(attendees) do
+    Enum.split(attendees, Enum.count(attendees) |> Integer.floor_div(2))
+  end
+
+  defp find_valid_teams_attendees({[], []}) do
+    {[], []}
+  end
+
+  defp find_valid_teams_attendees({bottom_field, top_field}) do
+    {teams_attendees, teams_langs} =
+      {bottom_field, top_field}
+      |> shuffle_experience_fields()
+      |> form_teams_attendees_from_experience_fields()
+      |> find_teams_langs()
+
+    if Enum.any?(teams_langs, &Enum.empty?/1) do
+      find_valid_teams_attendees({bottom_field, top_field})
+    else
+      {teams_attendees, teams_langs}
+    end
+  end
+
+  defp shuffle_experience_fields({bottom_field, top_field}) do
+    {Enum.shuffle(bottom_field), Enum.shuffle(top_field)}
+  end
+
+  defp form_teams_attendees_from_experience_fields({bottom_field, top_field}) do
+    pair_count = min(length(bottom_field), length(top_field)) - 1
+
+    pairs =
+      Enum.zip(Enum.take(bottom_field, pair_count), Enum.take(top_field, pair_count))
+      |> Enum.map(fn {a, b} -> [a, b] end)
+
+    final_team = Enum.drop(bottom_field, pair_count) ++ Enum.drop(top_field, pair_count)
+    pairs ++ [final_team]
+  end
+
+  defp find_teams_langs(teams_attendees) do
+    langs =
+      Enum.map(teams_attendees, fn team_attendees ->
+        find_team_langs(team_attendees) |> MapSet.to_list()
+      end)
+
+    {teams_attendees, langs}
+  end
+
+  defp find_team_langs([attendee | rest]) do
+    if Enum.empty?(rest) do
+      MapSet.new(attendee.langs)
+    else
+      MapSet.new(attendee.langs) |> MapSet.intersection(find_team_langs(rest))
+    end
+  end
+
+  defp find_team_langs([]) do
+    MapSet.new()
+  end
+
+  defp create_team_changesets({teams_attendees, teams_langs}, session) do
+    names = list_team_names() |> Enum.shuffle() |> Enum.take(length(teams_attendees))
+    # FIXME assert we have enough names, belongs into validate_team_building_constraints
+    Enum.zip([teams_attendees, teams_langs, names])
+    |> Enum.map(fn {team_attendees, team_langs, name} ->
+      lang = Enum.shuffle(team_langs) |> Enum.at(0)
+      is_remote = hd(team_attendees).is_remote
+
       %Team{}
-      |> Changeset.change(name: "Test", slug: "test", is_remote: false, session: session)
-      |> Changeset.put_assoc(:attendees, attendees)
-    )
+      |> Changeset.change(
+        name: name.name,
+        slug: name.slug,
+        is_remote: is_remote,
+        session: session,
+        lang: lang
+      )
+      |> Changeset.put_assoc(:attendees, team_attendees)
+    end)
   end
 end
