@@ -10,14 +10,14 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias DevRound.Sessions
+alias DevRound.Hosting
 
 [
   "2b|!2b",
   "char *team_name",
   "keep::calm && code",
   "#define true false",
-  "//TODO: Teamname",
+  "// TODO: Teamname",
   "camel_case",
   "return 42;",
   "Master's of Algo Lands",
@@ -69,4 +69,4 @@ alias DevRound.Sessions
   "Goto Fail",
   "Beyond Infinity"
 ]
-|> Enum.map(fn name -> {:ok, _} = Sessions.create_team_name(%{name: name}) end)
+|> Enum.map(fn name -> {:ok, _} = Hosting.create_team_name(%{name: name}) end)
