@@ -67,6 +67,7 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
   defp update_assigns(socket) do
     socket
     |> assign_event()
+    |> assign_team_names()
     |> ensure_current_user_is_host!()
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign_messages()
@@ -75,7 +76,10 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
 
   defp assign_messages(socket) do
     {_, messages} =
-      Hosting.validate_team_generation_constraints(socket.assigns.event.events_attendees)
+      Hosting.validate_team_generation_constraints(
+        socket.assigns.event.events_attendees,
+        socket.assigns.team_names
+      )
 
     assign(socket, :messages, messages)
   end

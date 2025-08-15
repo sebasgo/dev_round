@@ -1,6 +1,6 @@
 defmodule DevRoundWeb.HostingBase do
   import Phoenix.Component
-  alias DevRound.Events
+  alias DevRound.{Events, Hosting}
 
   def assign_event(socket) do
     assign(
@@ -8,6 +8,10 @@ defmodule DevRoundWeb.HostingBase do
       :event,
       Events.get_event!(socket.assigns.slug, order_attendees_by: :is_remote_and_full_name)
     )
+  end
+
+  def assign_team_names(socket) do
+    assign(socket, :team_names, Hosting.list_team_names())
   end
 
   def ensure_current_user_is_host!(socket) do

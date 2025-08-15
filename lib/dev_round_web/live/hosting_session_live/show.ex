@@ -26,7 +26,8 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     {:ok, _} =
       Hosting.build_teams_for_session(
         socket.assigns.session,
-        socket.assigns.event.events_attendees
+        socket.assigns.event.events_attendees,
+        socket.assigns.team_names
       )
 
     {:noreply, socket |> assign_teams()}
@@ -35,6 +36,7 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
   defp update_assigns(socket) do
     socket
     |> assign_event()
+    |> assign_team_names()
     |> ensure_current_user_is_host!()
     |> assign_session()
     |> assign_teams()

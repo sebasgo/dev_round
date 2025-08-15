@@ -117,7 +117,7 @@ defmodule DevRound.Hosting do
     EventAttendee.check_changeset(attendee, %{checked: checked})
   end
 
-  def validate_team_generation_constraints(attendees) do
+  def validate_team_generation_constraints(attendees, team_names) do
     attendees = filter_checked(attendees)
 
     if Enum.count(attendees) >= 2 do
@@ -135,6 +135,14 @@ defmodule DevRound.Hosting do
           end
         end
         |> Enum.reject(&is_nil/1)
+
+      messages =
+        messages ++
+          if Integer.floor_div(length(attendees), 2) > length(team_names) do
+            ["Not enough team names for checked participants."]
+          else
+            []
+          end
 
       case messages do
         [] -> {:ok, []}
@@ -163,25 +171,30 @@ defmodule DevRound.Hosting do
     |> Repo.preload(attendees: {attendee_query, [:user, :langs]})
   end
 
-  def build_teams_for_session(%EventSession{} = session, attendees) do
+  def build_teams_for_session(%EventSession{} = session, attendees, team_names) do
     attendees = filter_checked(attendees)
-    {:ok, []} = validate_team_generation_constraints(attendees)
+    {:ok, []} = validate_team_generation_constraints(attendees, team_names)
 
     Multi.new()
     |> Multi.delete_all(:teams, Ecto.assoc(session, :teams))
-    |> insert_teams(session, attendees)
+    |> insert_teams(session, attendees, team_names)
     |> Repo.transaction()
   end
 
-  defp insert_teams(multi, session, attendees) do
-    generate_team_changesets(session, attendees)
+  defp insert_teams(multi, session, attendees, team_names) do
+    generate_team_changesets(session, attendees, team_names)
     |> Enum.reduce(multi, &Multi.insert(&2, Changeset.get_change(&1, :slug), &1))
   end
 
-  defp generate_team_changesets(session, attendees) do
+  defp generate_team_changesets(session, attendees, team_names) do
     {local_teams, local_langs} = generate_teams_langs(attendees, false)
     {remote_teams, remote_langs} = generate_teams_langs(attendees, true)
-    create_team_changesets({local_teams ++ remote_teams, local_langs ++ remote_langs}, session)
+
+    create_team_changesets(
+      {local_teams ++ remote_teams, local_langs ++ remote_langs},
+      session,
+      team_names
+    )
   end
 
   defp generate_teams_langs(attendees, is_remote) do
@@ -254,9 +267,9 @@ defmodule DevRound.Hosting do
     MapSet.new()
   end
 
-  defp create_team_changesets({teams_attendees, teams_langs}, session) do
-    names = list_team_names() |> Enum.shuffle() |> Enum.take(length(teams_attendees))
-    # FIXME assert we have enough names, belongs into validate_team_building_constraints
+  defp create_team_changesets({teams_attendees, teams_langs}, session, team_names) do
+    names = team_names |> Enum.shuffle() |> Enum.take(length(teams_attendees))
+
     Enum.zip([teams_attendees, teams_langs, names])
     |> Enum.map(fn {team_attendees, team_langs, name} ->
       lang = Enum.shuffle(team_langs) |> Enum.at(0)
