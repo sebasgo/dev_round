@@ -1,12 +1,13 @@
 <DevRoundWeb.HostingComponents.header event={@event} session={@session} />
+<DevRoundWeb.HostingComponents.messages messages={@messages}/>
 
 <div class="my-8">
-  <.button type="button" phx-click={JS.push("build_teams")}>
+  <.button type="button" disabled={!Enum.empty?(@messages)} phx-click={JS.push("build_teams")}>
     Build Teams
   </.button>
 </div>
 
-<div>
+<div class="my-8">
   <%= for team <- @teams do %>
     <h2>{team.name}</h2>
     <p>{team.is_remote}</p>
@@ -25,3 +26,4 @@
     <% end %>
   <% end %>
 </div>
+

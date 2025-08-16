@@ -1,6 +1,7 @@
 defmodule DevRoundWeb.HostingComponents do
   use Phoenix.Component
   use DevRoundWeb, :verified_routes
+  alias Backpex.HTML.CoreComponents
   alias DevRound.Events.Event
   alias DevRound.Events.EventSession
 
@@ -53,6 +54,20 @@ defmodule DevRoundWeb.HostingComponents do
         </.link>
       <% end %>
     </div>
+    """
+  end
+
+  attr :messages, :list
+  def messages(assigns) do
+    ~H"""
+    <ul :if={not Enum.empty?(@messages)} class="my-8">
+      <%= for msg <- @messages do %>
+        <li class="flex gap-2 items-center text-error">
+          <CoreComponents.icon name="hero-exclamation-circle-mini" class="w-5 h-5" />
+          {msg}
+        </li>
+      <% end %>
+    </ul>
     """
   end
 end

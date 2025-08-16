@@ -74,16 +74,6 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
     |> maybe_assign_edit_attendee()
   end
 
-  defp assign_messages(socket) do
-    {_, messages} =
-      Hosting.validate_team_generation_constraints(
-        socket.assigns.event.events_attendees,
-        socket.assigns.team_names
-      )
-
-    assign(socket, :messages, messages)
-  end
-
   defp maybe_assign_edit_attendee(socket) do
     name = socket.assigns.registration_edit_username
 

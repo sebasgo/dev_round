@@ -23,4 +23,14 @@ defmodule DevRoundWeb.HostingBase do
 
     socket
   end
+
+  def assign_messages(socket) do
+    {_, messages} =
+      Hosting.validate_team_generation_constraints(
+        socket.assigns.event.events_attendees,
+        socket.assigns.team_names
+      )
+
+    assign(socket, :messages, messages)
+  end
 end

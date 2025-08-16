@@ -1,4 +1,5 @@
 <DevRoundWeb.HostingComponents.header event={@event} />
+<DevRoundWeb.HostingComponents.messages messages={@messages}/>
 
 <p class="my-8">
   Check in participants to include them in the team generation for the pair programming sessions:
@@ -72,15 +73,6 @@
     </div>
   </div>
 </div>
-
-<ul :if={not Enum.empty?(@messages)}>
-  <%= for msg <- @messages do %>
-    <li class="flex gap-2 items-center text-error">
-      <.icon name="hero-exclamation-circle-mini" class="w-5 h-5" />
-      {msg}
-    </li>
-  <% end %>
-</ul>
 
 <.modal
   :if={@live_action == :edit_registration}

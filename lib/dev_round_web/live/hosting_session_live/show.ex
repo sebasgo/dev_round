@@ -38,6 +38,7 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     |> assign_event()
     |> assign_team_names()
     |> ensure_current_user_is_host!()
+    |> assign_messages()
     |> assign_session()
     |> assign_teams()
     |> assign_page_title()
