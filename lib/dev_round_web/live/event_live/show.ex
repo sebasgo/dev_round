@@ -65,6 +65,7 @@ defmodule DevRoundWeb.EventLive.Show do
     |> assign(:event, event)
     |> assign(:attendence, attendence(event, socket.assigns.current_user))
     |> assign(:registration_open?, Events.event_open_for_registration?(event))
+    |> assign(:multiple_langs, Events.event_has_multiple_langs?(event))
   end
 
   defp page_title(:show, event), do: event.title

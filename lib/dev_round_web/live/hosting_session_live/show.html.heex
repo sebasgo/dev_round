@@ -1,5 +1,5 @@
 <DevRoundWeb.HostingComponents.header event={@event} session={@session} />
-<DevRoundWeb.HostingComponents.messages messages={@messages}/>
+<DevRoundWeb.HostingComponents.messages messages={@messages} />
 
 <div class="my-8">
   <.button type="button" disabled={!Enum.empty?(@messages)} phx-click={JS.push("build_teams")}>
@@ -7,23 +7,42 @@
   </.button>
 </div>
 
-<div class="my-8">
+<div class="my-8 grid gap-4 lg:grid-cols-3">
   <%= for team <- @teams do %>
-    <h2>{team.name}</h2>
-    <p>{team.is_remote}</p>
-    <%= for attendee <- team.attendees do %>
-      <div class="mt-4">
-        <.user_badge
-          user={attendee.user}
-          remote={attendee.is_remote}
-          expierence_level={attendee.experience_level}
+    <div class="card card-compact bg-base-300 show-md border border-base-300">
+      <div class="card-body gap-4">
+        <h2 class="card-title text-lg font-mono font-semibold text-base-content grid gap-1">
+          <span class="flex items-start">
+            <span class="grow">{team.name}</span>
+            <.icon :if={team.is_remote} name="hero-globe-alt" class="w-6 h-8" />
+          </span>
+          <.lang_badge :if={@multiple_langs} lang={team.lang} />
+        </h2>
+        <div
+          class="grid gap-1 bg-neutral-content border-neutral-content"
+          style="border-radius: 24px"
         >
-          <p class="text-sm">
-            {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
-          </p>
-        </.user_badge>
+          <%= for item <- Enum.intersperse(team.attendees, :divider) do %>
+            <%= case item do %>
+              <% :divider -> %>
+                <div class="mx-[1px] border-t border-neutral" />
+              <% attendee -> %>
+                <div class="">
+                  <.user_badge
+                    user={attendee.user}
+                    remote={attendee.is_remote}
+                    expierence_level={attendee.experience_level}
+                  >
+                    <p :if={@multiple_langs} class="text-sm">
+                      {Enum.map(attendee.langs, fn lang -> lang.name end)
+                      |> Enum.intersperse(", ")}
+                    </p>
+                  </.user_badge>
+                </div>
+            <% end %>
+          <% end %>
+        </div>
       </div>
-    <% end %>
+    </div>
   <% end %>
 </div>
-

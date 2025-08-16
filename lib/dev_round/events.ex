@@ -171,6 +171,10 @@ defmodule DevRound.Events do
     |> validate_event_attendee_langs(event)
   end
 
+  def event_has_multiple_langs?(%Event{langs: langs}) do
+    !Enum.empty?(tl(langs))
+  end
+
   def create_event_attendee(
         %Event{} = event,
         %User{} = user,

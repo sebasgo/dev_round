@@ -737,7 +737,7 @@ defmodule DevRoundWeb.CoreComponents do
     assigns = assign(assigns, :icon_url, icon_url)
 
     ~H"""
-    <div class="badge xbadge-outline badge-lg pd-0 gap-2">
+    <div class="badge badge-neutral badge-lg pd-0 gap-2">
       <img src={@icon_url} class="h-4 w-4" alt="" />
       <p>{@lang.name}</p>
     </div>

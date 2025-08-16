@@ -3,11 +3,11 @@ defmodule DevRoundWeb.HostingBase do
   alias DevRound.{Events, Hosting}
 
   def assign_event(socket) do
-    assign(
-      socket,
-      :event,
-      Events.get_event!(socket.assigns.slug, order_attendees_by: :is_remote_and_full_name)
-    )
+    event = Events.get_event!(socket.assigns.slug, order_attendees_by: :is_remote_and_full_name)
+
+    socket
+    |> assign(:event, event)
+    |> assign(:multiple_langs, Events.event_has_multiple_langs?(event))
   end
 
   def assign_team_names(socket) do

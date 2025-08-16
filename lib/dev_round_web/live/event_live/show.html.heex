@@ -109,7 +109,7 @@
         </p>
         <%= for attendee <- @event.events_attendees do %>
           <.user_badge user={attendee.user} remote={attendee.is_remote}>
-            <p :if={!Enum.empty?(tl(@event.langs))} class="text-sm">
+            <p :if={@multiple_langs} class="text-sm">
               {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
             </p>
           </.user_badge>

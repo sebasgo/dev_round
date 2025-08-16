@@ -1,5 +1,5 @@
 <DevRoundWeb.HostingComponents.header event={@event} />
-<DevRoundWeb.HostingComponents.messages messages={@messages}/>
+<DevRoundWeb.HostingComponents.messages messages={@messages} />
 
 <p class="my-8">
   Check in participants to include them in the team generation for the pair programming sessions:
@@ -38,7 +38,7 @@
                 remote={attendee.is_remote}
                 expierence_level={attendee.experience_level}
               >
-                <p :if={!Enum.empty?(tl(@event.langs))} class="text-sm">
+                <p :if={@multiple_langs} class="text-sm">
                   {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
                 </p>
               </.user_badge>

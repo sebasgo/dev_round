@@ -58,6 +58,7 @@ defmodule DevRoundWeb.HostingComponents do
   end
 
   attr :messages, :list
+
   def messages(assigns) do
     ~H"""
     <ul :if={not Enum.empty?(@messages)} class="my-8">
