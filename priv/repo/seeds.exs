@@ -62,7 +62,7 @@ alias DevRound.Hosting
   "NaN",
   "None",
   "Partners in Code",
-  "AbstractProblemFactoryFactory",
+  "AbstractProblemFactory",
   "Magic Number Wizards",
   "The Binary Trio",
   "Upgrade Required",
