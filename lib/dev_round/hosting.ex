@@ -206,7 +206,7 @@ defmodule DevRound.Hosting do
   end
 
   defp order_attendees_by_experience(attendees) do
-    Enum.sort(attendees, &(&1.experience_level >= &2.experience_level))
+    attendees |> Enum.sort_by(&({&1.experience_level, :rand.uniform()}))
   end
 
   defp split_experience_field(attendees) do
@@ -272,7 +272,7 @@ defmodule DevRound.Hosting do
 
     Enum.zip([teams_attendees, teams_langs, names])
     |> Enum.map(fn {team_attendees, team_langs, name} ->
-      lang = Enum.shuffle(team_langs) |> Enum.at(0)
+      lang = Enum.random(team_langs)
       is_remote = hd(team_attendees).is_remote
 
       %Team{}
