@@ -1,4 +1,4 @@
-<%= if @attendence == nil do %>
+<%= if @attendance == nil do %>
   <.header>
     <:actions>
       <%= if @current_user in @event.hosts do %>
@@ -31,7 +31,7 @@
     <:subtitle>
       <div class="badge badge-success gap-2">
         <.icon name="hero-check" class="inline-block h-4 w-4" />
-        You have registered on {@attendence.inserted_at
+        You have registered on {@attendance.inserted_at
         |> DateTime.shift_zone!(DevRound.Formats.time_zone())
         |> DevRound.Formats.format_datetime()}
       </div>
@@ -143,7 +143,7 @@
     title={@page_title}
     action={@live_action}
     event={@event}
-    attendence={@attendence}
+    attendance={@attendance}
     patch={~p"/events/#{@event}"}
     user={@current_user}
     mode={:self_registration}

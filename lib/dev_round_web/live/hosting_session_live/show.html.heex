@@ -31,7 +31,7 @@
                   <.user_badge
                     user={attendee.user}
                     remote={attendee.is_remote}
-                    expierence_level={attendee.experience_level}
+                    experience_level={attendee.experience_level}
                   >
                     <p :if={@multiple_langs} class="text-sm">
                       {Enum.map(attendee.langs, fn lang -> lang.name end)

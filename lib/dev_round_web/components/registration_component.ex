@@ -63,14 +63,14 @@ defmodule DevRoundWeb.RegistrationComponent do
   end
 
   @impl true
-  def update(%{event: event, attendence: attendence, mode: mode} = assigns, socket) do
-    attendence = get_or_create_attendee(attendence)
-    changeset = Events.change_event_attendee(attendence, event, %{}, mode)
+  def update(%{event: event, attendance: attendance, mode: mode} = assigns, socket) do
+    attendance = get_or_create_attendee(attendance)
+    changeset = Events.change_event_attendee(attendance, event, %{}, mode)
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:attendence, attendence)
+     |> assign(:attendance, attendance)
      |> assign(:title, title(assigns))
      |> assign(:save_label, save_label(assigns.action))
      |> assign_new(:lang_options, fn -> lang_opts(changeset, event) end)
@@ -79,8 +79,8 @@ defmodule DevRoundWeb.RegistrationComponent do
 
   @impl true
   def handle_event("validate", %{"event_attendee" => event_attendee_params}, socket) do
-    %{attendence: attendence, event: event, mode: mode} = socket.assigns
-    changeset = Events.change_event_attendee(attendence, event, event_attendee_params, mode)
+    %{attendance: attendance, event: event, mode: mode} = socket.assigns
+    changeset = Events.change_event_attendee(attendance, event, event_attendee_params, mode)
 
     {:noreply,
      assign(socket, %{
@@ -96,7 +96,7 @@ defmodule DevRoundWeb.RegistrationComponent do
   def handle_event("delete", _, socket) do
     %{:mode => :self_registration} = socket.assigns
 
-    case Events.delete_event_attendee(socket.assigns.attendence, :self_registration) do
+    case Events.delete_event_attendee(socket.assigns.attendance, :self_registration) do
       {:ok, attendee} ->
         event = socket.assigns.event
         broadcast_registration("registration", {:delete, event, attendee})
@@ -120,7 +120,7 @@ defmodule DevRoundWeb.RegistrationComponent do
 
   defp save_event_attendee(socket, :edit_registration, event_attendee_params) do
     case Events.update_event_attendee(
-           socket.assigns.attendence,
+           socket.assigns.attendance,
            event_attendee_params,
            socket.assigns.mode
          ) do

@@ -63,7 +63,7 @@ defmodule DevRoundWeb.EventLive.Show do
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action, event))
     |> assign(:event, event)
-    |> assign(:attendence, attendence(event, socket.assigns.current_user))
+    |> assign(:attendance, attendance(event, socket.assigns.current_user))
     |> assign(:registration_open?, Events.event_open_for_registration?(event))
     |> assign(:multiple_langs, Events.event_has_multiple_langs?(event))
   end
@@ -72,7 +72,7 @@ defmodule DevRoundWeb.EventLive.Show do
   defp page_title(:new_registration, event), do: "#{event.title} · Register"
   defp page_title(:edit_registration, event), do: "#{event.title} · Manage Registration"
 
-  defp attendence(event, user) do
+  defp attendance(event, user) do
     Enum.find(event.events_attendees, fn a -> a.user.id == user.id end)
   end
 end

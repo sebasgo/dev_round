@@ -749,7 +749,7 @@ defmodule DevRoundWeb.CoreComponents do
   """
   attr :user, DevRound.Accounts.User, required: true
   attr :remote, :boolean, default: false
-  attr :expierence_level, :integer, default: nil
+  attr :experience_level, :integer, default: nil
   slot :inner_block
 
   def user_badge(assigns) do
@@ -762,9 +762,9 @@ defmodule DevRoundWeb.CoreComponents do
             <.icon name="hero-globe-alt" class="w-4 h-4" />
           </div>
         <% end %>
-        <%= if @expierence_level != nil do %>
+        <%= if @experience_level != nil do %>
           <div class="absolute bottom-0 right-0 w-4 h-4 bg-primary rounded-full flex content-center justify-center text-xs">
-            {@expierence_level}
+            {@experience_level}
           </div>
         <% end %>
       </div>
