@@ -71,6 +71,7 @@ defmodule DevRound.Events.Event do
     |> validate_begin_before_end()
     |> validate_registration_deadline_before_begin()
     |> validate_sessions_within_event_dates()
+    |> validate_sessions_do_not_overlap()
     |> validate_option_selected([:langs, :hosts])
     |> generate_date_title_slug()
     |> unique_constraint(:slug)
@@ -95,7 +96,7 @@ defmodule DevRound.Events.Event do
 
     changeset =
       if sessions != nil && begin != nil && end_ != nil do
-        Enum.reduce(sessions, changeset, &validate_session_with_event_dates/2)
+        Enum.reduce(sessions, changeset, &validate_session_within_event_dates/2)
       else
         changeset
       end
@@ -103,7 +104,7 @@ defmodule DevRound.Events.Event do
     changeset
   end
 
-  defp validate_session_with_event_dates(session, changeset) do
+  defp validate_session_within_event_dates(session, changeset) do
     event_begin = get_field(changeset, :begin)
     event_end = get_field(changeset, :end)
     begin = session.begin
@@ -133,6 +134,48 @@ defmodule DevRound.Events.Event do
 
     changeset
   end
+
+  defp validate_sessions_do_not_overlap(changeset) do
+    sessions = get_field(changeset, :sessions, [])
+    validate_sessions_do_not_overlap(changeset, sessions)
+  end
+
+  defp validate_sessions_do_not_overlap(changeset, [session | rest]) do
+    Enum.reduce(rest, changeset, fn other, changeset ->
+      validate_session_does_not_overlap(changeset, session, other)
+    end)
+  end
+
+  defp validate_sessions_do_not_overlap(changeset, []), do: changeset
+
+  defp validate_session_does_not_overlap(
+         changeset,
+         %EventSession{} = session,
+         %EventSession{} = other
+       ) do
+    if sessions_overlap?(session, other) do
+      add_error(
+        changeset,
+        :sessions,
+        "#{EventSession.title(session)} overlaps with #{EventSession.title(other)}."
+      )
+    else
+      changeset
+    end
+  end
+
+  defp sessions_overlap?(
+         %EventSession{begin: %DateTime{} = a_begin, end: %DateTime{} = a_end},
+         %EventSession{begin: %DateTime{} = b_begin, end: %DateTime{} = b_end}
+       ) do
+    if DateTime.compare(a_begin, b_begin) == :lt do
+      DateTime.compare(a_end, b_begin) == :gt
+    else
+      DateTime.compare(a_begin, b_end) == :lt
+    end
+  end
+
+  defp sessions_overlap?(%EventSession{}, %EventSession{}), do: false
 
   defimpl Phoenix.Param, for: DevRound.Events.Event do
     def to_param(%{slug: slug}), do: slug

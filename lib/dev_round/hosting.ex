@@ -206,7 +206,7 @@ defmodule DevRound.Hosting do
   end
 
   defp order_attendees_by_experience(attendees) do
-    attendees |> Enum.sort_by(&({&1.experience_level, :rand.uniform()}))
+    attendees |> Enum.sort_by(&{&1.experience_level, :rand.uniform()})
   end
 
   defp split_experience_field(attendees) do
