@@ -78,7 +78,7 @@ defmodule DevRoundWeb.Admin.Event do
         except: [:index]
       },
       sessions: %{
-        module: Backpex.Fields.InlineCRUD,
+        module: DevRoundWeb.Admin.Fields.Sessions,
         type: :assoc,
         label: "Sessions",
         except: [:index],
