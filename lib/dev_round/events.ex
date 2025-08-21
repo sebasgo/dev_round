@@ -144,6 +144,19 @@ defmodule DevRound.Events do
     |> Ecto.Changeset.put_assoc(:langs, langs)
   end
 
+  def create_lang(attrs \\ %{}) do
+    %Lang{}
+    |> change_lang(attrs)
+    |> Repo.insert()
+  end
+
+  def change_lang(%Lang{} = lang, attrs \\ %{}) do
+    lang
+    |> Lang.changeset(attrs)
+  end
+
+  def lang_icon_dir, do: Path.join(["uploads", "langs", "icon"])
+
   def event_open_for_registration?(%Event{registration_deadline: registration_deadline}) do
     DateTime.compare(DateTime.utc_now(), registration_deadline) == :lt
   end

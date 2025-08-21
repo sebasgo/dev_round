@@ -109,5 +109,5 @@ defmodule DevRoundWeb.Admin.EventLangAdmin do
     "#{entry.uuid}.#{ext}"
   end
 
-  defp upload_dir, do: Path.join(["uploads", "langs", "icon"])
+  defp upload_dir, do: DevRound.Events.lang_icon_dir()
 end
