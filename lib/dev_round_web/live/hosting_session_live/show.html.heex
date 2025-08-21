@@ -11,9 +11,9 @@
   <%= for team <- @teams do %>
     <div class="card card-compact bg-base-300 show-md border border-base-300">
       <div class="card-body gap-4">
-        <h2 class="card-title text-lg font-mono font-semibold text-base-content grid gap-1">
+        <h2 class="card-title  grid gap-1">
           <span class="flex items-start">
-            <span class="grow">{team.name}</span>
+            <span class="grow text-lg font-mono font-semibold text-base-content">{team.name}</span>
             <.icon :if={team.is_remote} name="hero-globe-alt" class="w-6 h-8" />
           </span>
           <.lang_badge :if={@multiple_langs} lang={team.lang} />
