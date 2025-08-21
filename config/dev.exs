@@ -2,8 +2,11 @@ import Config
 
 # Configure your database
 config :dev_round, DevRound.Repo,
-  database: Path.expand("../dev_round_dev.db", __DIR__),
-  pool_size: 5,
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  database: "helloweb_dev",
+  pool_size: 10,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true
 

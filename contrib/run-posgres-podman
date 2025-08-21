@@ -1,0 +1,14 @@
+mkdir -p ~/.local/share/postgres
+
+podman run \
+    --replace \
+    -p 5432:5432 \
+    -e POSTGRES_PASSWORD=postgres \
+    -e POSTGRES_USER=postgres \
+    -e POSTGRES_DB=dev_round \
+    --name postgres \
+    -d \
+    -v ~/.local/share/postgres:/var/lib/postgresql/data \
+    --uidmap=0:1:999 --uidmap=999:0:1 --uidmap=1000:1000:64536 \
+    --gidmap=0:1:999 --gidmap=999:0:1 --gidmap=1000:1000:64536 \
+    docker.io/library/postgres:17
