@@ -32,7 +32,7 @@ defmodule DevRoundWeb.EventLive.Index do
           <%= for event <- @events do %>
             <.link
               patch={~p"/events/#{event}"}
-              class="card card-compact bg-base-300 shadow-md transition-shadow duration-200 border border-base-300 hover:border-primary/50"
+              class="card card-sm bg-base-300 shadow-md transition-shadow duration-200 border border-base-300 hover:border-primary/50"
             >
               <div class="card-body">
                 <h3 class="card-title text-lg font-mono font-semibold text-base-content">

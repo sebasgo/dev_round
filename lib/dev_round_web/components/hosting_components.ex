@@ -36,7 +36,7 @@ defmodule DevRoundWeb.HostingComponents do
 
   defp tabs(assigns) do
     ~H"""
-    <div role="tablist" class="tabs tabs-boxed tabs mt-8">
+    <div role="tablist" class="tabs tabs-border mt-8">
       <.link
         patch={~p"/events/#{@event}/hosting/lobby"}
         role="tab"

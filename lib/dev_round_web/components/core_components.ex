@@ -783,7 +783,7 @@ defmodule DevRoundWeb.CoreComponents do
 
   def user_avatar(%{user: %DevRound.Accounts.User{avatar_url: nil}} = assigns) do
     ~H"""
-    <div class="avatar placeholder">
+    <div class="avatar avatar-placeholder">
       <div class="bg-neutral text-neutral-content w-12 rounded-full">
         <span>{DevRound.Formats.format_avatar_placeholder(@user)}</span>
       </div>
