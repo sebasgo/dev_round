@@ -62,6 +62,12 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Enable PubSub for backpex admin panel and configure translation
+config :backpex,
+  pubsub_server: DevRound.PubSub,
+  translator_function: {DevRoundWeb.CoreComponents, :translate_backpex},
+  error_translator_function: {DevRoundWeb.CoreComponents, :translate_error}
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

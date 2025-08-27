@@ -1,4 +1,4 @@
-defmodule DevRoundWeb.Admin.EventLangAdmin do
+defmodule DevRoundWeb.Admin.Lang do
   use Backpex.LiveResource,
     adapter_config: [
       schema: DevRound.Events.Lang,
@@ -8,9 +8,7 @@ defmodule DevRoundWeb.Admin.EventLangAdmin do
     ],
     layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
-      name: DevRound.PubSub,
-      topic: "event_langs",
-      event_prefix: "event_lang_"
+      topic: "admin.langs"
     ]
 
   @impl Backpex.LiveResource

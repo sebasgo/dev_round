@@ -8,11 +8,10 @@ defmodule DevRoundWeb.Admin.Event do
     ],
     layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
-      name: DevRound.PubSub,
-      topic: "events",
-      event_prefix: "event_"
+      topic: "admin.events"
     ],
-    init_order: %{by: :begin, direction: :desc}
+    init_order: %{by: :begin, direction: :desc},
+    save_and_continue_button?: true
 
   @impl Backpex.LiveResource
   def singular_name, do: "Event"
@@ -36,11 +35,14 @@ defmodule DevRoundWeb.Admin.Event do
       },
       end_local: %{
         module: Backpex.Fields.DateTime,
-        label: "End"
+        label: "End",
+        except: [:index]
       },
       registration_deadline_local: %{
         module: Backpex.Fields.DateTime,
-        label: "Registration Deadline"
+        label: "Registration Deadline",
+        help_text: "After this date, all registrations are locked.",
+        except: [:index]
       },
       location: %{
         module: Backpex.Fields.Text,
@@ -51,7 +53,7 @@ defmodule DevRoundWeb.Admin.Event do
         module: Backpex.Fields.HasMany,
         label: "Programming Languages",
         display_field: :name,
-        live_resource: DevRoundWeb.Admin.EventLangAdmin,
+        live_resource: DevRoundWeb.Admin.Lang,
         prompt: "Select",
         not_found_text: "No languages found",
         except: [:index]
@@ -68,12 +70,14 @@ defmodule DevRoundWeb.Admin.Event do
       teaser: %{
         module: Backpex.Fields.Textarea,
         label: "Teaser",
+        help_text: "Shown on event listing page.",
         rows: 5,
         except: [:index]
       },
       body: %{
         module: Backpex.Fields.Textarea,
         label: "Body",
+        help_text: "Markdown ist supported.",
         rows: 15,
         except: [:index]
       },

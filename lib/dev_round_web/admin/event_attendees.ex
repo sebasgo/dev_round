@@ -8,9 +8,7 @@ defmodule DevRoundWeb.Admin.EventAttendees do
     ],
     layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
-      name: DevRound.PubSub,
-      topic: "event_attendees",
-      event_prefix: "event_attendee_"
+      topic: "admin.event_attendees"
     ],
     init_order: %{by: :begin, direction: :desc}
 
@@ -52,7 +50,7 @@ defmodule DevRoundWeb.Admin.EventAttendees do
         module: Backpex.Fields.HasMany,
         label: "Programming Languages",
         display_field: :name,
-        live_resource: DevRoundWeb.Admin.EventLangAdmin,
+        live_resource: DevRoundWeb.Admin.Lang,
         prompt: "Select",
         not_found_text: "No languages found"
       }

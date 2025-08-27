@@ -2,10 +2,11 @@ defmodule DevRoundWeb.EventLive.Show do
   use DevRoundWeb, :live_view
 
   alias DevRound.Events
+  alias DevRound.Events.Event
 
   @impl true
   def mount(_params, _session, socket) do
-    DevRoundWeb.Endpoint.subscribe("events")
+    DevRoundWeb.Endpoint.subscribe("admin.events")
     DevRoundWeb.Endpoint.subscribe("registrations")
     {:ok, socket}
   end
@@ -29,7 +30,7 @@ defmodule DevRoundWeb.EventLive.Show do
   end
 
   @impl Phoenix.LiveView
-  def handle_info({"event_updated", event}, socket) do
+  def handle_info({"updated", %Event{} = event}, socket) do
     if event.id == socket.assigns.event.id do
       socket =
         put_flash(socket, :info, "This page has been reloaded to reflect the latest update.")

@@ -146,7 +146,9 @@ defmodule DevRoundWeb.Admin.Fields.Sessions do
                 <BackpexForm.input
                   type={input_type(child_field_options) |> Atom.to_string()}
                   field={f_nested[child_field_name]}
-                  translate_error_fun={Backpex.Field.translate_error_fun(child_field_options, assigns)}
+                  translate_error_fun={
+                    Backpex.Field.translate_error_fun(child_field_options, assigns)
+                  }
                   phx-debounce={Backpex.Field.debounce(child_field_options, assigns)}
                   phx-throttle={Backpex.Field.throttle(child_field_options, assigns)}
                 />
@@ -178,7 +180,9 @@ defmodule DevRoundWeb.Admin.Fields.Sessions do
           aria-label={Backpex.translate("Add entry")}
           class="btn btn-sm btn-outline btn-primary"
         />
-        <BackpexForm.error :for={msg <- @form[@name].errors} class="mt-1">{elem(msg, 0)}</BackpexForm.error>
+        <BackpexForm.error :for={msg <- @form[@name].errors} class="mt-1">
+          {elem(msg, 0)}
+        </BackpexForm.error>
       </Layout.field_container>
     </div>
     """
@@ -194,12 +198,17 @@ defmodule DevRoundWeb.Admin.Fields.Sessions do
     |> Map.get(:queryable)
   end
 
-  defp child_field_class(%{class: class} = _child_field_options, assigns) when is_function(class), do: class.(assigns)
-  defp child_field_class(%{class: class} = _child_field_options, _assigns) when is_binary(class), do: class
+  defp child_field_class(%{class: class} = _child_field_options, assigns) when is_function(class),
+    do: class.(assigns)
+
+  defp child_field_class(%{class: class} = _child_field_options, _assigns) when is_binary(class),
+    do: class
+
   defp child_field_class(_child_field_options, _assigns), do: "grow"
 
-  defp input_type(%{input_type: input_type} = _child_field_options) when input_type in [:text, :textarea],
-    do: input_type
+  defp input_type(%{input_type: input_type} = _child_field_options)
+       when input_type in [:text, :textarea],
+       do: input_type
 
   defp input_type(%{input_type: :date_time} = _child_field_options), do: :"datetime-local"
 

@@ -8,9 +8,7 @@ defmodule DevRoundWeb.Admin.User do
     ],
     layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
-      name: DevRound.PubSub,
-      topic: "event_langs",
-      event_prefix: "event_lang_"
+      topic: "admin.event_langs"
     ]
 
   @impl Backpex.LiveResource

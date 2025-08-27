@@ -679,6 +679,17 @@ defmodule DevRoundWeb.CoreComponents do
   end
 
   @doc """
+  Translates backpex message using gettext.
+  """
+  def translate_backpex({msg, opts}) do
+    if count = opts[:count] do
+      Gettext.dngettext(DevRoundWeb.Gettext, "backpex", msg, msg, count, opts)
+    else
+      Gettext.dgettext(DevRoundWeb.Gettext, "backpex", msg, opts)
+    end
+  end
+
+  @doc """
   Translates an error message using gettext.
   """
   def translate_error({msg, opts}) do

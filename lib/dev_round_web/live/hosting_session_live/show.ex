@@ -1,11 +1,12 @@
 defmodule DevRoundWeb.HostingSessionLive.Show do
   use DevRoundWeb, :live_view
   import DevRoundWeb.HostingBase
+  alias DevRound.Events.Event
   alias DevRound.Hosting
 
   @impl true
   def mount(_params, _session, socket) do
-    DevRoundWeb.Endpoint.subscribe("events")
+    DevRoundWeb.Endpoint.subscribe("admin.events")
     DevRoundWeb.Endpoint.subscribe("registrations")
     {:ok, socket}
   end
@@ -18,6 +19,32 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
       |> assign(:session_slug, session_slug)
       |> update_assigns()
 
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({"updated", %Event{} = event}, socket) do
+    if event.id == socket.assigns.event.id do
+      if event.slug != socket.assigns.event.slug do
+        session = socket.assigns.session
+        {:noreply, push_patch(socket, to: ~p"/events/#{event}/hosting/session/#{session}")}
+      else
+        {:noreply, update_assigns(socket)}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_info(%{topic: "registrations", payload: {_op, event, _attendee}}, socket) do
+    if event.id == socket.assigns.event.id do
+      {:noreply, update_assigns(socket)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_info(_msg, socket) do
     {:noreply, socket}
   end
 

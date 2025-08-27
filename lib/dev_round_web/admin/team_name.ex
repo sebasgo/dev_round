@@ -8,9 +8,7 @@ defmodule DevRoundWeb.Admin.TeamName do
     ],
     layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
-      name: DevRound.PubSub,
-      topic: "team_names",
-      event_prefix: "team_name_"
+      topic: "admin.team_names"
     ]
 
   @impl Backpex.LiveResource
