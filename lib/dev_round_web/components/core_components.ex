@@ -231,7 +231,7 @@ defmodule DevRoundWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 btn font-mono uppercase",
+        "phx-submit-loading:opacity-75 btn",
         @class
       ]}
       {@rest}

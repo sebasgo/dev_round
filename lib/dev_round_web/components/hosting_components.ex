@@ -36,24 +36,38 @@ defmodule DevRoundWeb.HostingComponents do
 
   defp tabs(assigns) do
     ~H"""
-    <div role="tablist" class="tabs tabs-border mt-8">
-      <.link
+    <div role="tablist" class="tabs mt-8">
+      <.tab
         patch={~p"/events/#{@event}/hosting/lobby"}
-        role="tab"
-        class={["tab", @session == nil && "tab-active"]}
+        active={@session == nil}
       >
         Lobby
-      </.link>
+      </.tab>
       <%= for session <- @event.sessions  do %>
-        <.link
+        <.tab
           patch={~p"/events/#{@event}/hosting/session/#{session}"}
-          role="tab"
-          class={["tab", @session != nil && @session.id == session.id && "tab-active"]}
+          active={@session != nil && @session.id == session.id}
         >
           {session.title}
-        </.link>
+        </.tab>
       <% end %>
     </div>
+    """
+  end
+
+  attr :patch, :string, required: true
+  attr :active, :boolean, required: false, default: false
+  slot :inner_block, required: true
+
+  defp tab(assigns) do
+    ~H"""
+      <.link
+        patch={@patch}
+        role="tab"
+        class={["tab", @active && "tab-active"]}
+      >
+        {render_slot(@inner_block)}
+      </.link>
     """
   end
 
