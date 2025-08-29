@@ -9,7 +9,8 @@ defmodule DevRound.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      compilers: [:phoenix_live_view] ++ Mix.compilers()
     ]
   end
 
@@ -40,8 +41,8 @@ defmodule DevRound.MixProject do
       {:ecto_psql_extras, "~> 0.8"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 1.0.0"},
-      {:floki, ">= 0.30.0", only: :test},
+      {:phoenix_live_view, "~> 1.1.0"},
+      {:lazy_html, ">= 0.0.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
