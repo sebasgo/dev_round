@@ -83,9 +83,7 @@
         <% end %>
       </dt>
       <dd class="mb-4 md:mb-0">
-        <%= for lang <- @event.langs do %>
-          <.lang_badge lang={lang} />
-        <% end %>
+        <.lang_badge :for={lang <- @event.langs} :key={lang.id} lang={lang} />
       </dd>
       <dt class="flex flex-wrap gap-1">
         <.icon name="hero-academic-cap" class="" />
@@ -96,9 +94,7 @@
         <% end %>
       </dt>
       <dd class="flex flex-wrap gap-2">
-        <%= for user <- @event.hosts do %>
-          <.user_badge user={user} />
-        <% end %>
+        <.user_badge :for={user <- @event.hosts} :key={user.id} user={user} />
       </dd>
       <dt class="flex gap-1 md:col-span-2 md:mt-4">
         <.icon name="hero-user-group" class="" /> Participants:
@@ -107,13 +103,11 @@
         <p :if={Enum.empty?(@event.events_attendees)} class="italic opacity-75">
           None yet. Be the first to register.
         </p>
-        <%= for attendee <- @event.events_attendees do %>
-          <.user_badge user={attendee.user} remote={attendee.is_remote}>
-            <p :if={@multiple_langs} class="text-sm">
-              {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
-            </p>
-          </.user_badge>
-        <% end %>
+        <.user_badge :for={attendee <- @event.events_attendees} :key={attendee.id} user={attendee.user} remote={attendee.is_remote}>
+          <p :if={@multiple_langs} class="text-sm">
+            {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
+          </p>
+        </.user_badge>
       </dd>
     </dl>
   </div>

@@ -19,6 +19,7 @@
         <tbody>
           <tr
             :for={attendee <- @event.events_attendees}
+            :key={attendee.id}
             class={[
               (attendee.checked && "bg-green-900 hover:bg-green-950") || "hover:bg-zinc-950",
               "transition"

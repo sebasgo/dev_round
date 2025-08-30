@@ -8,43 +8,39 @@
 </div>
 
 <div class="my-8 grid gap-4 lg:grid-cols-3">
-  <%= for team <- @teams do %>
-    <div class="card bg-base-300">
-      <div class="card-body p-4 gap-4">
-        <h2 class="card-title  grid gap-1">
-          <span class="flex items-start">
-            <span class="grow text-lg font-mono font-semibold text-base-content">
-              {team.name}
-            </span>
-            <.icon :if={team.is_remote} name="hero-globe-alt" class="w-6 h-8" />
-          </span>
-          <.lang_badge :if={@multiple_langs} lang={team.lang} />
-        </h2>
-        <div
-          class="grid gap-1 bg-neutral-content border-neutral-content"
-          style="border-radius: 24px"
-        >
-          <%= for item <- Enum.intersperse(team.attendees, :divider) do %>
-            <%= case item do %>
-              <% :divider -> %>
-                <div class="mx-[1px] border-t border-neutral" />
-              <% attendee -> %>
-                <div class="">
-                  <.user_badge
-                    user={attendee.user}
-                    remote={attendee.is_remote}
-                    experience_level={attendee.experience_level}
-                  >
-                    <p :if={@multiple_langs} class="text-sm">
-                      {Enum.map(attendee.langs, fn lang -> lang.name end)
-                      |> Enum.intersperse(", ")}
-                    </p>
-                  </.user_badge>
-                </div>
-            <% end %>
+  <div :for={team <- @teams} :key={team.id} class="card bg-base-300">
+    <div class="card-body p-4 gap-4">
+      <h2 class="card-title  grid gap-1">
+        <span class="flex items-start">
+          <span class="grow text-lg font-mono font-semibold text-base-content">{team.name}</span>
+          <.icon :if={team.is_remote} name="hero-globe-alt" class="w-6 h-8" />
+        </span>
+        <.lang_badge :if={@multiple_langs} lang={team.lang} />
+      </h2>
+      <div
+        class="grid gap-1 bg-neutral-content border-neutral-content"
+        style="border-radius: 24px"
+      >
+        <%= for item <- Enum.intersperse(team.attendees, :divider) do %>
+          <%= case item do %>
+            <% :divider -> %>
+              <div class="mx-[1px] border-t border-neutral" />
+            <% attendee -> %>
+              <div class="">
+                <.user_badge
+                  user={attendee.user}
+                  remote={attendee.is_remote}
+                  experience_level={attendee.experience_level}
+                >
+                  <p :if={@multiple_langs} class="text-sm">
+                    {Enum.map(attendee.langs, fn lang -> lang.name end)
+                    |> Enum.intersperse(", ")}
+                  </p>
+                </.user_badge>
+              </div>
           <% end %>
-        </div>
+        <% end %>
       </div>
     </div>
-  <% end %>
+  </div>
 </div>

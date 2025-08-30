@@ -29,35 +29,35 @@ defmodule DevRoundWeb.EventLive.Index do
         {render_slot(@placeholder)}
       <% else %>
         <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <%= for event <- @events do %>
-            <.link
-              patch={~p"/events/#{event}"}
-              class="card card-sm bg-base-300 shadow-md transition-shadow duration-200 border border-base-300 hover:border-primary/50"
-            >
-              <div class="card-body">
-                <h3 class="card-title text-lg font-mono font-semibold text-base-content">
-                  {event.title}
-                </h3>
+          <.link
+            :for={event <- @events}
+            :key={event.id}
+            patch={~p"/events/#{event}"}
+            class="card card-sm bg-base-300 shadow-md transition-shadow duration-200 border border-base-300 hover:border-primary/50"
+          >
+            <div class="card-body">
+              <h3 class="card-title text-lg font-mono font-semibold text-base-content">
+                {event.title}
+              </h3>
 
-                <p class="mt-3 text-sm">{event.teaser}</p>
+              <p class="mt-3 text-sm">{event.teaser}</p>
 
-                <div class="flex flex-col gap-2 mt-3">
-                  <div class="flex items-center gap-2 text-sm text-base-content/70">
-                    <.icon name="hero-calendar" class="w-4 h-4" />
-                    {DevRound.Formats.format_datetime_range(
-                      event.begin |> DateTime.shift_zone!(DevRound.Formats.time_zone()),
-                      event.end |> DateTime.shift_zone!(DevRound.Formats.time_zone())
-                    )}
-                  </div>
+              <div class="flex flex-col gap-2 mt-3">
+                <div class="flex items-center gap-2 text-sm text-base-content/70">
+                  <.icon name="hero-calendar" class="w-4 h-4" />
+                  {DevRound.Formats.format_datetime_range(
+                    event.begin |> DateTime.shift_zone!(DevRound.Formats.time_zone()),
+                    event.end |> DateTime.shift_zone!(DevRound.Formats.time_zone())
+                  )}
+                </div>
 
-                  <div class="flex items-center gap-2 text-sm text-base-content/70">
-                    <.icon name="hero-map-pin" class="w-4 h-4" />
-                    {event.location}
-                  </div>
+                <div class="flex items-center gap-2 text-sm text-base-content/70">
+                  <.icon name="hero-map-pin" class="w-4 h-4" />
+                  {event.location}
                 </div>
               </div>
-            </.link>
-          <% end %>
+            </div>
+          </.link>
         </div>
       <% end %>
     </div>
