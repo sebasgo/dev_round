@@ -31,7 +31,7 @@ defmodule DevRound.Events.Event do
   end
 
   @doc false
-  def changeset(event, attrs, _opts \\ %{}) do
+  def changeset(event, attrs, opts \\ []) do
     event
     |> cast(attrs, [
       :title,
@@ -50,6 +50,8 @@ defmodule DevRound.Events.Event do
       sort_param: :sessions_order,
       drop_param: :sessions_delete
     )
+    |> put_langs_assoc(Keyword.get(opts, :put_langs))
+    |> put_hosts_assoc(Keyword.get(opts, :put_hosts))
     |> validate_required(
       [
         :title,
@@ -76,6 +78,12 @@ defmodule DevRound.Events.Event do
     |> generate_date_title_slug()
     |> unique_constraint(:slug)
   end
+
+  defp put_langs_assoc(changeset, nil = _langs), do: changeset
+  defp put_langs_assoc(changeset, langs), do: put_assoc(changeset, :langs, langs)
+
+  defp put_hosts_assoc(changeset, nil = _hosts), do: changeset
+  defp put_hosts_assoc(changeset, hosts), do: put_assoc(changeset, :hosts, hosts)
 
   defp validate_registration_deadline_before_begin(changeset) do
     registration_deadline = get_field(changeset, :registration_deadline)

@@ -86,9 +86,9 @@ defmodule DevRound.Events do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_event(attrs \\ %{}) do
+  def create_event(attrs \\ %{}, opts \\ []) do
     %Event{}
-    |> Event.changeset(attrs)
+    |> Event.changeset(attrs, opts)
     |> Repo.insert()
   end
 

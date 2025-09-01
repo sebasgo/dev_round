@@ -23,6 +23,17 @@ defmodule DevRoundWeb.Admin.Event do
   def can?(_assigns, _action, _item), do: true
 
   @impl Backpex.LiveResource
+  def item_actions(actions) do
+    actions ++
+      [
+        duplicate: %{
+          module: DevRoundWeb.Admin.ItemActions.DuplicateEvent,
+          only: [:row]
+        }
+      ]
+  end
+
+  @impl Backpex.LiveResource
   def fields do
     [
       title: %{
