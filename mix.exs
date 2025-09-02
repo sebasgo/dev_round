@@ -82,8 +82,9 @@ defmodule DevRound.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind dev_round", "esbuild dev_round"],
+      "assets.build": ["cmd --cd assets npm ci", "tailwind dev_round", "esbuild dev_round"],
       "assets.deploy": [
+        "cmd --cd assets npm ci",
         "tailwind dev_round --minify",
         "esbuild dev_round --minify",
         "phx.digest"
