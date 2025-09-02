@@ -4,8 +4,6 @@ defmodule DevRoundWeb.Admin.ItemActions.DuplicateEvent do
 
   import Ecto.Changeset
 
-  alias DevRound.Events.Event
-
   @impl Backpex.ItemAction
   def icon(assigns, _item) do
     ~H"""
@@ -42,9 +40,7 @@ defmodule DevRoundWeb.Admin.ItemActions.DuplicateEvent do
   end
 
   @impl Backpex.ItemAction
-  def changeset(change, attrs, meta) do
-    [event | _] = meta[:assigns].items
-
+  def changeset(change, attrs, _meta) do
     change
     |> cast(attrs, [:title, :begin_local])
     |> validate_required([:title, :begin_local], message: "Required.")
@@ -72,7 +68,6 @@ defmodule DevRoundWeb.Admin.ItemActions.DuplicateEvent do
 
   @impl Backpex.ItemAction
   def handle(socket, [item | _items], data) do
-    %{assigns: assigns} = socket
     date_diff = calculate_date_diff(data.begin_local, item.begin_local)
 
     attrs =
@@ -89,10 +84,10 @@ defmodule DevRoundWeb.Admin.ItemActions.DuplicateEvent do
     ]
 
     case Events.create_event(attrs, opts) do
-      {:ok, item} ->
+      {:ok, _item} ->
         {:ok, socket |> put_flash(:info, "Event has been duplicated successfully.")}
 
-      {:error, changeset} ->
+      {:error, _changeset} ->
         {:ok, socket |> put_flash(:error, "Error when duplicating event.")}
     end
   end

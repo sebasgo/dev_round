@@ -103,7 +103,12 @@
         <p :if={Enum.empty?(@event.events_attendees)} class="italic opacity-75">
           None yet. Be the first to register.
         </p>
-        <.user_badge :for={attendee <- @event.events_attendees} :key={attendee.id} user={attendee.user} remote={attendee.is_remote}>
+        <.user_badge
+          :for={attendee <- @event.events_attendees}
+          :key={attendee.id}
+          user={attendee.user}
+          remote={attendee.is_remote}
+        >
           <p :if={@multiple_langs} class="text-sm">
             {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
           </p>

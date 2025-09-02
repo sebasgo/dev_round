@@ -61,13 +61,13 @@ defmodule DevRoundWeb.HostingComponents do
 
   defp tab(assigns) do
     ~H"""
-      <.link
-        patch={@patch}
-        role="tab"
-        class={["tab", @active && "tab-active"]}
-      >
-        {render_slot(@inner_block)}
-      </.link>
+    <.link
+      patch={@patch}
+      role="tab"
+      class={["tab", @active && "tab-active"]}
+    >
+      {render_slot(@inner_block)}
+    </.link>
     """
   end
 
