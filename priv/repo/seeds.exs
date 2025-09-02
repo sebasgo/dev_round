@@ -69,7 +69,9 @@ alias DevRound.Hosting
   "Goto Fail",
   "Beyond Infinity"
 ]
-|> Enum.map(fn name -> {:ok, _} = Hosting.create_team_name(%{name: name}) end)
+|> Enum.map(fn name ->
+  {:ok, _} = Hosting.create_team_name(%{name: name}, on_conflict: :nothing)
+end)
 
 [
   %{name: "Python", icon_path: "python.svg"},
@@ -79,11 +81,16 @@ alias DevRound.Hosting
   %{name: "Elixir", icon_path: "elixir.png"}
 ]
 |> Enum.map(fn %{icon_path: src_icon_path} = attrs ->
-  priv_path = :code.priv_dir(:dev_round)
-  ext = Path.extname(src_icon_path)
-  src_icon_path = Path.join([priv_path, "repo", "lang_icons", src_icon_path])
-  dst_filename = "#{Ecto.UUID.generate()}.#{ext}"
-  dst_icon_path = Path.join([priv_path, "static", DevRound.Events.lang_icon_dir(), dst_filename])
-  File.cp!(src_icon_path, dst_icon_path)
-  {:ok, _} = DevRound.Events.create_lang(%{attrs | icon_path: dst_filename})
+  if DevRound.Events.get_lang_by_name(attrs.name) == nil do
+    priv_path = :code.priv_dir(:dev_round)
+    ext = Path.extname(src_icon_path)
+    src_icon_path = Path.join([priv_path, "repo", "lang_icons", src_icon_path])
+    dst_filename = "#{Ecto.UUID.generate()}.#{ext}"
+
+    dst_icon_path =
+      Path.join([priv_path, "static", DevRound.Events.lang_icon_dir(), dst_filename])
+
+    File.cp!(src_icon_path, dst_icon_path)
+    {:ok, _} = DevRound.Events.create_lang(%{attrs | icon_path: dst_filename})
+  end
 end)

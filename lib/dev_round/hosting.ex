@@ -54,10 +54,10 @@ defmodule DevRound.Hosting do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_team_name(attrs \\ %{}) do
+  def create_team_name(attrs \\ %{}, opts \\ []) do
     %TeamName{}
     |> TeamName.changeset(attrs)
-    |> Repo.insert()
+    |> Repo.insert(opts)
   end
 
   @doc """

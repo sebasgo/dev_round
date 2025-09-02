@@ -258,6 +258,10 @@ defmodule DevRound.Events do
     Repo.all(from l in Lang, where: l.id in ^lang_ids)
   end
 
+  def get_lang_by_name(name) do
+    Repo.one(from l in Lang, where: l.name == ^name)
+  end
+
   alias DevRound.Events.EventSession
 
   @doc """
