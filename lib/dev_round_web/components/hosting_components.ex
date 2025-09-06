@@ -6,7 +6,7 @@ defmodule DevRoundWeb.HostingComponents do
   alias DevRound.Events.EventSession
 
   attr :event, Event, required: true
-  attr :session, EventSession, required: false, default: nil
+  attr :tab, :any, required: false, default: nil
 
   def header(assigns) do
     ~H"""
@@ -14,7 +14,7 @@ defmodule DevRoundWeb.HostingComponents do
     <DevRoundWeb.CoreComponents.header>
       Hosting
     </DevRoundWeb.CoreComponents.header>
-    <.tabs event={@event} session={@session} />
+    <.tabs event={@event} tab={@tab} />
     """
   end
 
@@ -32,21 +32,27 @@ defmodule DevRoundWeb.HostingComponents do
   end
 
   attr :event, Event, required: true
-  attr :session, EventSession, required: false, default: nil
+  attr :tab, :any, required: false, default: nil
 
   defp tabs(assigns) do
     ~H"""
     <div role="tablist" class="tabs mt-8">
       <.tab
         patch={~p"/events/#{@event}/hosting/lobby"}
-        active={@session == nil}
+        active={@tab == :lobby}
       >
         Lobby
+      </.tab>
+      <.tab
+        patch={~p"/events/#{@event}/hosting/lecture"}
+        active={@tab == :lecture}
+      >
+        Lecture
       </.tab>
       <%= for session <- @event.sessions  do %>
         <.tab
           patch={~p"/events/#{@event}/hosting/session/#{session}"}
-          active={@session != nil && @session.id == session.id}
+          active={{:session, session.id} == @tab}
         >
           {session.title}
         </.tab>
