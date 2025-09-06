@@ -1,5 +1,8 @@
 defmodule DevRoundWeb.Admin.Event do
-  use DevRoundWeb.Admin.Upload, upload_dir: DevRound.Events.event_slides_dir(), field: :slides_filename
+  use DevRoundWeb.Admin.Upload,
+    upload_dir: DevRound.Events.event_slides_dir(),
+    field: :slides_filename
+
   use Backpex.LiveResource,
     adapter_config: [
       schema: DevRound.Events.Event,

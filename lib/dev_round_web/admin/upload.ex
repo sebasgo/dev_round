@@ -1,10 +1,9 @@
 defmodule DevRoundWeb.Admin.Upload do
-
   defmacro __using__(opts) do
     quote do
-
-      def list_existing_files(%{unquote(opts[:field]) => path} = _item) when path != "" and not is_nil(path),
-        do: [path]
+      def list_existing_files(%{unquote(opts[:field]) => path} = _item)
+          when path != "" and not is_nil(path),
+          do: [path]
 
       def list_existing_files(_item), do: []
 
@@ -70,5 +69,4 @@ defmodule DevRoundWeb.Admin.Upload do
       end
     end
   end
-
 end
