@@ -17,5 +17,12 @@ defmodule DevRound.Events.Lang do
     lang
     |> cast(attrs, [:name, :icon_path])
     |> validate_required([:name, :icon_path])
+    |> validate_change(:icon_path, fn :icon_path, path ->
+      case path do
+        "too_many_files" -> [icon_path: "Only one icon is allowed."]
+        "" -> [icon_path: "Required."]
+        _ -> []
+      end
+    end)
   end
 end

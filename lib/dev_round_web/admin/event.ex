@@ -1,4 +1,5 @@
 defmodule DevRoundWeb.Admin.Event do
+  use DevRoundWeb.Admin.Upload, upload_dir: DevRound.Events.event_slides_dir(), field: :slides_filename
   use Backpex.LiveResource,
     adapter_config: [
       schema: DevRound.Events.Event,
@@ -91,6 +92,30 @@ defmodule DevRoundWeb.Admin.Event do
         help_text: "Markdown ist supported.",
         rows: 15,
         except: [:index]
+      },
+      slides_filename: %{
+        module: Backpex.Fields.Upload,
+        label: "Slides",
+        upload_key: :slides,
+        accept: ~w(.pdf),
+        max_file_size: 50_000_000,
+        put_upload_change: &put_upload_change/6,
+        consume_upload: &consume_upload/4,
+        remove_uploads: &remove_uploads/3,
+        list_existing_files: &list_existing_files/1,
+        render: fn
+          %{value: value} = assigns when value == "" or is_nil(value) ->
+            ~H"<p>{Backpex.HTML.pretty_value(@value)}</p>"
+
+          assigns ->
+            ~H"""
+            <p>
+              <Phoenix.Component.link navigate={file_url(@value)}>
+                {Backpex.HTML.pretty_value(@value)}
+              </Phoenix.Component.link>
+            </p>
+            """
+        end
       },
       sessions: %{
         module: DevRoundWeb.Admin.Fields.Sessions,

@@ -156,6 +156,7 @@ defmodule DevRound.Events do
   end
 
   def lang_icon_dir, do: Path.join(["uploads", "langs", "icon"])
+  def event_slides_dir, do: Path.join(["uploads", "events", "slides"])
 
   def event_open_for_registration?(%Event{registration_deadline: registration_deadline}) do
     DateTime.compare(DateTime.utc_now(), registration_deadline) == :lt

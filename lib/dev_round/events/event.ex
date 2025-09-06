@@ -20,6 +20,7 @@ defmodule DevRound.Events.Event do
     field :registration_deadline, :utc_datetime
     field :registration_deadline_local, :naive_datetime
     field :slug, :string
+    field :slides_filename, :string
 
     many_to_many :langs, Lang, join_through: "event_langs", on_replace: :delete
     many_to_many :hosts, User, join_through: "event_hosts", on_replace: :delete
@@ -41,7 +42,8 @@ defmodule DevRound.Events.Event do
       :end_local,
       :location,
       :published,
-      :registration_deadline_local
+      :registration_deadline_local,
+      :slides_filename
     ])
     |> cast_assoc(:sessions,
       with: &EventSession.changeset/2,
@@ -76,6 +78,12 @@ defmodule DevRound.Events.Event do
     |> validate_sessions_do_not_overlap()
     |> validate_option_selected([:langs, :hosts])
     |> generate_date_title_slug()
+    |> validate_change(:slides_filename, fn :slides_filename, path ->
+      case path do
+        "too_many_files" -> [slides_filename: "Only one file is allowed."]
+        _ -> []
+      end
+    end)
     |> unique_constraint(:slug)
   end
 
