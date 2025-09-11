@@ -1,9 +1,14 @@
 {
+ "scripts": {
+    "copy-pdfjs": "cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs ../priv/static/assets/pdf.worker.min.js",
+    "postinstall": "npm run copy-pdfjs"
+  }, 
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
     "daisyui": "^5.0.50"
   },
   "dependencies": {
+    "pdfjs-dist": "^5.4.149",
     "prismjs": "^1.30.0"
   }
 }

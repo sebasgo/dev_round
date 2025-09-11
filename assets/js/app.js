@@ -22,6 +22,7 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import { Hooks as BackpexHooks } from 'backpex'
+import { PDFViewer } from "./pdf_viewer_hook"
 
 import Prism from 'prismjs'
 import 'prismjs/components/prism-python'
@@ -43,7 +44,7 @@ let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...BackpexHooks}
+  hooks: {PDFViewer: PDFViewer, ...BackpexHooks}
 })
 
 // Show progress bar on live navigation and form submits
