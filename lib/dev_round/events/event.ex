@@ -21,6 +21,7 @@ defmodule DevRound.Events.Event do
     field :registration_deadline_local, :naive_datetime
     field :slug, :string
     field :slides_filename, :string
+    field :slides_page_number, :integer
 
     many_to_many :langs, Lang, join_through: "event_langs", on_replace: :delete
     many_to_many :hosts, User, join_through: "event_hosts", on_replace: :delete
@@ -85,6 +86,14 @@ defmodule DevRound.Events.Event do
       end
     end)
     |> unique_constraint(:slug)
+  end
+
+  def slides_page_number_changeset(event, attrs) do
+    event
+    |> cast(attrs, [:slides_page_number])
+    |> validate_required(:slides_page_number)
+    # Keep original timestamp
+    |> force_change(:updated_at, event.updated_at)
   end
 
   defp put_langs_assoc(changeset, nil = _langs), do: changeset

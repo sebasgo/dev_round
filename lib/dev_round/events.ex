@@ -144,6 +144,12 @@ defmodule DevRound.Events do
     |> Ecto.Changeset.put_assoc(:langs, langs)
   end
 
+  def update_event_slides_page_number(%Event{} = event, attrs \\ %{}) do
+    event
+    |> Event.slides_page_number_changeset(attrs)
+    |> Repo.update(touch: false)
+  end
+
   def create_lang(attrs \\ %{}) do
     %Lang{}
     |> change_lang(attrs)

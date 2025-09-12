@@ -3,7 +3,6 @@ defmodule DevRoundWeb.HostingComponents do
   use DevRoundWeb, :verified_routes
   alias Backpex.HTML.CoreComponents
   alias DevRound.Events.Event
-  alias DevRound.Events.EventSession
 
   attr :event, Event, required: true
   attr :tab, :any, required: false, default: nil

@@ -5,14 +5,20 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = '/assets/pdf.worker.min.js';
 
 const PDFViewer = {
   mounted() {
-    this.currentPage = 1;
+    const pdfUrl = this.el.dataset.pdfUrl;
+    const pdfPageNumber = parseInt(this.el.dataset.pdfPageNumber);
+
+    this.currentPage = pdfPageNumber;
     this.pdfDoc = null;
 
-    const pdfUrl = this.el.dataset.pdfUrl;
     this.loadPDF(pdfUrl);
-
-    // Set up event listeners
     this.setupControls();
+
+    this.handleEvent("pdf_viewer_page_turn", (payload) => {
+      console.log("PAGE", payload.pageNumber);
+      this.currentPage = payload.pageNumber;
+      this.renderPage(this.currentPage);
+    })
   },
 
   loadPDF(url) {
@@ -73,15 +79,28 @@ const PDFViewer = {
     });
   },
 
+  goToNextPage() {
+    if (this.pdfDoc && this.currentPage < this.pdfDoc.numPages) {
+      this.currentPage++;
+      this.renderPage(this.currentPage);
+      this.pushEvent('pdf_page_turn', { page_number: this.currentPage })
+    }
+  },
+
+  goToPrevPage() {
+    if (this.pdfDoc && this.currentPage > 1) {
+      this.currentPage--;
+      this.renderPage(this.currentPage);
+      this.pushEvent('pdf_page_turn', { page_number: this.currentPage })
+    }
+  },
+
   setupControls() {
     // Previous page button
     const prevBtn = document.getElementById('prev-page');
     if (prevBtn) {
       prevBtn.addEventListener('click', () => {
-        if (this.currentPage > 1) {
-          this.currentPage--;
-          this.renderPage(this.currentPage);
-        }
+        this.goToPrevPage();
       });
     }
 
@@ -89,10 +108,7 @@ const PDFViewer = {
     const nextBtn = document.getElementById('next-page');
     if (nextBtn) {
       nextBtn.addEventListener('click', () => {
-        if (this.pdfDoc && this.currentPage < this.pdfDoc.numPages) {
-          this.currentPage++;
-          this.renderPage(this.currentPage);
-        }
+        this.goToNextPage();
       });
     }
 
@@ -103,18 +119,12 @@ const PDFViewer = {
       switch(e.key) {
         case 'ArrowLeft':
         case 'ArrowUp':
-          if (this.currentPage > 1) {
-            this.currentPage--;
-            this.renderPage(this.currentPage);
-          }
+          this.goToPrevPage();
           e.preventDefault();
           break;
         case 'ArrowRight':
         case 'ArrowDown':
-          if (this.currentPage < this.pdfDoc.numPages) {
-            this.currentPage++;
-            this.renderPage(this.currentPage);
-          }
+          this.goToNextPage();
           e.preventDefault();
           break;
       }
