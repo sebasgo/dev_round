@@ -15,12 +15,11 @@ const PDFViewer = {
     this.setupControls();
 
     this.handleEvent("pdf_viewer_page_turn", (payload) => {
-      console.log("PAGE", payload.pageNumber);
       this.currentPage = payload.pageNumber;
       this.renderPage(this.currentPage);
     })
   },
-
+  
   loadPDF(url) {
     const loadingTask = pdfjsLib.getDocument(url);
 
@@ -38,7 +37,7 @@ const PDFViewer = {
 
     }).catch((error) => {
       console.error('Error loading PDF:', error);
-      this.pushEvent('pdf_error', { error: error.message });
+      this.pushEventTo(this.el, 'pdf_error', { error: error.message });
     });
   },
 
@@ -83,7 +82,7 @@ const PDFViewer = {
     if (this.pdfDoc && this.currentPage < this.pdfDoc.numPages) {
       this.currentPage++;
       this.renderPage(this.currentPage);
-      this.pushEvent('pdf_page_turn', { page_number: this.currentPage })
+      this.pushEventTo(this.el, 'pdf_page_turn', { page_number: this.currentPage })
     }
   },
 
@@ -91,7 +90,7 @@ const PDFViewer = {
     if (this.pdfDoc && this.currentPage > 1) {
       this.currentPage--;
       this.renderPage(this.currentPage);
-      this.pushEvent('pdf_page_turn', { page_number: this.currentPage })
+      this.pushEventTo(this.el, 'pdf_page_turn', { page_number: this.currentPage })
     }
   },
 
