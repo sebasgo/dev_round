@@ -9,7 +9,9 @@ const PDFViewer = {
     const pdfPageNumber = parseInt(this.el.dataset.pdfPageNumber);
 
     this.currentPage = pdfPageNumber;
+    this.pageCount = 0;
     this.pdfDoc = null;
+    this.renderedPages = new Map();
 
     this.loadPDF(pdfUrl);
     this.setupControls();
@@ -19,12 +21,13 @@ const PDFViewer = {
       this.renderPage(this.currentPage);
     })
   },
-  
+
   loadPDF(url) {
     const loadingTask = pdfjsLib.getDocument(url);
 
     loadingTask.promise.then((pdf) => {
       this.pdfDoc = pdf;
+      this.pageCount = pdf.numPages;
 
       // Update total pages
       const totalPagesEl = document.getElementById('total-pages');
@@ -32,8 +35,7 @@ const PDFViewer = {
         totalPagesEl.textContent = pdf.numPages;
       }
 
-      // Render first page
-      this.renderPage(this.currentPage);
+      this.goToPage(this.currentPage);
 
     }).catch((error) => {
       console.error('Error loading PDF:', error);
@@ -41,47 +43,74 @@ const PDFViewer = {
     });
   },
 
-  renderPage(pageNum) {
-    if (!this.pdfDoc) return;
+  async renderPage(pageNum) {
+    if (this.renderedPages.has(pageNum)) {
+      return this.renderedPages.get(pageNum)
+    }
 
-    this.pdfDoc.getPage(pageNum).then((page) => {
-      let container = document.getElementById('pdf-canvas-container');
-      let canvas = document.getElementById('pdf-canvas');
+    console.log("Starting to render page " + pageNum)
 
-      const referenceViewport = page.getViewport({ scale: 1 });
-      const scale = container.clientWidth / referenceViewport.width;
-      const viewport = page.getViewport({ scale: scale });
+    const page = await this.pdfDoc.getPage(pageNum);
 
-      const context = canvas.getContext('2d');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+    let container = document.getElementById('pdf-canvas-container');
+    let canvas = document.createElement('canvas')
 
-      // Render PDF page into canvas context
-      const renderContext = {
-        canvasContext: context,
-        viewport: viewport
-      };
+    const referenceViewport = page.getViewport({ scale: 1 });
+    const scale = container.clientWidth / referenceViewport.width;
+    const viewport = page.getViewport({ scale: scale });
 
-      page.render(renderContext).promise.then(() => {
-        // Remove placeholder
-        const placeholderEl = document.getElementById('pdf-placeholder');
-        if (placeholderEl) {
-          placeholderEl.remove();
-        }
+    const context = canvas.getContext('2d');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
 
-        // Update current page display
-        const currentPageEl = document.getElementById('current-page');
-        if (currentPageEl) {
-          currentPageEl.textContent = pageNum;
-        }
-      });
-    });
+    // Render PDF page into canvas context
+    const renderContext = {
+      canvasContext: context,
+      viewport: viewport
+    };
+
+    await page.render(renderContext).promise;
+    this.renderedPages.set(pageNum, canvas)
+    console.log("Finished rendering page " + pageNum)
+    return canvas
   },
+
+  async goToPage(pageNum) {
+    const pageCanvas = await this.renderPage(pageNum)
+
+    // Display page
+    const displayCanvas = document.getElementById('pdf-canvas');
+    const ctx = displayCanvas.getContext('2d');
+    displayCanvas.width = pageCanvas.width;
+    displayCanvas.height = pageCanvas.height;
+    ctx.drawImage(pageCanvas, 0, 0);
+
+    // Remove placeholder
+    const placeholderEl = document.getElementById('pdf-placeholder');
+    if (placeholderEl) {
+      placeholderEl.remove();
+    }
+
+    // Update current page display
+    const currentPageEl = document.getElementById('current-page');
+    if (currentPageEl) {
+      currentPageEl.textContent = pageNum;
+    }
+
+    // Pre-render adjacent pages
+    if (pageNum < this.pageCount) {
+      this.renderPage(pageNum + 1);
+    }
+
+    if (pageNum > 1) {
+      this.renderPage(pageNum - 1);
+    }
+},
 
   goToNextPage() {
     if (this.pdfDoc && this.currentPage < this.pdfDoc.numPages) {
       this.currentPage++;
-      this.renderPage(this.currentPage);
+      this.goToPage(this.currentPage);
       this.pushEventTo(this.el, 'pdf_page_turn', { page_number: this.currentPage })
     }
   },
@@ -89,7 +118,7 @@ const PDFViewer = {
   goToPrevPage() {
     if (this.pdfDoc && this.currentPage > 1) {
       this.currentPage--;
-      this.renderPage(this.currentPage);
+      this.goToPage(this.currentPage);
       this.pushEventTo(this.el, 'pdf_page_turn', { page_number: this.currentPage })
     }
   },

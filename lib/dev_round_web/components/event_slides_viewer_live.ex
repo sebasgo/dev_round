@@ -60,7 +60,7 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
           </div>
           <div :if={@pdf_url && !@pdf_error} class="flex items-center space-x-4">
             <span class="text-sm">
-              Page <span id="current-page">1</span> of <span id="total-pages">-</span>
+              Page <span id="current-page">{@pdf_initial_page_number}</span> of <span id="total-pages">-</span>
             </span>
           </div>
         </div>
