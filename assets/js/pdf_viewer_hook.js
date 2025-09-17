@@ -15,6 +15,7 @@ const PDFViewer = {
 
     this.loadPDF(pdfUrl);
     this.setupControls();
+    this.setupResizeHandler();
 
     this.handleEvent("pdf_viewer_page_turn", (payload) => {
       this.currentPage = payload.pageNumber;
@@ -161,7 +162,26 @@ const PDFViewer = {
     document.addEventListener('keydown', this.keydownHandler);
   },
 
+  setupResizeHandler() {
+    const containerEl =  document.getElementById('pdf-canvas-container')
+    var lastWidth = containerEl.clientWidth;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      const width = containerEl.clientWidth;
+      if (this.pdfDoc && width != lastWidth) {
+        lastWidth = width;
+        this.renderedPages.clear();
+        this.goToPage(this.currentPage);
+      }
+    });
+
+    resizeObserver.observe(containerEl)
+  },
+
   destroyed() {
+    // Suppress navigation and resize events
+    this.pdfDoc = null;
+
     // Clean up event listeners
     if (this.keydownHandler) {
       document.removeEventListener('keydown', this.keydownHandler);
