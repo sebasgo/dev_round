@@ -19,7 +19,7 @@ const PDFViewer = {
 
     this.handleEvent("pdf_viewer_page_turn", (payload) => {
       this.currentPage = payload.pageNumber;
-      this.renderPage(this.currentPage);
+      this.goToPage(this.currentPage);
     })
   },
 

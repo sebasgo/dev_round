@@ -69,30 +69,11 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
     """
   end
 
-  def mount(socket) do
-    :ok = DevRoundWeb.Endpoint.subscribe("event_slides")
-    {:ok, socket}
-  end
-
   @impl true
   def update(%{event: event}, socket) do
     {:ok, socket |> assign(:event, event) |> assign_pdf_fields()}
   end
 
-  @impl true
-  def handle_info(
-        %{topic: "event_slides", payload: %{url: url, page_number: page_number}},
-        socket
-      )
-      when url == socket.assigns.pdf_url do
-    {:noreply, push_event(socket, "pdf_viewer_page_turn", %{pageNumber: page_number})}
-  end
-
-  @impl true
-  def handle_info(%{topic: "lectures", payload: %{url: url, page_number: page_number}}, socket)
-      when url == socket.assigns.pdf_url do
-    {:noreply, push_event(socket, "pdf_viewer_page_turn", %{pageNumber: page_number})}
-  end
 
   @impl true
   def handle_event("pdf_error", %{"error" => error}, socket) do
@@ -113,6 +94,30 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
     {:noreply, socket}
   end
 
+  defmacro __using__(:relay_page_turn_events) do
+    quote do
+      def handle_info(
+            %{topic: "event_slides", payload: %{url: url, page_number: page_number}},
+            socket
+          )
+          when url == socket.assigns.pdf_url do
+        IO.inspect("boo")
+        {:noreply, push_event(socket, "pdf_viewer_page_turn", %{pageNumber: page_number})}
+      end
+
+      defp subscribe_to_page_turn_topic() do
+        IO.puts("SUBSRIBING")
+        :ok = DevRoundWeb.Endpoint.subscribe("event_slides")
+      end
+
+      defp assign_pdf_url(socket) do
+        %{event: event} = socket.assigns
+        socket
+        |> assign(:pdf_url, DevRoundWeb.EventSlidesViewerLive.get_pdf_url(event.slides_filename))
+      end
+    end
+  end
+
   defp assign_pdf_fields(socket) do
     %{event: event} = socket.assigns
 
@@ -122,12 +127,12 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
     |> assign_new(:pdf_error, fn -> nil end)
   end
 
-  defp get_pdf_url(slides_filename) when is_binary(slides_filename) do
+  def get_pdf_url(slides_filename) when is_binary(slides_filename) do
     static_path = "/uploads/events/slides/#{slides_filename}"
     Phoenix.VerifiedRoutes.static_url(DevRoundWeb.Endpoint, static_path)
   end
 
-  defp get_pdf_url(_), do: nil
+  def get_pdf_url(_), do: nil
 
   defp broadcast_page_turn(url, page_number) do
     DevRoundWeb.Endpoint.broadcast_from(self(), "event_slides", "page_turn", %{

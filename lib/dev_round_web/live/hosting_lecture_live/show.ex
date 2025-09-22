@@ -1,13 +1,14 @@
 defmodule DevRoundWeb.HostingLectureLive.Show do
   use DevRoundWeb, :live_view
+  use DevRoundWeb.EventSlidesViewerLive, :relay_page_turn_events
   import DevRoundWeb.HostingBase
 
-  alias DevRound.Events
   alias DevRound.Events.Event
 
   @impl true
   def mount(_params, _session, socket) do
     DevRoundWeb.Endpoint.subscribe("admin.events")
+    subscribe_to_page_turn_topic()
     {:ok, socket}
   end
 
@@ -34,7 +35,7 @@ defmodule DevRoundWeb.HostingLectureLive.Show do
     end
   end
 
-  def handle_info(_msg, socket) do
+  def handle_info(msg, socket) do
     {:noreply, socket}
   end
 
@@ -45,6 +46,7 @@ defmodule DevRoundWeb.HostingLectureLive.Show do
     |> ensure_current_user_is_host!()
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign_messages()
+    |> assign_pdf_url()
   end
 
   defp page_title(:show), do: "Hosting Lecture"
