@@ -60,7 +60,8 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
           </div>
           <div :if={@pdf_url && !@pdf_error} class="flex items-center space-x-4">
             <span class="text-sm">
-              Page <span id="current-page">{@pdf_initial_page_number}</span> of <span id="total-pages">-</span>
+              Page <span id="current-page">{@pdf_initial_page_number}</span>
+              of <span id="total-pages">-</span>
             </span>
           </div>
         </div>
@@ -73,7 +74,6 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
   def update(%{event: event}, socket) do
     {:ok, socket |> assign(:event, event) |> assign_pdf_fields()}
   end
-
 
   @impl true
   def handle_event("pdf_error", %{"error" => error}, socket) do
@@ -88,7 +88,7 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
     %{event: event, pdf_url: url} = socket.assigns
 
     {:ok, _} =
-      Events.update_event_slides_page_number(event, %{"slides_page_number" => page_number})
+      Events.update_event_slides_page_number(event, page_number)
 
     broadcast_page_turn(url, page_number)
     {:noreply, socket}
@@ -106,7 +106,6 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
       end
 
       defp subscribe_to_page_turn_topic() do
-        IO.puts("SUBSRIBING")
         :ok = DevRoundWeb.Endpoint.subscribe("event_slides")
       end
 

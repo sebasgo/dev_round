@@ -22,6 +22,7 @@ defmodule DevRound.Events.Event do
     field :slug, :string
     field :slides_filename, :string
     field :slides_page_number, :integer
+    field :live, :boolean
 
     many_to_many :langs, Lang, join_through: "event_langs", on_replace: :delete
     many_to_many :hosts, User, join_through: "event_hosts", on_replace: :delete

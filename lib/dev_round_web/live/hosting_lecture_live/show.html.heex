@@ -1,6 +1,23 @@
 <DevRoundWeb.HostingComponents.header event={@event} tab={:lecture} />
 <DevRoundWeb.HostingComponents.messages messages={@messages} />
 
+<div class="my-8">
+  <.button
+    type="button"
+    disabled={@event.live}
+    phx-click={JS.push("set_live", value: %{live: true})}
+  >
+    Start Presentation
+  </.button>
+  <.button
+    type="button"
+    disabled={!@event.live}
+    phx-click={JS.push("set_live", value: %{live: false})}
+  >
+    Stop Presentation
+  </.button>
+</div>
+
 <.live_component
   module={DevRoundWeb.EventSlidesViewerLive}
   id={@event.id}
