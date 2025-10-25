@@ -7,6 +7,7 @@ const PDFViewer = {
   mounted() {
     const pdfUrl = this.el.dataset.pdfUrl;
     const pdfPageNumber = parseInt(this.el.dataset.pdfPageNumber);
+    const controls = this.el.dataset.controls !== undefined;
 
     this.currentPage = pdfPageNumber;
     this.pageCount = 0;
@@ -14,7 +15,11 @@ const PDFViewer = {
     this.renderedPages = new Map();
 
     this.loadPDF(pdfUrl);
-    this.setupControls();
+
+    if (controls) {
+      this.setupControls();
+    }
+
     this.setupResizeHandler();
 
     this.handleEvent("pdf_viewer_page_turn", (payload) => {

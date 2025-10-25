@@ -6,7 +6,7 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="bg-base-300 text-base rounded-lg shadow-lg overflow-hidden my-8">
+    <div class="bg-base-300 text-base">
       <div id="pdf-container" class="relative">
         <%= if @pdf_error do %>
           <div class="flex items-center justify-center w-full aspect-[16/9] bg-base-300">
@@ -22,6 +22,7 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
               phx-hook="PDFViewer"
               data-pdf-url={@pdf_url}
               data-pdf-page-number={@pdf_initial_page_number}
+              data-controls={@controls}
               class="aspect-[16/9]"
             >
               <!-- PDF.js viewer will be rendered here -->
@@ -49,7 +50,7 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
           <% end %>
         <% end %>
         <!-- PDF Controls -->
-        <div class="p-4 flex items-center justify-between bg-neutral">
+        <div :if={@controls} class="p-4 flex items-center justify-between bg-neutral">
           <div class="flex items-center space-x-4">
             <button id="prev-page" class="btn btn-primary" disabled={!@pdf_url || @pdf_error}>
               Previous
@@ -71,8 +72,12 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
   end
 
   @impl true
-  def update(%{event: event}, socket) do
-    {:ok, socket |> assign(:event, event) |> assign_pdf_fields()}
+  def update(%{event: event, controls: controls}, socket) do
+    {:ok,
+     socket
+     |> assign(:event, event)
+     |> assign(:controls, controls)
+     |> assign_pdf_fields()}
   end
 
   @impl true
@@ -83,7 +88,11 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
   end
 
   @impl true
-  def handle_event("pdf_page_turn", %{"page_number" => page_number}, socket)
+  def handle_event(
+        "pdf_page_turn",
+        %{"page_number" => page_number},
+        %{assigns: %{controls: true}} = socket
+      )
       when is_integer(page_number) do
     %{event: event, pdf_url: url} = socket.assigns
 
@@ -101,7 +110,6 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
             socket
           )
           when url == socket.assigns.pdf_url do
-        IO.inspect("boo")
         {:noreply, push_event(socket, "pdf_viewer_page_turn", %{pageNumber: page_number})}
       end
 
@@ -111,6 +119,7 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
 
       defp assign_pdf_url(socket) do
         %{event: event} = socket.assigns
+
         socket
         |> assign(:pdf_url, DevRoundWeb.EventSlidesViewerLive.get_pdf_url(event.slides_filename))
       end

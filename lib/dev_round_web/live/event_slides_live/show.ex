@@ -1,7 +1,6 @@
-defmodule DevRoundWeb.HostingLectureLive.Show do
+defmodule DevRoundWeb.EventSlidesLive.Show do
   use DevRoundWeb, :live_view
   use DevRoundWeb.EventSlidesViewerLive, :relay_page_turn_events
-  import DevRoundWeb.HostingBase
 
   alias DevRound.Events
   alias DevRound.Events.Event
@@ -40,22 +39,15 @@ defmodule DevRoundWeb.HostingLectureLive.Show do
     {:noreply, socket}
   end
 
-  @impl true
-  def handle_event("set_live", %{"live" => live?}, socket) when is_boolean(live?) do
-    %{event: event} = socket.assigns
-    {:ok, %Event{} = event} = Events.update_event_live(event, live?)
-    {:noreply, socket |> assign(:event, event)}
-  end
-
   defp update_assigns(socket) do
+    slug = socket.assigns.slug
+    event = Events.get_event!(slug)
+
     socket
-    |> assign_event()
-    |> assign_team_names()
-    |> ensure_current_user_is_host!()
     |> assign(:page_title, page_title(socket.assigns.live_action))
-    |> assign_messages()
+    |> assign(:event, event)
     |> assign_pdf_url()
   end
 
-  defp page_title(:show), do: "Hosting Lecture"
+  defp page_title(:show), do: "Event Slides"
 end

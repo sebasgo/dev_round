@@ -40,6 +40,23 @@
   </.header>
 <% end %>
 
+<div :if={@event.live} class="alert my-8" role="alert">
+  <div class="badge badge-neutral flex items-center gap-2">
+    <span class="relative flex h-3 w-3">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75">
+      </span>
+      <span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
+    </span>
+    <span class="font-semibold uppercase">Live</span>
+  </div>
+  This event is currently in progress.
+  <div>
+    <a href={~p"/events/#{@event}/live"} class="btn btn-sm btn-primary">
+      <.icon name="hero-eye" class="w-4 h-4" /> Follow Presentation
+    </a>
+  </div>
+</div>
+
 <div class="card bg-base-300 shadow-xl my-8">
   <div class="card-body">
     <dl class="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4 items-center">

@@ -18,8 +18,11 @@
   </.button>
 </div>
 
-<.live_component
-  module={DevRoundWeb.EventSlidesViewerLive}
-  id={@event.id}
-  event={@event}
-/>
+<div class="rounded-lg overflow-hidden my-8">
+  <.live_component
+    module={DevRoundWeb.EventSlidesViewerLive}
+    id={@event.id}
+    event={@event}
+    controls={true}
+  />
+</div>

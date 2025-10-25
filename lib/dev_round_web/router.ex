@@ -85,6 +85,7 @@ defmodule DevRoundWeb.Router do
       live "/users/settings", UserSettingsLive, :edit
       live "/events", EventLive.Index, :index
       live "/events/:slug", EventLive.Show, :show
+      live "/events/:slug/live", EventSlidesLive.Show, :show
       live "/events/:slug/registration/new", EventLive.Show, :new_registration
       live "/events/:slug/registration/edit", EventLive.Show, :edit_registration
       live "/events/:slug/hosting/lobby", HostingLobbyLive.Show, :show

@@ -90,6 +90,9 @@ defmodule DevRoundWeb do
       # Core UI components
       import DevRoundWeb.CoreComponents
 
+      # Other common components
+      import DevRoundWeb.Breadcrumbs
+
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 

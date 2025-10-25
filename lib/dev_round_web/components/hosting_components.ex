@@ -1,6 +1,7 @@
 defmodule DevRoundWeb.HostingComponents do
   use Phoenix.Component
   use DevRoundWeb, :verified_routes
+  import DevRoundWeb.Breadcrumbs
   alias Backpex.HTML.CoreComponents
   alias DevRound.Events.Event
 
@@ -9,24 +10,11 @@ defmodule DevRoundWeb.HostingComponents do
 
   def header(assigns) do
     ~H"""
-    <.breadcrumbs event={@event} />
+    <.breadcrumbs items={[:events, @event]} />
     <DevRoundWeb.CoreComponents.header>
       Hosting
     </DevRoundWeb.CoreComponents.header>
     <.tabs event={@event} tab={@tab} />
-    """
-  end
-
-  attr :event, Event, required: true
-
-  defp breadcrumbs(assigns) do
-    ~H"""
-    <div class="breadcrumbs">
-      <ul>
-        <li><.link patch={~p"/events"}>Events</.link></li>
-        <li><.link patch={~p"/events/#{@event}"}>{@event.title}</.link></li>
-      </ul>
-    </div>
     """
   end
 
