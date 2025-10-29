@@ -35,11 +35,9 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
     end
   end
 
-  def handle_info(%{topic: "event_slides", payload: %{event_id: event_id, live: live?}}, socket)
+  def handle_info(%{topic: "event_slides", payload: %{event_id: event_id}}, socket)
       when event_id == socket.assigns.event.id do
-    %{event: event} = socket.assigns
-    event = %{event | live: live?}
-    {:noreply, socket |> assign(:event, event)}
+    {:noreply, socket |> update_assigns()}
   end
 
 
