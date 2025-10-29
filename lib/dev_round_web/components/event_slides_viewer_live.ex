@@ -23,11 +23,12 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
               data-pdf-url={@pdf_url}
               data-pdf-page-number={@pdf_initial_page_number}
               data-controls={@controls}
+              data-fullscreen-wrapper-id={@fullscreen_wrapper_id}
               class="aspect-[16/9]"
             >
               <!-- PDF.js viewer will be rendered here -->
               <div id="pdf-canvas-container" class="w-full">
-                <canvas id="pdf-canvas"></canvas>
+                <canvas id="pdf-canvas" class="m-auto"></canvas>
               </div>
 
               <div
@@ -72,11 +73,15 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
   end
 
   @impl true
-  def update(%{event: event, controls: controls}, socket) do
+  def update(
+        %{event: event, controls: controls, fullscreen_wrapper_id: fullscreen_wrapper_id},
+        socket
+      ) do
     {:ok,
      socket
      |> assign(:event, event)
      |> assign(:controls, controls)
+     |> assign(:fullscreen_wrapper_id, fullscreen_wrapper_id)
      |> assign_pdf_fields()}
   end
 

@@ -15,7 +15,7 @@
 
 <div
   id="fullscreen-container"
-  class="bg-base-300 text-base rounded-lg [:fullscreen]:rounded-none shadow-lg overflow-hidden my-8"
+  class="bg-base-300 text-base rounded-lg [:fullscreen]:rounded-none [:fullscreen]:h-lvh shadow-lg overflow-hidden my-8"
 >
   <%= if @event.live do %>
     <.live_component
@@ -23,6 +23,7 @@
       id={@event.id}
       event={@event}
       controls={false}
+      fullscreen_wrapper_id="fullscreen-container"
     />
   <% else %>
     <svg width="0" height="0">

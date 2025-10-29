@@ -18,11 +18,12 @@
   </.button>
 </div>
 
-<div class="rounded-lg overflow-hidden my-8">
+<div id="fullscreen-wrapper" class="rounded-lg overflow-hidden my-8">
   <.live_component
     module={DevRoundWeb.EventSlidesViewerLive}
     id={@event.id}
     event={@event}
     controls={true}
+    fullscreen_wrapper_id="fullscreen-wrapper"
   />
 </div>

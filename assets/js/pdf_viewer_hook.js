@@ -8,8 +8,10 @@ const PDFViewer = {
     const pdfUrl = this.el.dataset.pdfUrl;
     const pdfPageNumber = parseInt(this.el.dataset.pdfPageNumber);
     const controls = this.el.dataset.controls !== undefined;
+    const fullScreenWrapperId = this.el.dataset.fullscreenWrapperId;
 
     this.currentPage = pdfPageNumber;
+    this.fullScreenWrapperId = fullScreenWrapperId;
     this.pageCount = 0;
     this.pdfDoc = null;
     this.renderedPages = new Map();
@@ -57,12 +59,19 @@ const PDFViewer = {
     console.log("Starting to render page " + pageNum)
 
     const page = await this.pdfDoc.getPage(pageNum);
+    const referenceViewport = page.getViewport({ scale: 1 });
 
     let container = document.getElementById('pdf-canvas-container');
-    let canvas = document.createElement('canvas')
+    let canvas = document.createElement('canvas');
+    let fullscreenWrapper = document.getElementById(this.fullScreenWrapperId);
+    let scale = 1
 
-    const referenceViewport = page.getViewport({ scale: 1 });
-    const scale = container.clientWidth / referenceViewport.width;
+    if (document.fullscreenElement === fullscreenWrapper){
+      scale = Math.min(fullscreenWrapper.clientHeight / referenceViewport.height, fullscreenWrapper.clientWidth / referenceViewport.width);
+    }
+    else {
+      scale = container.clientWidth / referenceViewport.width;
+    }
     const viewport = page.getViewport({ scale: scale });
 
     const context = canvas.getContext('2d');
