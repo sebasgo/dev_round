@@ -8,6 +8,7 @@ defmodule DevRoundWeb.EventLive.Show do
   def mount(_params, _session, socket) do
     DevRoundWeb.Endpoint.subscribe("admin.events")
     DevRoundWeb.Endpoint.subscribe("registrations")
+    DevRoundWeb.Endpoint.subscribe("event_slides")
     {:ok, socket}
   end
 
@@ -51,6 +52,13 @@ defmodule DevRoundWeb.EventLive.Show do
     else
       {:noreply, socket}
     end
+  end
+
+  def handle_info(%{topic: "event_slides", payload: %{event_id: event_id, live: live?}}, socket)
+      when event_id == socket.assigns.event.id do
+    %{event: event} = socket.assigns
+    event = %{event | live: live?}
+    {:noreply, socket |> assign(:event, event)}
   end
 
   def handle_info(_msg, socket) do
