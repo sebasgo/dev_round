@@ -13,6 +13,8 @@ defmodule DevRound.Events.EventSession do
     field :slug, :string
     field :begin_local, :naive_datetime
     field :end_local, :naive_datetime
+    field :live, :boolean
+    field :teams_locked, :boolean
 
     belongs_to :event, Event
     has_many :teams, Team, foreign_key: :session_id, on_replace: :delete, on_delete: :delete_all
@@ -32,6 +34,12 @@ defmodule DevRound.Events.EventSession do
     |> validate_begin_before_end()
     |> generate_slug()
     |> unique_constraint(:slug)
+  end
+
+  def reset_changeset(event_session, _attrs \\ %{}) do
+    event_session
+    |> change(live: false, teams_locked: false)
+    |> put_assoc(:teams, [])
   end
 
   defp generate_slug(changeset) do

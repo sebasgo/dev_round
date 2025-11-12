@@ -40,7 +40,6 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
     {:noreply, socket |> update_assigns()}
   end
 
-
   def handle_info(_msg, socket) do
     {:noreply, socket}
   end

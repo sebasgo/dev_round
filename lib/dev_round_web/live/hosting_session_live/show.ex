@@ -1,6 +1,8 @@
 defmodule DevRoundWeb.HostingSessionLive.Show do
+  alias DevRound.Events.EventSession
   use DevRoundWeb, :live_view
   import DevRoundWeb.HostingBase
+  alias DevRound.Events
   alias DevRound.Events.Event
   alias DevRound.Hosting
 
@@ -8,6 +10,7 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
   def mount(_params, _session, socket) do
     DevRoundWeb.Endpoint.subscribe("admin.events")
     DevRoundWeb.Endpoint.subscribe("registrations")
+    DevRoundWeb.Endpoint.subscribe("event_sessions")
     {:ok, socket}
   end
 
@@ -44,20 +47,60 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     end
   end
 
+  def handle_info(
+        %{topic: "event_sessions", event: "teams_built", payload: %{event_session_id: id}},
+        socket
+      )
+      when id == socket.assigns.session.id do
+    {:noreply, socket |> assign_teams()}
+  end
+
+  def handle_info(
+        %{topic: "event_sessions", event: "set_live", payload: %{event_session_id: id}},
+        socket
+      )
+      when id == socket.assigns.session.id do
+    {:noreply, socket |> update_assigns()}
+  end
+
+  def handle_info(
+        %{topic: "event_sessions", event: "reset", payload: %{event_session_id: id}},
+        socket
+      )
+      when id == socket.assigns.session.id do
+    {:noreply, socket |> update_assigns()}
+  end
+
   def handle_info(_msg, socket) do
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("build_teams", _params, socket) do
+    %{session: session, event: event, team_names: team_names} = socket.assigns
+    false = session.teams_locked
+
     {:ok, _} =
-      Hosting.build_teams_for_session(
-        socket.assigns.session,
-        socket.assigns.event.events_attendees,
-        socket.assigns.team_names
-      )
+      Hosting.build_teams_for_session(session, event.events_attendees, team_names)
+
+    broadcast_teams_build(session)
 
     {:noreply, socket |> assign_teams()}
+  end
+
+  def handle_event("set_live", %{"live" => live?}, socket) when is_boolean(live?) do
+    %{session: session, teams: teams} = socket.assigns
+    false = Enum.empty?(teams)
+    {:ok, %EventSession{} = session} = Events.update_event_session_live(session, live?)
+    broadcast_set_live(session, live?)
+    {:noreply, socket |> assign(:session, session)}
+  end
+
+  def handle_event("reset", _params, socket) do
+    %{session: session} = socket.assigns
+    {:ok, _} = Events.reset_event_session(session)
+    broadcast_reset(session)
+    {:noreply, socket |> update_assigns()}
   end
 
   defp update_assigns(socket) do
@@ -89,5 +132,24 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
   defp assign_page_title(%{assigns: %{live_action: :show, session: session}} = socket) do
     socket
     |> assign(:page_title, "Hosting #{session.title}")
+  end
+
+  defp broadcast_teams_build(event_session) do
+    DevRoundWeb.Endpoint.broadcast_from(self(), "event_sessions", "teams_built", %{
+      event_session_id: event_session.id
+    })
+  end
+
+  defp broadcast_set_live(event_session, live?) do
+    DevRoundWeb.Endpoint.broadcast_from(self(), "event_sessions", "set_live", %{
+      event_session_id: event_session.id,
+      live?: live?
+    })
+  end
+
+  defp broadcast_reset(event_session) do
+    DevRoundWeb.Endpoint.broadcast_from(self(), "event_sessions", "reset", %{
+      event_session_id: event_session.id
+    })
   end
 end

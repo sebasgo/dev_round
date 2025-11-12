@@ -2,15 +2,45 @@
 <DevRoundWeb.HostingComponents.messages messages={@messages} />
 
 <div class="my-8">
-  <.button type="button" disabled={!Enum.empty?(@messages)} phx-click={JS.push("build_teams")}>
+  <.button
+    type="button"
+    class="btn btn-primary"
+    disabled={!Enum.empty?(@messages) || @session.teams_locked}
+    phx-click={JS.push("build_teams")}
+  >
     Build Teams
+  </.button>
+  <.button
+    type="button"
+    class="btn btn-success"
+    disabled={Enum.empty?(@teams) || @session.live}
+    phx-click={JS.push("set_live", value: %{live: true})}
+  >
+    Start Session
+  </.button>
+  <.button
+    type="button"
+    class="btn btn-warning"
+    disabled={Enum.empty?(@teams) || !@session.live}
+    phx-click={JS.push("set_live", value: %{live: false})}
+  >
+    Return to Lecture
+  </.button>
+  <.button
+    type="button"
+    class="btn btn-error"
+    disabled={Enum.empty?(@teams)}
+    phx-click={JS.push("reset")}
+    data-confirm="Do you really want to reset the session? The session will be stopped and its teams purged."
+  >
+    Reset Session
   </.button>
 </div>
 
 <div class="my-8 grid gap-4 lg:grid-cols-3">
   <div :for={team <- @teams} :key={team.id} class="card bg-base-300">
-    <div class="card-body p-4 gap-4">
-      <h2 class="card-title  grid gap-1">
+    <div class="card-body p-2 gap-2">
+      <h2 class="card-title grid gap-2">
         <span class="flex items-start">
           <span class="grow text-lg font-mono font-semibold text-base-content">{team.name}</span>
           <.icon :if={team.is_remote} name="hero-globe-alt" class="w-6 h-8" />
@@ -18,7 +48,7 @@
         <.lang_badge :if={@multiple_langs} lang={team.lang} />
       </h2>
       <div
-        class="grid gap-1 bg-neutral-content border-neutral-content"
+        class="grid gap-0.5 bg-neutral-content border-neutral-content"
         style="border-radius: 24px"
       >
         <%= for item <- Enum.intersperse(team.attendees, :divider) do %>

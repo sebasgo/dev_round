@@ -348,6 +348,21 @@ defmodule DevRound.Events do
     |> Repo.update()
   end
 
+  def update_event_session_live(%EventSession{} = session, live?) do
+    case from(es in EventSession, where: es.id == ^session.id)
+         |> Repo.update_all(set: [live: live?, teams_locked: true]) do
+      {1, _} -> {:ok, %{session | live: live?, teams_locked: true}}
+      {0, _} -> {:error, :notfound}
+    end
+  end
+
+  def reset_event_session(%EventSession{} = session) do
+    session
+    |> Repo.preload(:teams)
+    |> EventSession.reset_changeset()
+    |> Repo.update()
+  end
+
   @doc """
   Deletes a event_session.
 
