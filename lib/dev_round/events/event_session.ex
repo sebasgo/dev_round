@@ -13,6 +13,8 @@ defmodule DevRound.Events.EventSession do
     field :slug, :string
     field :begin_local, :naive_datetime
     field :end_local, :naive_datetime
+    field :actual_begin, :utc_datetime
+    field :actual_end, :utc_datetime
     field :live, :boolean
     field :teams_locked, :boolean
 
@@ -36,9 +38,19 @@ defmodule DevRound.Events.EventSession do
     |> unique_constraint(:slug)
   end
 
+  def start_changeset(event_session, _attrs \\ %{}) do
+    event_session
+    |> change(live: true, teams_locked: true, actual_begin: DateTime.utc_now(:second))
+  end
+
+  def stop_changeset(event_session, _attrs \\ %{}) do
+    event_session
+    |> change(live: false, actual_end: DateTime.utc_now(:second))
+  end
+
   def reset_changeset(event_session, _attrs \\ %{}) do
     event_session
-    |> change(live: false, teams_locked: false)
+    |> change(live: false, teams_locked: false, actual_begin: nil, actual_end: nil)
     |> put_assoc(:teams, [])
   end
 

@@ -80,7 +80,7 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
 
   defp assign_time_remaining(socket, event_session) do
     if event_session.live do
-      case calculate_time_remaining(event_session.begin, event_session.end) do
+      case calculate_time_remaining(event_session.actual_begin, event_session.end) do
         {:ok, time_remaining} ->
           assign(socket, :time_remaining, time_remaining)
 
@@ -93,7 +93,8 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
   end
 
   defp assign_dates(socket, event_session) do
-    if Date.compare(event_session.begin_local, event_session.end_local) == :eq do
+    {:ok, now} = DateTime.now(Formats.time_zone())
+    if Date.compare(now, event_session.begin_local) == :eq && Date.compare(event_session.begin_local, event_session.end_local) == :eq do
       socket
       |> assign(:begin, Formats.format_time(event_session.begin_local))
       |> assign(:end_, Formats.format_time(event_session.end_local))
