@@ -71,7 +71,17 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     {:noreply, socket |> update_assigns()}
   end
 
-  def handle_info(_msg, socket) do
+  def handle_info({:tick, session_id}, socket) do
+    # Send update to the component
+    send_update(DevRoundWeb.EventSessionCountdownLive,
+      id: "countdown-#{session_id}",
+      event_session: socket.assigns.session
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_info(msg, socket) do
     {:noreply, socket}
   end
 

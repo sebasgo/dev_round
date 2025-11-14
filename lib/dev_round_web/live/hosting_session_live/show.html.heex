@@ -1,76 +1,94 @@
 <DevRoundWeb.HostingComponents.header event={@event} tab={{:session, @session.id}} />
 <DevRoundWeb.HostingComponents.messages messages={@messages} />
 
-<div class="my-8">
-  <.button
-    type="button"
-    class="btn btn-primary"
-    disabled={!Enum.empty?(@messages) || @session.teams_locked}
-    phx-click={JS.push("build_teams")}
-  >
-    Build Teams
-  </.button>
-  <.button
-    type="button"
-    class="btn btn-success"
-    disabled={Enum.empty?(@teams) || @session.live}
-    phx-click={JS.push("set_live", value: %{live: true})}
-  >
-    Start Session
-  </.button>
-  <.button
-    type="button"
-    class="btn btn-warning"
-    disabled={Enum.empty?(@teams) || !@session.live}
-    phx-click={JS.push("set_live", value: %{live: false})}
-  >
-    Return to Lecture
-  </.button>
-  <.button
-    type="button"
-    class="btn btn-error"
-    disabled={Enum.empty?(@teams)}
-    phx-click={JS.push("reset")}
-    data-confirm="Do you really want to reset the session? The session will be stopped and its teams purged."
-  >
-    Reset Session
-  </.button>
-</div>
+<div class="grid my-8 gap-4">
+  <div class="flex p-2 gap-2 bg-neutral rounded-lg">
+    <.button
+      type="button"
+      class="btn btn-primary"
+      disabled={!Enum.empty?(@messages) || @session.teams_locked}
+      phx-click={JS.push("build_teams")}
+    >
+      Build Teams
+    </.button>
+    <.button
+      type="button"
+      class="btn btn-success"
+      disabled={Enum.empty?(@teams) || @session.live}
+      phx-click={JS.push("set_live", value: %{live: true})}
+    >
+      Start Session
+    </.button>
+    <.button
+      type="button"
+      class="btn btn-warning"
+      disabled={Enum.empty?(@teams) || !@session.live}
+      phx-click={JS.push("set_live", value: %{live: false})}
+    >
+      Return to Lecture
+    </.button>
+    <div class="flex-1" />
+    <.button
+      type="button"
+      class="btn btn-error"
+      disabled={Enum.empty?(@teams)}
+      phx-click={JS.push("reset")}
+      data-confirm="Do you really want to reset the session? The session will be stopped and its teams purged."
+    >
+      Reset Session
+    </.button>
+  </div>
 
-<div class="my-8 grid gap-4 lg:grid-cols-3">
-  <div :for={team <- @teams} :key={team.id} class="card bg-base-300">
-    <div class="card-body p-2 gap-2">
-      <h2 class="card-title grid gap-2">
-        <span class="flex items-start">
-          <span class="grow text-lg font-mono font-semibold text-base-content">{team.name}</span>
-          <.icon :if={team.is_remote} name="hero-globe-alt" class="w-6 h-8" />
-        </span>
-        <.lang_badge :if={@multiple_langs} lang={team.lang} />
-      </h2>
-      <div
-        class="grid gap-0.5 bg-neutral-content border-neutral-content"
-        style="border-radius: 24px"
-      >
-        <%= for item <- Enum.intersperse(team.attendees, :divider) do %>
-          <%= case item do %>
-            <% :divider -> %>
-              <div class="mx-[1px] border-t border-neutral" />
-            <% attendee -> %>
-              <div class="">
-                <.user_badge
-                  user={attendee.user}
-                  remote={attendee.is_remote}
-                  experience_level={attendee.experience_level}
-                >
-                  <p :if={@multiple_langs} class="text-sm">
-                    {Enum.map(attendee.langs, fn lang -> lang.name end)
-                    |> Enum.intersperse(", ")}
-                  </p>
-                </.user_badge>
-              </div>
-          <% end %>
-        <% end %>
+  <.live_component
+    module={DevRoundWeb.EventSessionCountdownLive}
+    id={"countdown-#{@session.id}"}
+    event_session={@session}
+  />
+  <%= if Enum.empty?(@teams) do %>
+    <div class="card flex items-center justify-center w-full aspect-[16/9] bg-base-300">
+      <p>
+        The teams for this session have not been assigned yet.
+      </p>
+    </div>
+  <% else %>
+    <div class="grid gap-4 lg:grid-cols-3">
+      <div :for={team <- @teams} :key={team.id} class="card bg-base-300">
+        <div class="card-body p-2 gap-2">
+          <h2 class="card-title grid gap-2">
+            <span class="flex items-start">
+              <span class="grow text-lg font-mono font-semibold text-base-content">
+                {team.name}
+              </span>
+              <.icon :if={team.is_remote} name="hero-globe-alt" class="w-6 h-8" />
+            </span>
+            <.lang_badge :if={@multiple_langs} lang={team.lang} />
+          </h2>
+          <div
+            class="grid gap-0.5 bg-neutral-content border-neutral-content"
+            style="border-radius: 24px"
+          >
+            <%= for item <- Enum.intersperse(team.attendees, :divider) do %>
+              <%= case item do %>
+                <% :divider -> %>
+                  <div class="mx-[1px] border-t border-neutral" />
+                <% attendee -> %>
+                  <div class="">
+                    <.user_badge
+                      user={attendee.user}
+                      remote={attendee.is_remote}
+                      experience_level={attendee.experience_level}
+                    >
+                      <p :if={@multiple_langs} class="text-sm">
+                        {Enum.map(attendee.langs, fn lang -> lang.name end)
+                        |> Enum.intersperse(", ")}
+                      </p>
+                    </.user_badge>
+                  </div>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  <% end %>
 </div>
