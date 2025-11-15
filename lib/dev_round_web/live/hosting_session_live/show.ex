@@ -81,7 +81,7 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     {:noreply, socket}
   end
 
-  def handle_info(msg, socket) do
+  def handle_info(_msg, socket) do
     {:noreply, socket}
   end
 
@@ -95,22 +95,40 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
 
     broadcast_teams_build(session)
 
-    {:noreply, socket |> assign_teams()}
+    {:noreply,
+     socket
+     |> assign_teams()
+     |> put_flash(:info, "Teams generated. You may start the session now.")}
   end
 
   def handle_event("set_live", %{"live" => live?}, socket) when is_boolean(live?) do
-    %{session: session, teams: teams} = socket.assigns
+    %{event: event, session: session, teams: teams} = socket.assigns
     false = Enum.empty?(teams)
     {:ok, %EventSession{} = session} = Events.update_event_session_live(session, live?)
     broadcast_set_live(session, live?)
-    {:noreply, socket |> assign(:session, session)}
+
+    msg =
+      (live? && "Session \"#{session.title}\" started.") ||
+        "Session \"#{session.title}\" stopped."
+
+    if live? do
+      {:noreply, socket |> assign(:session, session) |> put_flash(:info, msg)}
+    else
+      {:noreply,
+       socket
+       |> assign(:session, session)
+       |> put_flash(:info, msg)
+       |> push_navigate(to: ~p"/events/#{event}/hosting/lecture")}
+    end
   end
 
   def handle_event("reset", _params, socket) do
     %{session: session} = socket.assigns
     {:ok, _} = Events.reset_event_session(session)
     broadcast_reset(session)
-    {:noreply, socket |> update_assigns()}
+
+    {:noreply,
+     socket |> update_assigns() |> put_flash(:info, "Session reset. You may build new teams now.")}
   end
 
   defp update_assigns(socket) do

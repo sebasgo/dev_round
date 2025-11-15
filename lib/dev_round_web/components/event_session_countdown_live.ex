@@ -94,7 +94,9 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
 
   defp assign_dates(socket, event_session) do
     {:ok, now} = DateTime.now(Formats.time_zone())
-    if Date.compare(now, event_session.begin_local) == :eq && Date.compare(event_session.begin_local, event_session.end_local) == :eq do
+
+    if Date.compare(now, event_session.begin_local) == :eq &&
+         Date.compare(event_session.begin_local, event_session.end_local) == :eq do
       socket
       |> assign(:begin, Formats.format_time(event_session.begin_local))
       |> assign(:end_, Formats.format_time(event_session.end_local))
