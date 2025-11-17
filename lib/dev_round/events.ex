@@ -7,6 +7,7 @@ defmodule DevRound.Events do
   alias DevRound.Repo
   alias DevRound.Accounts.User
   alias DevRound.Events.Event
+  alias DevRound.Events.EventSession
   alias DevRound.Events.Lang
   alias DevRound.Events.EventAttendee
 
@@ -68,9 +69,11 @@ defmodule DevRound.Events do
             order_by: [asc: ea.is_remote, asc: u.full_name]
       end
 
+    sessions_query = from s in EventSession, order_by: s.begin
+
     Event
     |> Repo.get_by!(query)
-    |> Repo.preload([:langs, :hosts, :sessions])
+    |> Repo.preload([:langs, :hosts, :last_live_session, sessions: sessions_query])
     |> Repo.preload(events_attendees: {attendee_query, [:user, :langs]})
   end
 
@@ -348,12 +351,33 @@ defmodule DevRound.Events do
     |> Repo.update()
   end
 
-  def update_event_session_live(%EventSession{} = session, live?) do
-    if live? do
-      session |> EventSession.start_changeset()
+  def start_event_session(%Event{} = event, %EventSession{} = session) do
+    Ecto.Multi.new()
+    |> maybe_stop_last_live_session_multi_update(event, session)
+    |> Ecto.Multi.update(:session, EventSession.start_changeset(session))
+    |> Ecto.Multi.update(:event, event |> Ecto.Changeset.change(last_live_session_id: session.id))
+    |> Repo.transaction()
+  end
+
+  defp maybe_stop_last_live_session_multi_update(
+         %Ecto.Multi{} = multi,
+         %Event{} = event,
+         %EventSession{} = session
+       ) do
+    if is_nil(event.last_live_session) or event.last_live_session.id == session.id do
+      multi
     else
-      session |> EventSession.stop_changeset()
+      multi
+      |> Ecto.Multi.update(
+        :last_session,
+        event.last_live_session |> EventSession.stop_changeset()
+      )
     end
+  end
+
+  def stop_event_session(%EventSession{} = session) do
+    session
+    |> EventSession.stop_changeset()
     |> Repo.update()
   end
 

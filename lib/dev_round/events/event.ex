@@ -29,6 +29,7 @@ defmodule DevRound.Events.Event do
     has_many :events_attendees, EventAttendee, on_replace: :delete, on_delete: :delete_all
     has_many :attendees, through: [:events_attendees, :user]
     has_many :sessions, EventSession, on_replace: :delete, on_delete: :delete_all
+    belongs_to :last_live_session, EventSession
 
     timestamps(type: :utc_datetime)
   end

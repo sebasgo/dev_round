@@ -15,7 +15,7 @@
       type="button"
       class="btn btn-success"
       disabled={Enum.empty?(@teams) || @session.live}
-      phx-click={JS.push("set_live", value: %{live: true})}
+      phx-click={JS.push("start_session")}
     >
       Start Session
     </.button>
@@ -23,7 +23,7 @@
       type="button"
       class="btn btn-warning"
       disabled={Enum.empty?(@teams) || !@session.live}
-      phx-click={JS.push("set_live", value: %{live: false})}
+      phx-click={JS.push("stop_session")}
     >
       Return to Lecture
     </.button>
