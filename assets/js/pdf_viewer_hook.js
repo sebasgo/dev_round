@@ -126,7 +126,7 @@ const PDFViewer = {
     if (this.pdfDoc && this.currentPage < this.pdfDoc.numPages) {
       this.currentPage++;
       this.goToPage(this.currentPage);
-      this.pushEventTo(this.el, 'pdf_page_turn', { page_number: this.currentPage })
+      this.pushEventTo(this.el, 'pdf_page_turn', { slides_page_number: this.currentPage })
     }
   },
 
@@ -134,7 +134,7 @@ const PDFViewer = {
     if (this.pdfDoc && this.currentPage > 1) {
       this.currentPage--;
       this.goToPage(this.currentPage);
-      this.pushEventTo(this.el, 'pdf_page_turn', { page_number: this.currentPage })
+      this.pushEventTo(this.el, 'pdf_page_turn', { slides_page_number: this.currentPage })
     }
   },
 

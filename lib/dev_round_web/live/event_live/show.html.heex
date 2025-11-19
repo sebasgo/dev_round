@@ -140,7 +140,7 @@
 </article>
 
 <p class="my-8 text-sm italic opacity-75">
-  Last updated on {@event.updated_at
+  Last updated on {@event.modified_at
   |> DateTime.shift_zone!(DevRound.Formats.time_zone())
   |> DevRound.Formats.format_datetime()}
 </p>

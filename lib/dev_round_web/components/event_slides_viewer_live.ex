@@ -95,14 +95,14 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
   @impl true
   def handle_event(
         "pdf_page_turn",
-        %{"page_number" => page_number},
+        %{"slides_page_number" => page_number} = attrs,
         %{assigns: %{controls: true}} = socket
       )
       when is_integer(page_number) do
     %{event: event, pdf_url: url} = socket.assigns
 
     {:ok, _} =
-      Events.update_event_slides_page_number(event, page_number)
+      Events.update_event_slides_page_number(event, attrs)
 
     broadcast_page_turn(url, page_number)
     {:noreply, socket}

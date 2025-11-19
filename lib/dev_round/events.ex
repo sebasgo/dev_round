@@ -147,22 +147,16 @@ defmodule DevRound.Events do
     |> Ecto.Changeset.put_assoc(:langs, langs)
   end
 
-  def update_event_slides_page_number(%Event{} = event, slides_page_number) do
-    # Use update_all so updated_at is not updated
-    case from(e in Event, where: e.id == ^event.id)
-         |> Repo.update_all(set: [slides_page_number: slides_page_number]) do
-      {1, _} -> {:ok, %{event | slides_page_number: slides_page_number}}
-      {0, _} -> {:error, :notfound}
-    end
+  def update_event_slides_page_number(%Event{} = event, attrs) do
+    event
+    |> Event.slides_page_number_changeset(attrs)
+    |> Repo.update()
   end
 
   def update_event_live(%Event{} = event, live?) do
-    # Use update_all so updated_at is not updated
-    case from(e in Event, where: e.id == ^event.id)
-         |> Repo.update_all(set: [live: live?]) do
-      {1, _} -> {:ok, %{event | live: live?}}
-      {0, _} -> {:error, :notfound}
-    end
+    event
+    |> Event.slides_page_number_changeset(%{live: live?})
+    |> Repo.update()
   end
 
   def create_lang(attrs \\ %{}) do
