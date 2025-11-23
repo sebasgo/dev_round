@@ -25,11 +25,23 @@
                     Admin Panel
                   </.link>
                 </li>
-                <li>
-                  <.link href={~p"/users/log_out"} method="delete">
-                    Log out
-                  </.link>
-                </li>
+                <%= if Application.get_env(:dev_round, :dev_routes) do %>
+                  <li>
+                    <.link href={~p"/dev/dashboard"}>
+                      Phoenix Dashboard
+                    </.link>
+                  </li>
+                  <li>
+                    <.link href={~p"/dev/mailbox"}>
+                      Swoosh Mailbox
+                    </.link>
+                  </li>
+                  <li>
+                    <.link href={~p"/users/log_out"} method="delete">
+                      Log out
+                    </.link>
+                  </li>
+                <% end %>
               </ul>
             </details>
           </li>
