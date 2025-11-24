@@ -100,7 +100,7 @@ defmodule DevRound.Events.Event do
 
   def live_changeset(event, attrs) do
     event
-    |> cast(attrs, :live)
+    |> cast(attrs, [:live])
     |> validate_required(:live)
   end
 

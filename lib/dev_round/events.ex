@@ -155,7 +155,7 @@ defmodule DevRound.Events do
 
   def update_event_live(%Event{} = event, live?) do
     event
-    |> Event.slides_page_number_changeset(%{live: live?})
+    |> Event.live_changeset(%{live: live?})
     |> Repo.update()
   end
 
