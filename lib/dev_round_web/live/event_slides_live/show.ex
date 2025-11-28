@@ -40,6 +40,15 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
     {:noreply, socket |> update_assigns()}
   end
 
+  def handle_info({:tick, session_id}, socket) do
+    send_update(DevRoundWeb.EventSessionTeamsSlideLive,
+      id: "teams-#{session_id}",
+      event_session: socket.assigns.event.last_live_session
+    )
+
+    {:noreply, socket}
+  end
+
   def handle_info(_msg, socket) do
     {:noreply, socket}
   end

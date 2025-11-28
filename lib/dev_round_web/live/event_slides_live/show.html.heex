@@ -18,13 +18,21 @@
   class="bg-base-300 text-base rounded-lg [:fullscreen]:rounded-none [:fullscreen]:h-lvh shadow-lg overflow-hidden my-8"
 >
   <%= if @event.live do %>
-    <.live_component
-      module={DevRoundWeb.EventSlidesViewerLive}
-      id={@event.id}
-      event={@event}
-      controls={false}
-      fullscreen_wrapper_id="fullscreen-container"
-    />
+    <%= if @event.last_live_session != nil and @event.last_live_session.live do %>
+      <.live_component
+        module={DevRoundWeb.EventSessionTeamsSlideLive}
+        id={"teams-#{@event.last_live_session.id}"}
+        event_session={@event.last_live_session}
+      />
+    <% else %>
+      <.live_component
+        module={DevRoundWeb.EventSlidesViewerLive}
+        id={@event.id}
+        event={@event}
+        controls={false}
+        fullscreen_wrapper_id="fullscreen-container"
+      />
+    <% end %>
   <% else %>
     <svg width="0" height="0">
       <filter id="noise-filter">

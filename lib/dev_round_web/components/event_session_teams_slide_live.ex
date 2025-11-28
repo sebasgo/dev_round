@@ -1,4 +1,4 @@
-defmodule DevRoundWeb.EventSessionCountdownLive do
+defmodule DevRoundWeb.EventSessionTeamsSlideLive do
   alias DevRound.Formats
   use DevRoundWeb, :live_component
 
@@ -35,45 +35,30 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="card grid lg:grid-cols-3 items-center gap-4 bg-base-300">
-      <div class="grid gap-1 p-2">
-        <div class="text-sm text-base-content/70">
-          Begin
-        </div>
-        <div class="text-2xl font-mono">
-          {@begin}
+    <div class="aspect-video flex flex-col" style="container-type: size">
+      <div class="h-[10%] min-h-[10%] max-h-[10%] flex items-center px-[1.5%] gap-[1%] bg-base-200">
+        <img src={~p"/images/icon.svg"} class="h-[6cqh]" alt="DevRound" />
+        <h2 class="flex-1 font-mono font-semibold" style="font-size: 3cqh">
+          {@event_session.title}
+          <span class="opacity-70">
+            {@time}
+          </span>
+        </h2>
+        <.icon name="hero-clock" class="h-[3cqh] w-[3cqh] opacity-70" />
+        <div class="flex font-mono items-center" style="font-size: 3cqh">
+          <%= if @time_remaining do %>
+            <div class="countdown">
+              <%= if @time_remaining.day_digits > 0 do %>
+                <span style={"--value:#{@time_remaining.days}; --digits: #{@time_remaining.day_digits};"}></span>:
+              <% end %>
+              <span style={"--value:#{@time_remaining.hours}; --digits: 2"}></span>: <span style={"--value:#{@time_remaining.minutes}; --digits: 2"}></span>:
+              <span style={"--value:#{@time_remaining.seconds}; --digits: 2"}></span>
+            </div>
+          <% else %>
+            <span class="text-error animate-pulse">Session Ended</span>
+          <% end %>
         </div>
       </div>
-
-      <div class="p-2">
-        <div class="text-sm text-base-content/70">
-          End
-        </div>
-        <div class="text-2xl font-mono">
-          {@end_}
-        </div>
-      </div>
-
-      <%= if @event_session.live do %>
-        <div class="p-2">
-          <div class="text-sm text-base-content/70">
-            Time Remaining
-          </div>
-          <div class="text-2xl font-mono">
-            <%= if @time_remaining do %>
-              <div class="countdown">
-                <%= if @time_remaining.day_digits > 0 do %>
-                  <span style={"--value:#{@time_remaining.days}; --digits: #{@time_remaining.day_digits};"}></span>:
-                <% end %>
-                <span style={"--value:#{@time_remaining.hours}; --digits: 2"}></span>: <span style={"--value:#{@time_remaining.minutes}; --digits: 2"}></span>:
-                <span style={"--value:#{@time_remaining.seconds}; --digits: 2"}></span>
-              </div>
-            <% else %>
-              <span class="text-error animate-pulse">Session Ended</span>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
     </div>
     """
   end
@@ -95,15 +80,19 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
   defp assign_dates(socket, event_session) do
     {:ok, now} = DateTime.now(Formats.time_zone())
 
-    if Date.compare(now, event_session.begin_local) == :eq &&
+    if Date.compare(now, event_session.begin_local) == :eq and
          Date.compare(event_session.begin_local, event_session.end_local) == :eq do
       socket
-      |> assign(:begin, Formats.format_time(event_session.begin_local))
-      |> assign(:end_, Formats.format_time(event_session.end_local))
+      |> assign(
+        :time,
+        Formats.format_time_range(event_session.begin_local, event_session.end_local)
+      )
     else
       socket
-      |> assign(:begin, Formats.format_datetime(event_session.begin_local))
-      |> assign(:end_, Formats.format_datetime(event_session.end_local))
+      |> assign(
+        :time,
+        Formats.format_datetime_range(event_session.begin_local, event_session.end_local)
+      )
     end
   end
 
