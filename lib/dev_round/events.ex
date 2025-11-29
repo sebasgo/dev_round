@@ -58,6 +58,12 @@ defmodule DevRound.Events do
         slug when is_binary(slug) -> [slug: slug, published: true]
       end
 
+    Event
+    |> Repo.get_by!(query)
+    |> preload_event_assocs(opts)
+  end
+
+  def preload_event_assocs(%Event{} = event, opts \\ [order_attendees_by: :registration]) do
     attendee_query =
       case Keyword.get(opts, :order_attendees_by) do
         :registration ->
@@ -71,8 +77,7 @@ defmodule DevRound.Events do
 
     sessions_query = from s in EventSession, order_by: s.begin
 
-    Event
-    |> Repo.get_by!(query)
+    event
     |> Repo.preload([:langs, :hosts, :last_live_session, sessions: sessions_query])
     |> Repo.preload(events_attendees: {attendee_query, [:user, :langs]})
   end

@@ -61,7 +61,7 @@ defmodule DevRound.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:backpex, "~> 0.14.0"},
+      {:backpex, "~> 0.16.0"},
       {:earmark, "~> 1.4"},
       {:time_zone_info, "~> 0.7"},
       {:uuid, "~> 1.1"},

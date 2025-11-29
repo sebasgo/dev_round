@@ -68,6 +68,7 @@ defmodule DevRoundWeb.Admin.ItemActions.DuplicateEvent do
 
   @impl Backpex.ItemAction
   def handle(socket, [item | _items], data) do
+    item = item |> Events.preload_event_assocs()
     date_diff = calculate_date_diff(data.begin_local, item.begin_local)
 
     attrs =
