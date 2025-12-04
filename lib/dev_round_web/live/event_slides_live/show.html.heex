@@ -15,7 +15,7 @@
 
 <div
   id="fullscreen-container"
-  class="bg-base-300 text-base rounded-lg [:fullscreen]:rounded-none [:fullscreen]:h-lvh shadow-lg overflow-hidden my-8"
+  class="bg-base-300 text-base rounded-lg [:fullscreen]:rounded-none shadow-lg overflow-hidden my-8 aspect-[16/9]"
 >
   <%= if @event.live do %>
     <%= if @event.last_live_session != nil and @event.last_live_session.live do %>
@@ -23,6 +23,7 @@
         module={DevRoundWeb.EventSessionTeamsSlideLive}
         id={"teams-#{@event.last_live_session.id}"}
         event_session={@event.last_live_session}
+        multiple_langs={@multiple_langs}
       />
     <% else %>
       <.live_component

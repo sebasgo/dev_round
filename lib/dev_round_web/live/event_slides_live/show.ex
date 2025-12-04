@@ -43,7 +43,8 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
   def handle_info({:tick, session_id}, socket) do
     send_update(DevRoundWeb.EventSessionTeamsSlideLive,
       id: "teams-#{session_id}",
-      event_session: socket.assigns.event.last_live_session
+      event_session: socket.assigns.event.last_live_session,
+      multiple_langs: socket.assigns.multiple_langs
     )
 
     {:noreply, socket}
@@ -60,6 +61,7 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:event, event)
+    |> assign(:multiple_langs, not Enum.empty?(tl(event.langs)))
     |> assign_pdf_url()
   end
 

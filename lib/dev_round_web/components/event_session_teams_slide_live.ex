@@ -1,5 +1,6 @@
 defmodule DevRoundWeb.EventSessionTeamsSlideLive do
   alias DevRound.Formats
+  alias DevRound.Hosting
   use DevRoundWeb, :live_component
 
   @impl true
@@ -8,12 +9,13 @@ defmodule DevRoundWeb.EventSessionTeamsSlideLive do
   end
 
   @impl true
-  def update(%{event_session: event_session} = assigns, socket) do
+  def update(%{event_session: event_session, multiple_langs: _multiple_langs} = assigns, socket) do
     socket =
       socket
       |> assign(assigns)
       |> assign_time_remaining(event_session)
       |> assign_dates(event_session)
+      |> assign_teams(event_session)
 
     # Schedule tick aligned to wallclock seconds if live
     if event_session.live and connected?(socket) do
@@ -35,8 +37,13 @@ defmodule DevRoundWeb.EventSessionTeamsSlideLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="aspect-video flex flex-col" style="container-type: size">
-      <div class="h-[10%] min-h-[10%] max-h-[10%] flex items-center px-[1.5%] gap-[1%] bg-base-200">
+    <div
+      id="event-teams"
+      class="h-full flex flex-col"
+      style="container-type: size"
+      phx-hook="EventSessionTeamsSlideHook"
+    >
+      <div class="h-[10cqh] min-h-[10cqh] max-h-[10cqh] flex items-center px-[1.5%] gap-x-[1%] bg-base-200">
         <img src={~p"/images/icon.svg"} class="h-[6cqh]" alt="DevRound" />
         <h2 class="flex-1 font-mono font-semibold" style="font-size: 3cqh">
           {@event_session.title}
@@ -59,8 +66,27 @@ defmodule DevRoundWeb.EventSessionTeamsSlideLive do
           <% end %>
         </div>
       </div>
+      <div
+        id="event-teams-grid"
+        class="grow overflow-hidden grid p-[1.5cqh] gap-x-[1.5cqh] content-between bg-black"
+      >
+        <DevRoundWeb.EventComponents.team
+          :for={team <- @teams}
+          :key={team.id}
+          team={team}
+          show_attendee_experience_level={false}
+          show_attendee_langs={false}
+          multiple_langs={@multiple_langs}
+          class="invisible"
+        />
+      </div>
     </div>
     """
+  end
+
+  defp assign_teams(socket, event_session) do
+    socket
+    |> assign_new(:teams, fn -> Hosting.list_teams_for_session(event_session) end)
   end
 
   defp assign_time_remaining(socket, event_session) do

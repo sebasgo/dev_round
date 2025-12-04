@@ -24,6 +24,7 @@ import topbar from "../vendor/topbar"
 import { Hooks as BackpexHooks } from 'backpex'
 import { PDFViewer } from "./pdf_viewer_hook"
 import { ShowFullScreen} from "./show_fullscreen_hook"
+import { EventSessionTeamsSlideHook } from "./event_session_teams_slide_hook"
 
 import Prism from 'prismjs'
 import 'prismjs/components/prism-python'
@@ -45,7 +46,7 @@ let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {PDFViewer: PDFViewer, ShowFullScreen: ShowFullScreen, ...BackpexHooks}
+  hooks: {PDFViewer: PDFViewer, ShowFullScreen: ShowFullScreen, EventSessionTeamsSlideHook, ...BackpexHooks}
 })
 
 // Show progress bar on live navigation and form submits
