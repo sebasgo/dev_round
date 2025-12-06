@@ -1,7 +1,9 @@
 defmodule DevRoundWeb.HostingSessionLive.Show do
   alias DevRound.Events.EventSession
   use DevRoundWeb, :live_view
+  use DevRoundWeb.EventSessionCountdownLive, :relay_countdown_ticks
   import DevRoundWeb.HostingBase
+  alias DevRound.Formats
   alias DevRound.Events
   alias DevRound.Events.Event
   alias DevRound.Hosting
@@ -71,16 +73,6 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     {:noreply, socket |> update_assigns()}
   end
 
-  def handle_info({:tick, session_id}, socket) do
-    # Send update to the component
-    send_update(DevRoundWeb.EventSessionCountdownLive,
-      id: "countdown-#{session_id}",
-      event_session: socket.assigns.session
-    )
-
-    {:noreply, socket}
-  end
-
   def handle_info(_msg, socket) do
     {:noreply, socket}
   end
@@ -141,6 +133,7 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     |> assign_messages()
     |> assign_session()
     |> assign_teams()
+    |> assign_dates()
     |> assign_page_title()
   end
 
@@ -157,6 +150,22 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
   defp assign_teams(socket) do
     socket
     |> assign(:teams, Hosting.list_teams_for_session(socket.assigns.session))
+  end
+
+  defp assign_dates(socket) do
+    event_session = socket.assigns.session
+    {:ok, now} = DateTime.now(Formats.time_zone())
+
+    if Date.compare(now, event_session.begin_local) == :eq &&
+         Date.compare(event_session.begin_local, event_session.end_local) == :eq do
+      socket
+      |> assign(:begin, Formats.format_time(event_session.begin_local))
+      |> assign(:end_, Formats.format_time(event_session.end_local))
+    else
+      socket
+      |> assign(:begin, Formats.format_datetime(event_session.begin_local))
+      |> assign(:end_, Formats.format_datetime(event_session.end_local))
+    end
   end
 
   defp assign_page_title(%{assigns: %{live_action: :show, session: session}} = socket) do

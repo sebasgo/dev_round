@@ -1,5 +1,4 @@
 defmodule DevRoundWeb.EventSessionCountdownLive do
-  alias DevRound.Formats
   use DevRoundWeb, :live_component
 
   @impl true
@@ -8,12 +7,11 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
   end
 
   @impl true
-  def update(%{event_session: event_session} = assigns, socket) do
+  def update(%{event_session: event_session, class: _, style: _} = assigns, socket) do
     socket =
       socket
       |> assign(assigns)
       |> assign_time_remaining(event_session)
-      |> assign_dates(event_session)
 
     # Schedule tick aligned to wallclock seconds if live
     if event_session.live and connected?(socket) do
@@ -21,6 +19,16 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
     end
 
     {:ok, socket}
+  end
+
+  def update(%{tick: true}, socket) do
+    event_session = socket.assigns.event_session
+
+    if event_session.live and connected?(socket) do
+      schedule_next_tick(event_session.id)
+    end
+
+    {:ok, socket |> assign_time_remaining(event_session)}
   end
 
   defp schedule_next_tick(session_id) do
@@ -35,44 +43,17 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="card grid lg:grid-cols-3 items-center gap-4 bg-base-300">
-      <div class="grid gap-1 p-2">
-        <div class="text-sm text-base-content/70">
-          Begin
+    <div class={@class} style={@style}>
+      <%= if @time_remaining do %>
+        <div class="countdown">
+          <%= if @time_remaining.day_digits > 0 do %>
+            <span style={"--value:#{@time_remaining.days}; --digits: #{@time_remaining.day_digits};"}></span>:
+          <% end %>
+          <span style={"--value:#{@time_remaining.hours}; --digits: 2"}></span>: <span style={"--value:#{@time_remaining.minutes}; --digits: 2"}></span>:
+          <span style={"--value:#{@time_remaining.seconds}; --digits: 2"}></span>
         </div>
-        <div class="text-2xl font-mono">
-          {@begin}
-        </div>
-      </div>
-
-      <div class="p-2">
-        <div class="text-sm text-base-content/70">
-          End
-        </div>
-        <div class="text-2xl font-mono">
-          {@end_}
-        </div>
-      </div>
-
-      <%= if @event_session.live do %>
-        <div class="p-2">
-          <div class="text-sm text-base-content/70">
-            Time Remaining
-          </div>
-          <div class="text-2xl font-mono">
-            <%= if @time_remaining do %>
-              <div class="countdown">
-                <%= if @time_remaining.day_digits > 0 do %>
-                  <span style={"--value:#{@time_remaining.days}; --digits: #{@time_remaining.day_digits};"}></span>:
-                <% end %>
-                <span style={"--value:#{@time_remaining.hours}; --digits: 2"}></span>: <span style={"--value:#{@time_remaining.minutes}; --digits: 2"}></span>:
-                <span style={"--value:#{@time_remaining.seconds}; --digits: 2"}></span>
-              </div>
-            <% else %>
-              <span class="text-error animate-pulse">Session Ended</span>
-            <% end %>
-          </div>
-        </div>
+      <% else %>
+        <span class="text-error animate-pulse">Session Ended</span>
       <% end %>
     </div>
     """
@@ -89,21 +70,6 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
       end
     else
       assign(socket, :time_remaining, nil)
-    end
-  end
-
-  defp assign_dates(socket, event_session) do
-    {:ok, now} = DateTime.now(Formats.time_zone())
-
-    if Date.compare(now, event_session.begin_local) == :eq &&
-         Date.compare(event_session.begin_local, event_session.end_local) == :eq do
-      socket
-      |> assign(:begin, Formats.format_time(event_session.begin_local))
-      |> assign(:end_, Formats.format_time(event_session.end_local))
-    else
-      socket
-      |> assign(:begin, Formats.format_datetime(event_session.begin_local))
-      |> assign(:end_, Formats.format_datetime(event_session.end_local))
     end
   end
 
@@ -132,6 +98,19 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
 
       _ ->
         {:expired, %{days: 0, hours: 0, minutes: 0, seconds: 0, day_digits: 0}}
+    end
+  end
+
+  defmacro __using__(:relay_countdown_ticks) do
+    quote do
+      def handle_info({:tick, session_id}, socket) do
+        send_update(DevRoundWeb.EventSessionCountdownLive,
+          id: "countdown-#{session_id}",
+          tick: true
+        )
+
+        {:noreply, socket}
+      end
     end
   end
 end

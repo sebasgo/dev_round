@@ -52,19 +52,13 @@ defmodule DevRoundWeb.EventSessionTeamsSlideLive do
           </span>
         </h2>
         <.icon name="hero-clock" class="h-[3cqh] w-[3cqh] opacity-70" />
-        <div class="flex font-mono items-center" style="font-size: 3cqh">
-          <%= if @time_remaining do %>
-            <div class="countdown">
-              <%= if @time_remaining.day_digits > 0 do %>
-                <span style={"--value:#{@time_remaining.days}; --digits: #{@time_remaining.day_digits};"}></span>:
-              <% end %>
-              <span style={"--value:#{@time_remaining.hours}; --digits: 2"}></span>: <span style={"--value:#{@time_remaining.minutes}; --digits: 2"}></span>:
-              <span style={"--value:#{@time_remaining.seconds}; --digits: 2"}></span>
-            </div>
-          <% else %>
-            <span class="text-error animate-pulse">Session Ended</span>
-          <% end %>
-        </div>
+        <.live_component
+          module={DevRoundWeb.EventSessionCountdownLive}
+          id={"countdown-#{@event_session.id}"}
+          event_session={@event_session}
+          class="flex font-mono items-center"
+          style="font-size: 3cqh"
+        />
       </div>
       <div
         id="event-teams-grid"

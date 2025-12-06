@@ -39,11 +39,41 @@
     </.button>
   </div>
 
-  <.live_component
-    module={DevRoundWeb.EventSessionCountdownLive}
-    id={"countdown-#{@session.id}"}
-    event_session={@session}
-  />
+  <div class="card grid lg:grid-cols-3 items-center gap-4 bg-base-300">
+    <div class="grid gap-1 p-2">
+      <div class="text-sm text-base-content/70">
+        Scheduled Begin
+      </div>
+      <div class="text-2xl font-mono">
+        {@begin}
+      </div>
+    </div>
+
+    <div class="p-2">
+      <div class="text-sm text-base-content/70">
+        Scheduled End
+      </div>
+      <div class="text-2xl font-mono">
+        {@end_}
+      </div>
+    </div>
+
+    <%= if @session.live do %>
+      <div class="p-2">
+        <div class="text-sm text-base-content/70">
+          Time Remaining
+        </div>
+        <.live_component
+          module={DevRoundWeb.EventSessionCountdownLive}
+          id={"countdown-#{@session.id}"}
+          event_session={@session}
+          class="text-2xl font-mono"
+          style={nil}
+        />
+      </div>
+    <% end %>
+  </div>
+
   <%= if Enum.empty?(@teams) do %>
     <div class="card flex items-center justify-center w-full aspect-[16/9] bg-base-300">
       <p>

@@ -1,6 +1,7 @@
 defmodule DevRoundWeb.EventSlidesLive.Show do
   use DevRoundWeb, :live_view
   use DevRoundWeb.EventSlidesViewerLive, :relay_page_turn_events
+  use DevRoundWeb.EventSessionCountdownLive, :relay_countdown_ticks
 
   alias DevRound.Events
   alias DevRound.Events.Event
@@ -38,16 +39,6 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
   def handle_info(%{topic: "event_slides", payload: %{event_id: event_id}}, socket)
       when event_id == socket.assigns.event.id do
     {:noreply, socket |> update_assigns()}
-  end
-
-  def handle_info({:tick, session_id}, socket) do
-    send_update(DevRoundWeb.EventSessionTeamsSlideLive,
-      id: "teams-#{session_id}",
-      event_session: socket.assigns.event.last_live_session,
-      multiple_langs: socket.assigns.multiple_langs
-    )
-
-    {:noreply, socket}
   end
 
   def handle_info(_msg, socket) do
