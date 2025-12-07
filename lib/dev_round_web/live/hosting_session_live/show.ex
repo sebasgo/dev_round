@@ -97,7 +97,7 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     %{event: event, session: session, teams: teams} = socket.assigns
     false = Enum.empty?(teams)
     {:ok, %{event: event, session: session}} = Events.start_event_session(event, session)
-    broadcast_set_live(session, true)
+    broadcast_set_live(event, session, true)
 
     msg = "Session \"#{session.title}\" started."
     {:noreply, socket |> assign(event: event, session: session) |> put_flash(:info, msg)}
@@ -107,7 +107,7 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     %{event: event, session: session, teams: teams} = socket.assigns
     false = Enum.empty?(teams)
     {:ok, %EventSession{} = session} = Events.stop_event_session(session)
-    broadcast_set_live(session, false)
+    broadcast_set_live(event, session, false)
 
     {:noreply,
      socket
@@ -117,9 +117,9 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
   end
 
   def handle_event("reset", _params, socket) do
-    %{session: session} = socket.assigns
+    %{event: event, session: session} = socket.assigns
     {:ok, _} = Events.reset_event_session(session)
-    broadcast_reset(session)
+    broadcast_reset(event, session)
 
     {:noreply,
      socket |> update_assigns() |> put_flash(:info, "Session reset. You may build new teams now.")}
@@ -179,15 +179,17 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     })
   end
 
-  defp broadcast_set_live(event_session, live?) do
+  defp broadcast_set_live(event, event_session, live?) do
     DevRoundWeb.Endpoint.broadcast_from(self(), "event_sessions", "set_live", %{
+      event_id: event.id,
       event_session_id: event_session.id,
       live?: live?
     })
   end
 
-  defp broadcast_reset(event_session) do
+  defp broadcast_reset(event, event_session) do
     DevRoundWeb.Endpoint.broadcast_from(self(), "event_sessions", "reset", %{
+      event_id: event.id,
       event_session_id: event_session.id
     })
   end

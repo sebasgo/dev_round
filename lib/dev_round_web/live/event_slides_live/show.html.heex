@@ -18,11 +18,11 @@
   class="bg-base-300 text-base rounded-lg [:fullscreen]:rounded-none shadow-lg overflow-hidden my-8 aspect-[16/9]"
 >
   <%= if @event.live do %>
-    <%= if @event.last_live_session != nil and @event.last_live_session.live do %>
+    <%= if @session != nil do %>
       <.live_component
         module={DevRoundWeb.EventSessionTeamsSlideLive}
-        id={"teams-#{@event.last_live_session.id}"}
-        event_session={@event.last_live_session}
+        id={"teams-#{@session.id}"}
+        event_session={@session}
         multiple_langs={@multiple_langs}
       />
     <% else %>

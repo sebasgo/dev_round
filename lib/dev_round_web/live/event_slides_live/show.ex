@@ -9,6 +9,7 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
   @impl true
   def mount(_params, _session, socket) do
     DevRoundWeb.Endpoint.subscribe("admin.events")
+    DevRoundWeb.Endpoint.subscribe("event_sessions")
     subscribe_to_page_turn_topic()
     {:ok, socket}
   end
@@ -41,6 +42,22 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
     {:noreply, socket |> update_assigns()}
   end
 
+  def handle_info(
+        %{topic: "event_sessions", event: "set_live", payload: %{event_id: id}},
+        socket
+      )
+      when id == socket.assigns.event.id do
+    {:noreply, socket |> update_assigns()}
+  end
+
+  def handle_info(
+        %{topic: "event_sessions", event: "reset", payload: %{event_id: id}},
+        socket
+      )
+      when id == socket.assigns.event.id do
+    {:noreply, socket |> update_assigns()}
+  end
+
   def handle_info(_msg, socket) do
     {:noreply, socket}
   end
@@ -49,9 +66,15 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
     slug = socket.assigns.slug
     event = Events.get_event!(slug)
 
+    session =
+      if event.last_live_session != nil and event.last_live_session.live,
+        do: event.last_live_session,
+        else: nil
+
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:event, event)
+    |> assign(:session, session)
     |> assign(:multiple_langs, not Enum.empty?(tl(event.langs)))
     |> assign_pdf_url()
   end
