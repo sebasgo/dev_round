@@ -15,7 +15,10 @@
 
 <div
   id="fullscreen-container"
-  class="bg-base-300 text-base rounded-lg [:fullscreen]:rounded-none shadow-lg overflow-hidden my-8 aspect-[16/9]"
+  class={[
+    "bg-base-300 text-base rounded-lg [:fullscreen]:rounded-none shadow-lg overflow-hidden my-8",
+    @session != nil && "aspect-video"
+  ]}
 >
   <%= if @event.live do %>
     <%= if @session != nil do %>
