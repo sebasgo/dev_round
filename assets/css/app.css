@@ -76,6 +76,23 @@
    @apply text-primary hover:text-primary;
 }
 
+/* Custom 3D rotation animation */
+@keyframes rotate-3d {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(-90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0deg);
+  }
+}
+
+@utility rotate-3d-enter {
+  animation: rotate-3d 0.3s ease-out;
+  transform-origin: top center;
+}
+
 
 /* Make LiveView wrapper divs transparent for layout */
 [data-phx-session], [data-phx-teleported-src] { display: contents }

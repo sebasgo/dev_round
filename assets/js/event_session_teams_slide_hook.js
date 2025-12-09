@@ -18,7 +18,7 @@ const EventSessionTeamsSlideHook = {
     this.cols = Math.ceil(-.5 + Math.sqrt(.25 + this.teams.length))
 
     this.updateLayout();
-    this.revealGrid();
+    this.revealGrid(this.cols);
     this.setupResizeHandler();
   },
 
@@ -56,9 +56,16 @@ const EventSessionTeamsSlideHook = {
     }
   },
 
-  revealGrid() {
-    for (let el of this.teams) {
-      el.classList.remove("invisible");
+  revealGrid(cols) {
+    const teams = Array.from(this.teams)
+    for (let row = 0, i = 0; i < this.teams.length; row++, i += cols) {
+      for (const [j, el] of teams.slice(i, i + cols).entries()) {
+        const delay = (row + j) * 150
+        setTimeout(() => {
+          el.classList.remove("invisible");
+          el.classList.add("rotate-3d-enter");
+        }, delay);
+      }
     }
   },
 
