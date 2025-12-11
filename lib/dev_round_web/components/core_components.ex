@@ -811,4 +811,14 @@ defmodule DevRoundWeb.CoreComponents do
     </div>
     """
   end
+
+  slot :inner_block
+
+  def toolbar(assigns) do
+    ~H"""
+    <div class="flex p-2 gap-2 bg-neutral rounded-lg">
+      {render_slot(@inner_block)}
+    </div>
+    """
+  end
 end

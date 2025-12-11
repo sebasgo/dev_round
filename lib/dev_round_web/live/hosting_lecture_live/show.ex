@@ -52,7 +52,8 @@ defmodule DevRoundWeb.HostingLectureLive.Show do
     %{event: event} = socket.assigns
     {:ok, %Event{} = event} = Events.update_event_live(event, live?)
     broadcast_set_live(event, live?)
-    {:noreply, socket |> assign(:event, event)}
+    msg = if live?, do: "Presentation started.", else: "Presentation stopped."
+    {:noreply, socket |> assign(:event, event) |> put_flash(:info, msg)}
   end
 
   defp update_assigns(socket) do
