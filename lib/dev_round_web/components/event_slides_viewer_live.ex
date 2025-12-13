@@ -126,7 +126,7 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
         %{event: event} = socket.assigns
 
         socket
-        |> assign(:pdf_url, DevRoundWeb.EventSlidesViewerLive.get_pdf_url(event.slides_filename))
+        |> assign(:pdf_url, DevRound.Events.get_event_pdf_url(event))
       end
     end
   end
@@ -135,17 +135,10 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
     %{event: event} = socket.assigns
 
     socket
-    |> assign(:pdf_url, get_pdf_url(event.slides_filename))
+    |> assign(:pdf_url, Events.get_event_pdf_url(event))
     |> assign(:pdf_initial_page_number, event.slides_page_number)
     |> assign_new(:pdf_error, fn -> nil end)
   end
-
-  def get_pdf_url(slides_filename) when is_binary(slides_filename) do
-    static_path = "/uploads/events/slides/#{slides_filename}"
-    Phoenix.VerifiedRoutes.static_url(DevRoundWeb.Endpoint, static_path)
-  end
-
-  def get_pdf_url(_), do: nil
 
   defp broadcast_page_turn(url, page_number) do
     DevRoundWeb.Endpoint.broadcast_from(self(), "event_slides", "page_turn", %{

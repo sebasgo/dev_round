@@ -102,6 +102,18 @@
       <dd class="mb-4 md:mb-0">
         <.lang_badge :for={lang <- @event.langs} :key={lang.id} lang={lang} />
       </dd>
+      <dt class="flex gap-1">
+        <.icon name="hero-paper-clip" class="" /> Slides
+      </dt>
+      <dd class="mb-4 md:mb-0">
+        <%= if @pdf_url do %>
+          <.link href={@pdf_url} class="flex gap-1 font-semibold" target="_blank">
+            <.icon name="hero-arrow-down-tray" class="h-5 w-5" /> Download
+          </.link>
+        <% else %>
+          <p class="opacity-70">N/A</p>
+        <% end %>
+      </dd>
       <dt class="flex flex-wrap gap-1">
         <.icon name="hero-academic-cap" class="" />
         <%= if Enum.empty?(tl(@event.hosts)) do %>

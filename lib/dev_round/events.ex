@@ -164,6 +164,13 @@ defmodule DevRound.Events do
     |> Repo.update()
   end
 
+  def get_event_pdf_url(%Event{slides_filename: filename}) when is_binary(filename) do
+    static_path = "/uploads/events/slides/#{filename}"
+    Phoenix.VerifiedRoutes.static_url(DevRoundWeb.Endpoint, static_path)
+  end
+
+  def get_event_pdf_url(%Event{}), do: nil
+
   def create_lang(attrs \\ %{}) do
     %Lang{}
     |> change_lang(attrs)
