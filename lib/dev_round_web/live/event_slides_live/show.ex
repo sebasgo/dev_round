@@ -72,12 +72,12 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
         else: nil
 
     socket
-    |> assign(:page_title, page_title(socket.assigns.live_action))
+    |> assign(:page_title, page_title(event, socket.assigns.live_action))
     |> assign(:event, event)
     |> assign(:session, session)
     |> assign(:multiple_langs, not Enum.empty?(tl(event.langs)))
     |> assign_pdf_url()
   end
 
-  defp page_title(:show), do: "Event Slides"
+  defp page_title(event, :show), do: "Live Presentation · #{event.title}"
 end
