@@ -9,7 +9,10 @@ defmodule DevRoundWeb.EventSessionTeamsSlideLive do
   end
 
   @impl true
-  def update(%{event_session: event_session, multiple_langs: _multiple_langs} = assigns, socket) do
+  def update(
+        %{event_session: event_session, multiple_langs: _, new_event_session?: _} = assigns,
+        socket
+      ) do
     socket =
       socket
       |> assign(assigns)
@@ -27,6 +30,7 @@ defmodule DevRoundWeb.EventSessionTeamsSlideLive do
       class="h-full flex flex-col"
       style="container-type: size"
       phx-hook="EventSessionTeamsSlideHook"
+      data-is-new-session={@new_event_session? || nil}
     >
       <div class="h-[10cqh] min-h-[10cqh] max-h-[10cqh] flex items-center px-[1.5%] gap-x-[1%] bg-base-200">
         <img src={~p"/images/icon.svg"} class="h-[6cqh]" alt="DevRound" />

@@ -11,6 +11,8 @@ const EventSessionTeamsSlideHook = {
     this.grid = document.getElementById("event-teams-grid");
     this.teams = this.grid.querySelectorAll(":scope > div");
     this.teamHeights = this.measureHeights(this.teams);
+    this.isNewSession = this.el.dataset.isNewSession !== undefined;
+
 
     // arrange teams in a square matrix layout where the last row may have empty spots
     // failing this, use one more row than columns
@@ -57,14 +59,21 @@ const EventSessionTeamsSlideHook = {
   },
 
   revealGrid(cols) {
-    const teams = Array.from(this.teams)
-    for (let row = 0, i = 0; i < this.teams.length; row++, i += cols) {
-      for (const [j, el] of teams.slice(i, i + cols).entries()) {
-        const delay = (row + j) * 150
-        setTimeout(() => {
-          el.classList.remove("invisible");
-          el.classList.add("rotate-3d-enter");
-        }, delay);
+    if (this.isNewSession) {
+      const teams = Array.from(this.teams)
+      for (let row = 0, i = 0; i < this.teams.length; row++, i += cols) {
+        for (const [j, el] of teams.slice(i, i + cols).entries()) {
+          const delay = (row + j) * 150
+          setTimeout(() => {
+            el.classList.remove("invisible");
+            el.classList.add("rotate-3d-enter");
+          }, delay);
+        }
+      }
+    }
+    else {
+      for (let el of this.teams) {
+        el.classList.remove("invisible");
       }
     }
   },

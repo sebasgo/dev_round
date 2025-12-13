@@ -47,7 +47,7 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
         socket
       )
       when id == socket.assigns.event.id do
-    {:noreply, socket |> update_assigns()}
+    {:noreply, socket |> update_assigns(true)}
   end
 
   def handle_info(
@@ -62,7 +62,7 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
     {:noreply, socket}
   end
 
-  defp update_assigns(socket) do
+  defp update_assigns(socket, new_session? \\ false) do
     slug = socket.assigns.slug
     event = Events.get_event!(slug)
 
@@ -75,6 +75,7 @@ defmodule DevRoundWeb.EventSlidesLive.Show do
     |> assign(:page_title, page_title(event, socket.assigns.live_action))
     |> assign(:event, event)
     |> assign(:session, session)
+    |> assign(:new_session?, new_session?)
     |> assign(:multiple_langs, not Enum.empty?(tl(event.langs)))
     |> assign_pdf_url()
   end
