@@ -34,6 +34,8 @@ import 'prismjs/components/prism-cpp'
 import 'prismjs/components/prism-julia'
 import 'prismjs/components/prism-toml'
 import 'prismjs/components/prism-yaml'
+import 'prismjs/components/prism-elixir'
+import 'prismjs/components/prism-fortran'
 
 document.addEventListener('DOMContentLoaded', function() {
   Prism.highlightAll()
