@@ -13,7 +13,7 @@ config :dev_round,
   time_zone: "Europe/Berlin",
   mail_from: {"DevRound", "devround@localhost"}
 
-# Configures the endpoint
+# Configure the endpoint
 config :dev_round, DevRoundWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
@@ -24,7 +24,7 @@ config :dev_round, DevRoundWeb.Endpoint,
   pubsub_server: DevRound.PubSub,
   live_view: [signing_salt: "iLw+7PCb"]
 
-# Configures the mailer
+# Configure the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
 # locally. You can see the emails in your browser, at "/dev/mailbox".
@@ -35,10 +35,10 @@ config :dev_round, DevRound.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,
-  version: "0.17.11",
+  version: "0.25.4",
   dev_round: [
     args:
-      ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/* --alias:@=.),
+      ~w(js/app.js --bundle --target=es2022 --outdir=../priv/static/assets/js --external:/fonts/* --external:/images/* --alias:@=.),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
   ]
@@ -49,13 +49,13 @@ config :tailwind,
   dev_round: [
     args: ~w(
       --input=css/app.css
-      --output=../priv/static/assets/app.css
+      --output=../priv/static/assets/css/app.css
     ),
     cd: Path.expand("../assets", __DIR__)
   ]
 
-# Configures Elixir's Logger
-config :logger, :console,
+# Configure Elixir's Logger
+config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
