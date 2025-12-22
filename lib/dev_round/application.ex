@@ -14,8 +14,6 @@ defmodule DevRound.Application do
        repos: Application.fetch_env!(:dev_round, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:dev_round, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: DevRound.PubSub},
-      # Start the Finch HTTP client for sending emails
-      {Finch, name: DevRound.Finch},
       # Start a worker by calling: DevRound.Worker.start_link(arg)
       # {DevRound.Worker, arg},
       # Start to serve requests, typically the last entry

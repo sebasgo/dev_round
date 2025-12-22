@@ -19,7 +19,7 @@ config :dev_round, DevRound.Repo,
 # Binding to loopback ipv4 address prevents access from other machines.
 config :dev_round, DevRoundWeb.Endpoint,
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  http: [ip: {127, 0, 0, 1}],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
@@ -54,11 +54,16 @@ config :dev_round, DevRoundWeb.Endpoint,
 
 # Watch static and templates for browser reloading.
 config :dev_round, DevRoundWeb.Endpoint,
+  web_console_logger: true,
   live_reload: [
     patterns: [
-      ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
-      ~r"priv/gettext/.*(po)$",
-      ~r"lib/dev_round_web/(controllers|live|components)/.*(ex|heex)$"
+      # Static assets, except user uploads
+      ~r"priv/static/(?!uploads/).*\.(js|css|png|jpeg|jpg|gif|svg)$"E,
+      # Gettext translations
+      ~r"priv/gettext/.*\.po$"E,
+      # Router, Controllers, LiveViews and LiveComponents
+      ~r"lib/sample_app_web/router\.ex$"E,
+      ~r"lib/sample_app_web/(controllers|live|components)/.*\.(ex|heex)$"E
     ]
   ]
 
@@ -66,7 +71,7 @@ config :dev_round, DevRoundWeb.Endpoint,
 config :dev_round, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :default_logger, format: "[$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -76,7 +81,8 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 config :phoenix_live_view,
-  # Include HEEx debug annotations as HTML comments in rendered markup
+  # Include debug annotations and locations in rendered markup.
+  # Changing this configuration will require mix clean and a full recompile.
   debug_heex_annotations: true,
   debug_attributes: true,
   # Enable helpful, but potentially expensive runtime checks
