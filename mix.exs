@@ -37,13 +37,13 @@ defmodule DevRound.MixProject do
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.8.3"},
       {:phoenix_ecto, "~> 4.5"},
-      {:ecto_sql, "~> 3.10"},
+      {:ecto_sql, "~> 3.13"},
       {:postgrex, ">= 0.0.0"},
       {:ecto_psql_extras, "~> 0.8"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.1.0"},
-      {:lazy_html, ">= 0.0.0", only: :test},
+      {:lazy_html, ">= 0.1.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
@@ -54,12 +54,12 @@ defmodule DevRound.MixProject do
        app: false,
        compile: false,
        depth: 1},
-      {:swoosh, "~> 1.5"},
+      {:swoosh, "~> 1.16"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
-      {:gettext, "~> 0.26"},
+      {:gettext, "~> 1.0"},
       {:jason, "~> 1.2"},
-      {:dns_cluster, "~> 0.1.1"},
+      {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:backpex, "~> 0.16.0"},
       {:earmark, "~> 1.4"},
@@ -81,14 +81,15 @@ defmodule DevRound.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.setup": ["compile", "tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["cmd --cd assets npm ci", "tailwind dev_round", "esbuild dev_round"],
       "assets.deploy": [
         "cmd --cd assets npm ci",
         "tailwind dev_round --minify",
         "esbuild dev_round --minify",
         "phx.digest"
-      ]
+      ],
+      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
     ]
   end
 end
