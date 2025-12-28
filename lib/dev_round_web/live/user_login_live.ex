@@ -3,31 +3,33 @@ defmodule DevRoundWeb.UserLoginLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
-      <.header class="text-center">
-        Log in to account
-        <:subtitle>
-          Don't have an account?
-          <.link navigate={~p"/users/register"} class="font-semibold text-brand hover:underline">
-            Sign up
-          </.link>
-          for an account now.
-        </:subtitle>
-      </.header>
+    <Layouts.app flash={@flash} current_user={@current_user}>
+      <div class="mx-auto max-w-sm">
+        <.header class="text-center">
+          Log in to account
+          <:subtitle>
+            Don't have an account?
+            <.link navigate={~p"/users/register"} class="font-semibold text-brand hover:underline">
+              Sign up
+            </.link>
+            for an account now.
+          </:subtitle>
+        </.header>
 
-      <.simple_form for={@form} id="login_form" action={~p"/users/log_in"} phx-update="ignore">
-        <.input field={@form[:name]} type="text" label="User name" required />
+        <.simple_form for={@form} id="login_form" action={~p"/users/log_in"} phx-update="ignore">
+          <.input field={@form[:name]} type="text" label="User name" required />
 
-        <:actions>
-          <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
-        </:actions>
-        <:actions>
-          <.button phx-disable-with="Logging in..." class="btn-primary btn-block">
-            Log in <span aria-hidden="true">→</span>
-          </.button>
-        </:actions>
-      </.simple_form>
-    </div>
+          <:actions>
+            <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
+          </:actions>
+          <:actions>
+            <.button phx-disable-with="Logging in..." class="btn-primary btn-block">
+              Log in <span aria-hidden="true">→</span>
+            </.button>
+          </:actions>
+        </.simple_form>
+      </div>
+    </Layouts.app>
     """
   end
 

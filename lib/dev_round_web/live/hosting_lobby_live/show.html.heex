@@ -1,94 +1,96 @@
-<DevRoundWeb.HostingComponents.header event={@event} tab={:lobby} />
-<DevRoundWeb.HostingComponents.messages messages={@messages} />
+<Layouts.app flash={@flash} current_user={@current_user}>
+  <DevRoundWeb.HostingComponents.header event={@event} tab={:lobby} />
+  <DevRoundWeb.HostingComponents.messages messages={@messages} />
 
-<p class="my-8">
-  Check in participants to include them in the team generation for the pair programming sessions:
-</p>
+  <p class="my-8">
+    Check in participants to include them in the team generation for the pair programming sessions:
+  </p>
 
-<div class="relative">
-  <div class="bg-base-300 rounded-box my-4 overflow-hidden shadow-sm">
-    <div class="overflow-x-auto">
-      <table id="attendees" class="table table-fixed w-full">
-        <thead>
-          <tr>
-            <th class="w-[50px]">Status</th>
-            <th>Participant</th>
-            <th class="w-[333px]">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            :for={attendee <- @event.events_attendees}
-            :key={attendee.id}
-            class={[
-              (attendee.checked && "bg-green-900 hover:bg-green-950") || "hover:bg-zinc-950",
-              "transition"
-            ]}
-          >
-            <td class="">
-              <.icon
-                :if={attendee.checked}
-                name="hero-check-circle"
-                class="w-8 h-8 text-success"
-                aria-label="Checked"
-              />
-            </td>
-            <td>
-              <.user_badge
-                user={attendee.user}
-                remote={attendee.is_remote}
-                experience_level={attendee.experience_level}
-              >
-                <p :if={@multiple_langs} class="text-sm">
-                  {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
-                </p>
-              </.user_badge>
-            </td>
-            <td class="flex gap-2">
-              <.button
-                class="btn btn btn-success flex gap-2"
-                disabled={attendee.checked}
-                phx-click={JS.push("checkin", value: %{id: attendee.id})}
-              >
-                <.icon name="hero-check-circle" class="w-4 h-4" /> Check in
-              </.button>
-              <.button
-                class="btn btn btn-warning flex gap-2"
-                disabled={!attendee.checked}
-                phx-click={JS.push("checkout", value: %{id: attendee.id})}
-              >
-                <.icon name="hero-x-circle" class="w-4 h-4" /> Check out
-              </.button>
-              <.link
-                patch={~p"/events/#{@event}/hosting/lobby/registration/edit/#{attendee.user}"}
-                phx-click={JS.push_focus()}
-              >
-                <.button class="btn btn btn-neutral">
-                  <.icon name="hero-pencil" class="w-4 h-4" />
+  <div class="relative">
+    <div class="bg-base-300 rounded-box my-4 overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table id="attendees" class="table table-fixed w-full">
+          <thead>
+            <tr>
+              <th class="w-[50px]">Status</th>
+              <th>Participant</th>
+              <th class="w-[333px]">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              :for={attendee <- @event.events_attendees}
+              :key={attendee.id}
+              class={[
+                (attendee.checked && "bg-green-900 hover:bg-green-950") || "hover:bg-zinc-950",
+                "transition"
+              ]}
+            >
+              <td class="">
+                <.icon
+                  :if={attendee.checked}
+                  name="hero-check-circle"
+                  class="w-8 h-8 text-success"
+                  aria-label="Checked"
+                />
+              </td>
+              <td>
+                <.user_badge
+                  user={attendee.user}
+                  remote={attendee.is_remote}
+                  experience_level={attendee.experience_level}
+                >
+                  <p :if={@multiple_langs} class="text-sm">
+                    {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
+                  </p>
+                </.user_badge>
+              </td>
+              <td class="flex gap-2">
+                <.button
+                  class="btn btn btn-success flex gap-2"
+                  disabled={attendee.checked}
+                  phx-click={JS.push("checkin", value: %{id: attendee.id})}
+                >
+                  <.icon name="hero-check-circle" class="w-4 h-4" /> Check in
                 </.button>
-              </.link>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                <.button
+                  class="btn btn btn-warning flex gap-2"
+                  disabled={!attendee.checked}
+                  phx-click={JS.push("checkout", value: %{id: attendee.id})}
+                >
+                  <.icon name="hero-x-circle" class="w-4 h-4" /> Check out
+                </.button>
+                <.link
+                  patch={~p"/events/#{@event}/hosting/lobby/registration/edit/#{attendee.user}"}
+                  phx-click={JS.push_focus()}
+                >
+                  <.button class="btn btn btn-neutral">
+                    <.icon name="hero-pencil" class="w-4 h-4" />
+                  </.button>
+                </.link>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 
-<.modal
-  :if={@live_action == :edit_registration}
-  id="event-modal"
-  show
-  on_cancel={JS.patch(~p"/events/#{@event}/hosting/lobby")}
->
-  <.live_component
-    module={DevRoundWeb.RegistrationComponent}
-    id={@event.id}
-    action={@live_action}
-    event={@event}
-    attendance={@registration_edit_attendee}
-    patch={~p"/events/#{@event}/hosting/lobby"}
-    user={@registration_edit_attendee.user}
-    mode={:host}
-  />
-</.modal>
+  <.modal
+    :if={@live_action == :edit_registration}
+    id="event-modal"
+    show
+    on_cancel={JS.patch(~p"/events/#{@event}/hosting/lobby")}
+  >
+    <.live_component
+      module={DevRoundWeb.RegistrationComponent}
+      id={@event.id}
+      action={@live_action}
+      event={@event}
+      attendance={@registration_edit_attendee}
+      patch={~p"/events/#{@event}/hosting/lobby"}
+      user={@registration_edit_attendee.user}
+      mode={:host}
+    />
+  </.modal>
+</Layouts.app>

@@ -38,9 +38,7 @@ defmodule DevRoundWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: DevRoundWeb.Layouts]
+      use Phoenix.Controller, formats: [:html, :json]
 
       use Gettext, backend: DevRoundWeb.Gettext
 
@@ -52,8 +50,7 @@ defmodule DevRoundWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {DevRoundWeb.Layouts, :app}
+      use Phoenix.LiveView
 
       unquote(html_helpers())
     end
@@ -89,6 +86,7 @@ defmodule DevRoundWeb do
       import Phoenix.HTML
       # Core UI components
       import DevRoundWeb.CoreComponents
+      alias DevRoundWeb.Layouts
 
       # Other common components
       import DevRoundWeb.Breadcrumbs

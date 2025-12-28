@@ -1,25 +1,27 @@
-<.header class="mb-8 text-center">
-  Events
-  <:subtitle>Discover upcoming and past events</:subtitle>
-</.header>
+<Layouts.app flash={@flash} current_user={@current_user}>
+  <.header class="mb-8 text-center">
+    Events
+    <:subtitle>Discover upcoming and past events</:subtitle>
+  </.header>
 
-<.event_list events={@upcoming_events} title="Upcoming Events" accent_class="primary">
-  <:placeholder>
-    <div class="card bg-base-200 shadow-sm">
-      <div class="card-body text-center py-12">
-        <div class="mb-4">
-          <img src={~p"/images/broken-heart.svg"} class="inline opacity-70 w-[128px]" />
+  <.event_list events={@upcoming_events} title="Upcoming Events" accent_class="primary">
+    <:placeholder>
+      <div class="card bg-base-200 shadow-sm">
+        <div class="card-body text-center py-12">
+          <div class="mb-4">
+            <img src={~p"/images/broken-heart.svg"} class="inline opacity-70 w-[128px]" />
+          </div>
+          <h3 class="text-xl font-medium text-base-content mb-2">No upcoming events</h3>
+          <p class="text-base-content/70">Check back soon for new events!</p>
         </div>
-        <h3 class="text-xl font-medium text-base-content mb-2">No upcoming events</h3>
-        <p class="text-base-content/70">Check back soon for new events!</p>
       </div>
-    </div>
-  </:placeholder>
-</.event_list>
+    </:placeholder>
+  </.event_list>
 
-<.event_list
-  :if={not Enum.empty?(@past_events)}
-  events={@past_events}
-  title="Past Events"
-  accent_class="neutral"
-/>
+  <.event_list
+    :if={not Enum.empty?(@past_events)}
+    events={@past_events}
+    title="Past Events"
+    accent_class="neutral"
+  />
+</Layouts.app>

@@ -5,26 +5,28 @@ defmodule DevRoundWeb.UserSettingsLive do
 
   def render(assigns) do
     ~H"""
-    <.header class="text-center">
-      Account Settings
-      <:subtitle>Manage account settings</:subtitle>
-    </.header>
+    <Layouts.app flash={@flash} current_user={@current_user}>
+      <.header class="text-center">
+        Account Settings
+        <:subtitle>Manage account settings</:subtitle>
+      </.header>
 
-    <div class="space-y-12 divide-y">
-      <div>
-        <.simple_form
-          for={@profile_form}
-          id="profile_form"
-          phx-submit="update_profile"
-          phx-change="validate_profile"
-        >
-          <.input field={@profile_form[:full_name]} type="text" label="Full name" required />
-          <:actions>
-            <.button phx-disable-with="Changing...">Update Settings</.button>
-          </:actions>
-        </.simple_form>
+      <div class="space-y-12 divide-y">
+        <div>
+          <.simple_form
+            for={@profile_form}
+            id="profile_form"
+            phx-submit="update_profile"
+            phx-change="validate_profile"
+          >
+            <.input field={@profile_form[:full_name]} type="text" label="Full name" required />
+            <:actions>
+              <.button phx-disable-with="Changing...">Update Settings</.button>
+            </:actions>
+          </.simple_form>
+        </div>
       </div>
-    </div>
+    </Layouts.app>
     """
   end
 

@@ -1,33 +1,35 @@
-<DevRoundWeb.HostingComponents.header event={@event} tab={:lecture} />
-<DevRoundWeb.HostingComponents.messages messages={@messages} />
+<Layouts.app flash={@flash} current_user={@current_user}>
+  <DevRoundWeb.HostingComponents.header event={@event} tab={:lecture} />
+  <DevRoundWeb.HostingComponents.messages messages={@messages} />
 
-<div class="grid my-8 gap-4">
-  <.toolbar>
-    <.button
-      type="button"
-      disabled={@event.live}
-      class="btn btn-success"
-      phx-click={JS.push("set_live", value: %{live: true})}
-    >
-      Start Presentation
-    </.button>
-    <.button
-      type="button"
-      class="btn btn-warning"
-      disabled={!@event.live}
-      phx-click={JS.push("set_live", value: %{live: false})}
-    >
-      Stop Presentation
-    </.button>
-  </.toolbar>
+  <div class="grid my-8 gap-4">
+    <.toolbar>
+      <.button
+        type="button"
+        disabled={@event.live}
+        class="btn btn-success"
+        phx-click={JS.push("set_live", value: %{live: true})}
+      >
+        Start Presentation
+      </.button>
+      <.button
+        type="button"
+        class="btn btn-warning"
+        disabled={!@event.live}
+        phx-click={JS.push("set_live", value: %{live: false})}
+      >
+        Stop Presentation
+      </.button>
+    </.toolbar>
 
-  <div id="fullscreen-wrapper" class="rounded-lg overflow-hidden">
-    <.live_component
-      module={DevRoundWeb.EventSlidesViewerLive}
-      id={@event.id}
-      event={@event}
-      controls={true}
-      fullscreen_wrapper_id="fullscreen-wrapper"
-    />
+    <div id="fullscreen-wrapper" class="rounded-lg overflow-hidden">
+      <.live_component
+        module={DevRoundWeb.EventSlidesViewerLive}
+        id={@event.id}
+        event={@event}
+        controls={true}
+        fullscreen_wrapper_id="fullscreen-wrapper"
+      />
+    </div>
   </div>
-</div>
+</Layouts.app>
