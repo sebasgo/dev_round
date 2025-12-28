@@ -102,7 +102,7 @@ if config_env() == :prod do
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
 
-   # ## Configuring the mailer
+  # ## Configuring the mailer
   #
   # In production you need to configure the mailer to use a different adapter.
   # Here is an example configuration for Mailgun:
