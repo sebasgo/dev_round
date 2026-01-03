@@ -727,7 +727,7 @@ defmodule DevRoundWeb.CoreComponents do
   def user_badge(assigns) do
     ~H"""
     <div class="flex items-center bg-neutral-content text-neutral rounded-full border border-neutral-content whitespace-nowrap">
-      <div class="relative w-12 h-12">
+      <div class="relative w-10 h-10">
         <.user_avatar user={@user} />
         <%= if @remote do %>
           <div class="absolute top-0 right-0 w-4 h-4 bg-white rounded-full flex">
@@ -752,11 +752,12 @@ defmodule DevRoundWeb.CoreComponents do
   Renders a user avatar.
   """
   attr :user, DevRound.Accounts.User, required: true
+  attr :class, :string, default: nil
 
   def user_avatar(%{user: %DevRound.Accounts.User{avatar_url: nil}} = assigns) do
     ~H"""
-    <div class="avatar avatar-placeholder">
-      <div class="bg-neutral text-neutral-content w-12 rounded-full">
+    <div class={["avatar avatar-placeholder", @class]}>
+      <div class="bg-neutral text-neutral-content w-10 rounded-full">
         <span>{DevRound.Formats.format_avatar_placeholder(@user)}</span>
       </div>
     </div>
@@ -779,6 +780,75 @@ defmodule DevRoundWeb.CoreComponents do
     ~H"""
     <div class="flex p-2 gap-2 bg-neutral rounded-lg">
       {render_slot(@inner_block)}
+    </div>
+    """
+  end
+
+  @doc """
+  Renders a dropdown menu component with a trigger and menu content.
+
+  ## Examples
+
+      <.dropdown id="user-menu">
+        <:trigger class="btn btn-primary btn-sm">
+          User Menu
+        </:trigger>
+        <:menu>
+          <li><.link navigate={~p"/profile"} class="menu-item">Profile</.link></li>
+          <li><.link navigate={~p"/settings"}>Settings</.link></li>
+          <li><.link navigate={~p"/logout"}>Logout</.link></li>
+        </:menu>
+      </.dropdown>
+  """
+  attr :id, :string, required: true, doc: "unique identifier for the dropdown"
+  attr :class, :any, default: nil, doc: "additional classes for the outer container element"
+
+  slot :trigger, doc: "the trigger element to be used to toggle the dropdown menu" do
+    attr :class, :any, doc: "additional classes for the wrapper of the trigger"
+  end
+
+  slot :menu, doc: "the dropdown menu" do
+    attr :class, :any, doc: "additional classes for the wrapper of the menu"
+  end
+
+  attr :rest, :global, include: ~w(phx-*)
+
+  def dropdown(assigns) do
+    assigns =
+      assigns
+      |> update(:trigger, fn
+        [trigger] -> trigger
+        _trigger -> nil
+      end)
+      |> update(:menu, fn
+        [menu] -> menu
+        _trigger -> nil
+      end)
+
+    ~H"""
+    <div id={@id} class={["dropdown", @class]} {@rest}>
+      <div
+        id={"#{@id}-trigger"}
+        role="button"
+        tabindex="0"
+        aria-haspopup="menu"
+        class={@trigger && @trigger[:class]}
+      >
+        {render_slot(@trigger)}
+      </div>
+
+      <div
+        id={"#{@id}-menu"}
+        role="menu"
+        tabindex="0"
+        aria-labelledby={"#{@id}-trigger"}
+        class={[
+          "menu dropdown-content z-[1] bg-base-100 rounded-box outline-black/5 shadow outline-[length:var(--border)]",
+          @menu && @menu[:class]
+        ]}
+      >
+        {render_slot(@menu)}
+      </div>
     </div>
     """
   end
