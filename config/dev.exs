@@ -62,8 +62,8 @@ config :dev_round, DevRoundWeb.Endpoint,
       # Gettext translations
       ~r"priv/gettext/.*\.po$"E,
       # Router, Controllers, LiveViews and LiveComponents
-      ~r"lib/sample_app_web/router\.ex$"E,
-      ~r"lib/sample_app_web/(controllers|live|components)/.*\.(ex|heex)$"E
+      ~r"lib/dev_round_web/router\.ex$"E,
+      ~r"lib/dev_round_web/(controllers|live|components)/.*\.(ex|heex)$"E
     ]
   ]
 
