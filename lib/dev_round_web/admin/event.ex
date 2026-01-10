@@ -92,7 +92,7 @@ defmodule DevRoundWeb.Admin.Event do
       body: %{
         module: Backpex.Fields.Textarea,
         label: "Body",
-        help_text: "Markdown ist supported.",
+        help_text: "Markdown is supported.",
         rows: 15,
         except: [:index]
       },
@@ -118,7 +118,8 @@ defmodule DevRoundWeb.Admin.Event do
               </Phoenix.Component.link>
             </p>
             """
-        end
+        end,
+        except: [:index]
       },
       sessions: %{
         module: DevRoundWeb.Admin.Fields.Sessions,
