@@ -4,12 +4,12 @@
       <:actions>
         <%= if @current_user in @event.hosts do %>
           <.link patch={~p"/events/#{@event}/hosting/lobby"} phx-click={JS.push_focus()}>
-            <.button class="btn-default">Host</.button>
+            <.button class="btn btn-default">Host</.button>
           </.link>
         <% end %>
         <%= if @registration_open? do %>
           <.link patch={~p"/events/#{@event}/registration/new"} phx-click={JS.push_focus()}>
-            <.button class="btn-primary">Register</.button>
+            <.button class="btn btn-primary">Register</.button>
           </.link>
         <% end %>
       </:actions>
@@ -20,12 +20,12 @@
       <:actions>
         <%= if @current_user in @event.hosts do %>
           <.link patch={~p"/events/#{@event}/hosting/lobby"} phx-click={JS.push_focus()}>
-            <.button class="btn-default">Host</.button>
+            <.button class="btn btn-default">Host</.button>
           </.link>
         <% end %>
         <%= if @registration_open? do %>
           <.link patch={~p"/events/#{@event}/registration/edit"} phx-click={JS.push_focus()}>
-            <.button class="btn-primary">Manage Registration</.button>
+            <.button class="btn btn-primary">Manage Registration</.button>
           </.link>
         <% end %>
       </:actions>

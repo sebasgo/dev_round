@@ -21,7 +21,7 @@ defmodule DevRoundWeb.UserSettingsLive do
           >
             <.input field={@profile_form[:full_name]} type="text" label="Full name" required />
             <:actions>
-              <.button phx-disable-with="Changing...">Update Settings</.button>
+              <.button variant="primary" phx-disable-with="Changing...">Update Settings</.button>
             </:actions>
           </.simple_form>
         </div>

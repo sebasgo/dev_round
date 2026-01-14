@@ -37,7 +37,9 @@ defmodule DevRoundWeb.UserRegistrationLive do
           <.input field={@form[:full_name]} type="text" label="Full name" required />
 
           <:actions>
-            <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>
+            <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
+              Create an account
+            </.button>
           </:actions>
         </.simple_form>
       </div>
