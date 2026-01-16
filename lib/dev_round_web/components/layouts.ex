@@ -50,6 +50,8 @@ defmodule DevRoundWeb.Layouts do
         {render_slot(@inner_block)}
       </div>
     </main>
+
+    <.flash_group flash={@flash} />
     """
   end
 
