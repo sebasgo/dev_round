@@ -244,7 +244,7 @@ defmodule DevRoundWeb.CoreComponents do
   attr :type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file month number password
-               range search select tel text textarea time url week hidden langs experience_level)
+               search select tel text textarea time url week hidden langs experience_level)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -254,6 +254,8 @@ defmodule DevRoundWeb.CoreComponents do
   attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
   attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
+  attr :class, :string, default: nil, doc: "the input class to use over defaults"
+  attr :error_class, :string, default: nil, doc: "the input error class to use over defaults"
 
   attr :rest, :global,
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
@@ -277,19 +279,18 @@ defmodule DevRoundWeb.CoreComponents do
       end)
 
     ~H"""
-    <div>
-      <label class="flex items-center gap-4 text-sm leading-6">
-        <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
+    <div class="fieldset mb-2">
+      <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
+      <label class="label">
         <input
           type="checkbox"
           id={@id}
           name={@name}
           value="true"
           checked={@checked}
-          class="checkbox"
+          class={@class || "checkbox"}
           {@rest}
-        />
-        {@label}
+        />{@label}
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
@@ -298,18 +299,20 @@ defmodule DevRoundWeb.CoreComponents do
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div>
-      <.label for={@id}>{@label}</.label>
-      <select
-        id={@id}
-        name={@name}
-        class="select mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm"
-        multiple={@multiple}
-        {@rest}
-      >
-        <option :if={@prompt} value="">{@prompt}</option>
-        {Phoenix.HTML.Form.options_for_select(@options, @value)}
-      </select>
+    <div class="fieldset mb-2">
+      <label>
+        <span :if={@label} class="label mb-1">{@label}</span>
+        <select
+          id={@id}
+          name={@name}
+          class={[@class || "w-full select", @errors != [] && (@error_class || "select-error")]}
+          multiple={@multiple}
+          {@rest}
+        >
+          <option :if={@prompt} value="">{@prompt}</option>
+          {Phoenix.HTML.Form.options_for_select(@options, @value)}
+        </select>
+      </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
@@ -317,17 +320,19 @@ defmodule DevRoundWeb.CoreComponents do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <div>
-      <.label for={@id}>{@label}</.label>
-      <textarea
-        id={@id}
-        name={@name}
-        class={[
-          "textarea textarea-bordered mt-2 block w-full sm:text-sm sm:leading-6 min-h-[6rem]",
-          @errors != [] && "textarea-error"
-        ]}
-        {@rest}
-      >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
+    <div class="fieldset mb-2">
+      <label>
+        <span :if={@label} class="label mb-1">{@label}</span>
+        <textarea
+          id={@id}
+          name={@name}
+          class={[
+            @class || "w-full textarea",
+            @errors != [] && (@error_class || "textarea-error")
+          ]}
+          {@rest}
+        >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
+      </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
@@ -335,16 +340,16 @@ defmodule DevRoundWeb.CoreComponents do
 
   def input(%{type: "langs"} = assigns) do
     ~H"""
-    <div id={@id}>
+    <div id={@id} class="fieldset mb-2">
       <input type="hidden" name={@name} value={-1} />
       <%= for opt <- @options do %>
-        <label class="flex items-center gap-4 text-sm my-2">
+        <label class="label">
           <input
             type="checkbox"
             name={@name}
             value={opt[:lang].id}
             checked={opt[:selected]}
-            class="checkbox"
+            class={@class || "checkbox"}
           />
           <.lang_badge lang={opt[:lang]} />
         </label>
@@ -388,47 +393,31 @@ defmodule DevRoundWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div>
-      <.label for={@id}>{@label}</.label>
-      <input
-        type={@type}
-        name={@name}
-        id={@id}
-        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-        class={[
-          "input input-bordered mt-2 block w-full sm:text-sm sm:leading-6",
-          @errors != [] && "input-error"
-        ]}
-        {@rest}
-      />
+    <div class="fieldset mb-2">
+      <label>
+        <span :if={@label} class="label mb-1">{@label}</span>
+        <input
+          type={@type}
+          name={@name}
+          id={@id}
+          value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+          class={[
+            @class || "w-full input",
+            @errors != [] && (@error_class || "input-error")
+          ]}
+          {@rest}
+        />
+      </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
 
-  @doc """
-  Renders a label.
-  """
-  attr :for, :string, default: nil
-  slot :inner_block, required: true
-
-  def label(assigns) do
+  # Helper used by inputs to generate form errors
+  defp error(assigns) do
     ~H"""
-    <label for={@for} class="block text-sm font-semibold leading-6">
-      {render_slot(@inner_block)}
-    </label>
-    """
-  end
-
-  @doc """
-  Generates a generic error message.
-  """
-  slot :inner_block, required: true
-
-  def error(assigns) do
-    ~H"""
-    <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600">
-      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
+    <p class="mt-1.5 flex gap-2 items-center text-sm text-error">
+      <.icon name="hero-exclamation-circle" class="size-5" />
       {render_slot(@inner_block)}
     </p>
     """

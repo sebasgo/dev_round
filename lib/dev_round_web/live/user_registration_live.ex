@@ -28,10 +28,6 @@ defmodule DevRoundWeb.UserRegistrationLive do
           action={~p"/users/log_in?_action=registered"}
           method="post"
         >
-          <.error :if={@check_errors}>
-            Oops, something went wrong! Please check the errors below.
-          </.error>
-
           <.input field={@form[:name]} type="text" label="Username" required />
           <.input field={@form[:email]} type="email" label="Email" required />
           <.input field={@form[:full_name]} type="text" label="Full name" required />

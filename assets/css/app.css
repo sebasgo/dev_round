@@ -76,6 +76,10 @@
    @apply text-primary hover:text-primary;
 }
 
+@utility label {
+  @apply text-base;
+}
+
 /* Custom 3D rotation animation */
 @keyframes rotate-3d {
   0% {
