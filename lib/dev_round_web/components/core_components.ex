@@ -448,7 +448,7 @@ defmodule DevRoundWeb.CoreComponents do
     """
   end
 
-  @doc ~S"""
+  @doc """
   Renders a table with generic styling.
 
   ## Examples
@@ -480,7 +480,7 @@ defmodule DevRoundWeb.CoreComponents do
       end
 
     ~H"""
-    <table class="table">
+    <table class="table table-zebra">
       <thead>
         <tr>
           <th :for={col <- @col}>{col[:label]}</th>
@@ -527,14 +527,14 @@ defmodule DevRoundWeb.CoreComponents do
 
   def list(assigns) do
     ~H"""
-    <div class="mt-14">
-      <dl class="-my-4 divide-y divide-zinc-100">
-        <div :for={item <- @item} class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
-          <dt class="w-1/4 flex-none text-zinc-500">{item.title}</dt>
-          <dd class="text-zinc-700">{render_slot(item)}</dd>
+    <ul class="list">
+      <li :for={item <- @item} class="list-row">
+        <div class="list-col-grow">
+          <div class="font-bold">{item.title}</div>
+          <div>{render_slot(item)}</div>
         </div>
-      </dl>
-    </div>
+      </li>
+    </ul>
     """
   end
 
@@ -570,20 +570,19 @@ defmodule DevRoundWeb.CoreComponents do
   width, height, and background color classes.
 
   Icons are extracted from the `deps/heroicons` directory and bundled within
-  your compiled app.css by the plugin in your `assets/tailwind.config.js`.
+  your compiled app.css by the plugin in `assets/vendor/heroicons.js`.
 
   ## Examples
 
-      <.icon name="hero-x-mark-solid" />
-      <.icon name="hero-arrow-path" class="ml-1 w-3 h-3 animate-spin" />
+      <.icon name="hero-x-mark" />
+      <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
   """
   attr :name, :string, required: true
-  attr :class, :string, default: nil
-  attr :rest, :global
+  attr :class, :string, default: "size-4"
 
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
-    <span class={[@name, @class]} @rest />
+    <span class={[@name, @class]} />
     """
   end
 
@@ -594,7 +593,7 @@ defmodule DevRoundWeb.CoreComponents do
       to: selector,
       time: 300,
       transition:
-        {"transition-all transform ease-out duration-300",
+        {"transition-all ease-out duration-300",
          "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
          "opacity-100 translate-y-0 sm:scale-100"}
     )
@@ -605,8 +604,7 @@ defmodule DevRoundWeb.CoreComponents do
       to: selector,
       time: 200,
       transition:
-        {"transition-all transform ease-in duration-200",
-         "opacity-100 translate-y-0 sm:scale-100",
+        {"transition-all ease-in duration-200", "opacity-100 translate-y-0 sm:scale-100",
          "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
     )
   end
