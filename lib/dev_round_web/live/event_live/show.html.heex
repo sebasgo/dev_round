@@ -158,8 +158,6 @@
     |> DevRound.Formats.format_datetime()}
   </p>
 
-  <.back navigate={~p"/events"}>Back to events</.back>
-
   <.modal
     :if={@live_action in [:new_registration, :edit_registration]}
     id="event-modal"
