@@ -447,3 +447,325 @@ And **never** do this:
 <!-- phoenix:liveview-end -->
 
 <!-- usage-rules-end -->
+
+---
+
+# DevRound Application Architecture
+
+## Overview
+
+DevRound is an event management platform for organizing coding events and programming workshops, built with Phoenix LiveView. The application features intelligent team formation algorithms, real-time collaboration, and live presentation capabilities.
+
+## Technology Stack
+
+- **Backend**: Phoenix 1.8 with LiveView 1.1
+- **Database**: PostgreSQL 17 with Ecto 3.13
+- **Admin Interface**: Backpex 0.16
+- **Frontend**: Tailwind CSS v4, Heroicons v2.2
+- **JavaScript Tools**: Custom external hooks (PDF viewer, fullscreen, team slides)
+- **Real-time**: Phoenix PubSub for live updates
+- **Markdown**: Earmark for event descriptions
+- **Time Zones**: Automatic UTC/local time conversion with `time_zone_info`
+- **Other**: Slugify, UUID, BCrypt for authentication
+
+## Domain Architecture
+
+### Core Contexts
+
+#### Events Context (`lib/dev_round/events.ex`)
+Manages the complete event lifecycle including:
+- **Event Management**: Create, update, list events with published/unpublished states
+- **Session Scheduling**: Multiple sessions per event with overlap detection and validation
+- **Registration**: Time-limited registration with deadline enforcement
+- **Language Support**: Many-to-many relationship with programming languages
+- **Slides Management**: PDF uploads with page tracking and live streaming capabilities
+- **Attendee Management**: Pre-registration with language preferences and remote/in-person status
+
+**Key Functions**:
+- `list_events(:upcoming | :past)` - Filter events by timeline
+- `get_event!(slug_or_id, opts)` - Fetch with preloaded associations
+- `event_open_for_registration?/1` - Check registration deadline
+- `create_event_attendee/4` - Register user with validation
+- `start_event_session/2` - Start session and manage live state
+- `stop_event_session/1` - Stop active session
+- `reset_event_session/1` - Reset session and clear teams
+
+#### Accounts Context (`lib/dev_round/accounts.ex`)
+Handles user authentication and profiles:
+- **Authentication**: Session token-based auth (no password reset in current implementation)
+- **User Management**: Registration, profile updates, experience levels
+- **Session Management**: Token generation, validation, cleanup
+
+**Key Functions**:
+- `register_user/1` - Create new user account
+- `generate_user_session_token/1` - Create auth token
+- `get_user_by_session_token/1` - Validate and retrieve user
+- `apply_user_profile/2` - Update user profile data
+
+#### Hosting Context (`lib/dev_round/hosting.ex`)
+Advanced team formation and event hosting:
+- **Team Generation Algorithm**: Sophisticated pairing based on experience, languages, and location
+- **Check-in System**: Attendee verification before team formation
+- **Constraint Validation**: Ensures valid team compositions
+- **Team Names**: Pool management for team assignments
+
+**Team Generation Algorithm**:
+1. Filter checked-in attendees
+2. Separate by remote/in-person status
+3. Sort by experience level
+4. Split into bottom/top experience fields
+5. Shuffle for randomness
+6. Pair across experience levels
+7. Find compatible programming languages
+8. Retry if no common languages found
+9. Assign random team names
+
+**Key Functions**:
+- `validate_team_generation_constraints/2` - Pre-check before generation
+- `build_teams_for_session/3` - Generate teams with algorithm
+- `list_teams_for_session/1` - Fetch teams with members
+- `update_event_attendee_checked/2` - Check-in attendee
+
+### Schema Design
+
+#### Event (`lib/dev_round/events/event.ex`)
+```elixir
+fields: title, location, begin/end (UTC+local), teaser, body, 
+        registration_deadline, slug, published, slides_filename,
+        slides_page_number, live, modified_at
+associations: langs (many_to_many), hosts (many_to_many),
+              sessions (has_many), events_attendees (has_many),
+              last_live_session (belongs_to)
+```
+
+**Complex Validations**:
+- Registration deadline must be before event begin
+- Sessions must be within event dates
+- Sessions cannot overlap with each other
+- Requires at least one session
+- Auto-generates slug from date and title
+
+#### EventSession (`lib/dev_round/events/event_session.ex`)
+```elixir
+fields: title, begin/end (UTC+local), actual_begin/actual_end,
+        is_slides, is_session
+associations: event (belongs_to), teams (has_many)
+```
+
+#### EventAttendee (`lib/dev_round/events/event_attendee.ex`)
+```elixir
+fields: is_remote, experience_level, checked
+associations: event, user, langs (many_to_many)
+validations: lang selection required, experience level 1-5
+```
+
+#### Team (`lib/dev_round/hosting/team.ex`)
+```elixir
+fields: name, slug, is_remote
+associations: session (belongs_to), lang (belongs_to),
+              attendees (many_to_many through team_members)
+```
+
+## Web Layer Architecture
+
+### Router Structure (`lib/dev_round_web/router.ex`)
+
+**Public Scope**:
+- `/` - Home page
+
+**Admin Scope** (`/admin`):
+- Uses Backpex for CRUD operations
+- Routes: `/events`, `/event_attendees`, `/users`, `/langs`, `/team_names`
+- Requires authentication: `on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}]`
+
+**Authenticated User Scope**:
+- `/events` - Event listing
+- `/events/:slug` - Event details
+- `/events/:slug/live` - Live slide viewer
+- `/events/:slug/registration/new` - User registration
+- `/events/:slug/registration/edit` - Edit registration
+- `/events/:slug/hosting/*` - Host-only routes
+
+### LiveView Components
+
+#### Event Management
+- **EventLive.Index** (`lib/dev_round_web/live/event_live/index.ex`)
+  - Lists upcoming and past events
+  - Real-time updates via PubSub
+  
+- **EventLive.Show** (`lib/dev_round_web/live/event_live/show.ex`)
+  - Event details with registration
+  - Real-time registration updates
+  - Enforces registration deadlines
+  - Modal actions for new/edit registration
+
+#### Hosting Interface (Host-Only)
+- **HostingLobbyLive** - Attendee check-in and team generation interface
+- **HostingLectureLive** - Presentation control with slide navigation
+- **HostingSessionLive** - Session-specific team display
+
+#### Component Libraries
+- **CoreComponents** (`lib/dev_round_web/components/core_components.ex`)
+  - Standard Phoenix components: buttons, forms, inputs, modals, tables, etc.
+  
+- **EventComponents** (`lib/dev_round_web/components/event_components.ex`)
+  - Event-specific UI components
+  
+- **HostingComponents** (`lib/dev_round_web/components/hosting_components.ex`)
+  - Hosting interface components
+
+### Real-time Features (PubSub)
+
+**Topic: `admin.events`**
+- Broadcasts when events are updated from admin panel
+- Triggers page reloads with flash messages
+
+**Topic: `registrations`**
+- Broadcasts on attendee create/update/delete
+- Payload: `{operation, event, attendee}`
+- Updates event details view in real-time
+
+**Topic: `event_slides`**
+- Broadcasts slide page changes and live status
+- Payload: `%{event_id: id, live: boolean}`
+- Syncs presentation across all viewers
+
+### JavaScript Hooks
+
+Located in `assets/js/`:
+- **pdf_viewer_hook.js** - PDF.js integration for slide rendering
+- **show_fullscreen_hook.js** - Fullscreen mode management
+- **event_session_teams_slide_hook.js** - Team display animations
+
+All hooks registered in `assets/js/app.js` and passed to LiveSocket constructor.
+
+## Admin Interface (Backpex)
+
+### Event Admin (`lib/dev_round_web/admin/event.ex`)
+- Custom upload handling for PDF slides via `Upload` behavior
+- Nested session editor with custom field module
+- Event duplication action for cloning events
+- Full field customization including markdown body editor
+
+### Upload System
+- **Upload Module** (`lib/dev_round_web/admin/upload.ex`)
+  - Configurable upload directory
+  - File validation and persistence
+  - Cleanup on record delete
+
+**Upload Directories**:
+- `uploads/events/slides/` - Event presentation PDFs
+- `uploads/langs/icon/` - Programming language icons
+
+## Database Considerations
+
+### Time Handling
+- All times stored in UTC (`utc_datetime`)
+- Local time fields (`naive_datetime`) for display/input
+- Automatic conversion in changeset via custom `fill_utc_dates/2`
+- Uses Europe/Berlin timezone for local conversions
+
+### Associations
+- Events <-> Langs: `event_langs` join table
+- Events <-> Hosts (Users): `event_hosts` join table
+- EventAttendees <-> Langs: `event_attendees_langs` join table
+- Teams <-> Attendees: `team_members` join table
+
+### Indices & Constraints
+- Unique constraint on event slugs
+- Unique constraint on `[event_id, user_id]` for attendees
+- Foreign keys with `on_delete: :delete_all` for cascading deletes
+
+## Development Workflow
+
+### Setup Database (Option A: Container)
+```bash
+./contrib/run-posgres-podman
+```
+This creates a PostgreSQL 17 container with:
+- User mapping for rootless podman
+- Persistent storage in `~/.local/share/postgres`
+- Default credentials matching `config/dev.exs`
+
+### Setup Database (Option B: Local PostgreSQL)
+Configure `config/dev.exs` with your database credentials.
+
+### Common Commands
+```bash
+mix setup                    # Full setup: deps, database, assets
+mix precommit               # Run before committing: compile, format, test
+mix test                    # Run test suite
+mix test --failed           # Re-run only failed tests
+mix ecto.reset              # Drop, create, migrate, seed database
+mix assets.build            # Build frontend assets
+mix assets.deploy           # Build for production with minification
+```
+
+### PubSub Broadcasting
+When modifying data that affects live views:
+```elixir
+# In context after successful update
+DevRoundWeb.Endpoint.broadcast("admin.events", "updated", event)
+DevRoundWeb.Endpoint.broadcast("registrations", %{}, {operation, event, attendee})
+```
+
+## Testing Guidelines
+
+### Test Structure
+- Unit tests in `test/dev_round/` for context logic
+- Integration tests in `test/dev_round_web/` for LiveViews and controllers
+- Use fixtures from `test/support/fixtures/`
+
+### LiveView Testing
+```elixir
+# Always use unique element IDs
+assert has_element?(view, "#product-form")
+assert has_element?(view, "#attendee-#{attendee.id}")
+
+# Form interactions
+view |> form("#registration-form", user: attrs) |> render_submit()
+```
+
+## Security Considerations
+
+### Authentication
+- Session tokens stored in database
+- Tokens validated on each request
+- No password reset flow (implement if needed)
+- CSRF protection enabled globally
+
+### Authorization
+- Host-only routes enforce `ensure_current_user_is_host!/1`
+- Raises `PermissionError` with 404 status for non-hosts
+- Admin routes require authentication
+
+### Input Validation
+- Never use `String.to_atom/1` on user input
+- All user IDs set programmatically (not in cast)
+- Experience level restricted to 1-5
+- Registration deadline enforced server-side
+
+## Performance Considerations
+
+### Preloading
+Always preload associations when accessed in templates:
+```elixir
+event
+|> Repo.preload([:langs, :hosts, :last_live_session])
+|> Repo.preload(events_attendees: [:user, :langs])
+```
+
+### Attendee Ordering
+Two ordering strategies available:
+- `:registration` - By insertion time (default)
+- `:is_remote_and_full_name` - By remote status then name (for hosting views)
+
+## Deployment Notes
+
+- Set `PHX_SERVER=true` to start server automatically
+- Configure `SECRET_KEY_BASE` (from `mix phx.gen.secret`)
+- Set proper `DATABASE_URL` in production
+- Run migrations: `mix ecto.migrate`
+- Build assets: `mix assets.deploy`
+- Consider using `mix release` for production deployment
+
