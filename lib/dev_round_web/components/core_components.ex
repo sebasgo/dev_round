@@ -279,7 +279,7 @@ defmodule DevRoundWeb.CoreComponents do
       end)
 
     ~H"""
-    <div class="fieldset mb-2">
+    <div class="fieldset">
       <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
       <label class="label">
         <input
@@ -299,7 +299,7 @@ defmodule DevRoundWeb.CoreComponents do
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div class="fieldset mb-2">
+    <div class="fieldset">
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
         <select
@@ -320,7 +320,7 @@ defmodule DevRoundWeb.CoreComponents do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <div class="fieldset mb-2">
+    <div class="fieldset">
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
         <textarea
@@ -340,7 +340,7 @@ defmodule DevRoundWeb.CoreComponents do
 
   def input(%{type: "langs"} = assigns) do
     ~H"""
-    <div id={@id} class="fieldset mb-2">
+    <div id={@id} class="fieldset">
       <input type="hidden" name={@name} value={-1} />
       <%= for opt <- @options do %>
         <label class="label">
@@ -393,7 +393,7 @@ defmodule DevRoundWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div class="fieldset mb-2">
+    <div class="fieldset">
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
         <input
