@@ -21,7 +21,7 @@ defmodule DevRound.MixProject do
   def application do
     [
       mod: {DevRound.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :exldap]
     ]
   end
 
@@ -65,7 +65,8 @@ defmodule DevRound.MixProject do
       {:earmark, "~> 1.4"},
       {:time_zone_info, "~> 0.7"},
       {:uuid, "~> 1.1"},
-      {:slugify, "~> 1.3"}
+      {:slugify, "~> 1.3"},
+      {:exldap, "~> 0.6"}
     ]
   end
 

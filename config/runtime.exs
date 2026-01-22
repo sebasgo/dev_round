@@ -70,6 +70,16 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  # Configure LDAP
+  config :exldap, :settings,
+    server: System.fetch_env!("LDAP_SERVER"),
+    base: System.fetch_env!("LDAP_BASE"),
+    port: String.to_integer(System.fetch_env!("LDAP_PORT")),
+    ssl: System.fetch_env!("LDAP_SSL") == "on",
+    user_dn: System.fetch_env!("LDAP_BIND_DN"),
+    password: System.fetch_env!("LDAP_BIND_PASSWORD"),
+    sslopts: [verify: :verify_peer, cacerts: :public_key.cacerts_get()]
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

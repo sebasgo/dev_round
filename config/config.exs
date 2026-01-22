@@ -68,6 +68,17 @@ config :backpex,
   translator_function: {DevRoundWeb.CoreComponents, :translate_backpex},
   error_translator_function: {DevRoundWeb.CoreComponents, :translate_error}
 
+# Configure LDAP
+config :exldap, :settings,
+  server: System.get_env("LDAP_SERVER"),
+  base: System.get_env("LDAP_BASE"),
+  port: String.to_integer(System.get_env("LDAP_PORT") || "636"),
+  ssl: System.get_env("LDAP_SSL") == "on",
+  user_dn: System.get_env("LDAP_BIND_DN"),
+  password: System.get_env("LDAP_BIND_PASSWORD"),
+  sslopts: [verify: :verify_peer, cacerts: :public_key.cacerts_get()],
+  search_timeout: 10_000
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
