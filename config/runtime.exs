@@ -59,6 +59,14 @@ if config_env() == :prod do
 
   config :dev_round, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
+  config :dev_round,
+         :mail_from,
+         System.get_env(MAIL_FROM) ||
+           raise("""
+           environment variable MAIL_FROM is missing.
+           For example: devround@localhost
+           """)
+
   config :dev_round, DevRoundWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
