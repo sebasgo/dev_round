@@ -2,13 +2,13 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="127.02664"
-   height="32.000057"
-   viewBox="0 0 33.60871 8.4665751"
+   width="129.02663"
+   height="32.000439"
+   viewBox="0 0 34.137866 8.466676"
    version="1.1"
    id="svg1491"
    inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
-   sodipodi:docname="logo-opt.svg"
+   sodipodi:docname="logo.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="25.69972"
-     inkscape:cx="32.101517"
-     inkscape:cy="10.291941"
+     inkscape:zoom="6.42493"
+     inkscape:cx="68.63888"
+     inkscape:cy="1.4786153"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -48,8 +48,8 @@
     <inkscape:grid
        type="xygrid"
        id="grid2036"
-       originx="-7.0799668"
-       originy="-2.1166366" />
+       originx="-6.5508088"
+       originy="-2.1165527" />
   </sodipodi:namedview>
   <metadata
      id="metadata1488">
@@ -66,7 +66,7 @@
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-7.0799668,-286.41661)">
+     transform="translate(-6.5508087,-286.41653)">
     <g
        id="g27888"
        transform="matrix(0.59259242,0,0,0.59259242,9.4317902,118.41297)"
