@@ -80,6 +80,10 @@
   @apply text-base;
 }
 
+@utility toast-top {
+  @apply top-10;
+}
+
 /* Custom 3D rotation animation */
 @keyframes rotate-3d {
   0% {
