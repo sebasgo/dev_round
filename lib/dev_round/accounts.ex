@@ -5,6 +5,7 @@ defmodule DevRound.Accounts do
 
   import Ecto.Query, warn: false
   alias DevRound.Repo
+  alias DevRound.LDAP
 
   alias DevRound.Accounts.{User, UserToken}
 
@@ -28,6 +29,33 @@ defmodule DevRound.Accounts do
 
   def get_user_by_name(name) when is_binary(name) do
     Repo.get_by(User, name: name)
+  end
+
+  @doc """
+  Authenticates a user via LDAP and returns the user.
+  Creates a new user record if this is their first login.
+  """
+  def authenticate_user_via_ldap(user, password) do
+    case LDAP.authenticate(user, password) do
+      {:ok, ldap_attrs} ->
+        upsert_user(ldap_attrs)
+
+      {:error, _reason} = error ->
+        error
+    end
+  end
+
+  @doc """
+  Inserts or updates a user with the given attributes.
+  """
+  def upsert_user(attrs) do
+    %User{}
+    |> User.registration_changeset(attrs)
+    |> Repo.insert(
+      on_conflict: {:replace_all_except, [:id, :inserted_at]},
+      conflict_target: [:name],
+      returning: [:inserted_at]
+    )
   end
 
   @doc """

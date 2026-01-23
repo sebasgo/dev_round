@@ -29,6 +29,7 @@ defmodule DevRound.Accounts.User do
       submitting the form), this option can be set to `false`.
       Defaults to `true`.
   """
+
   def registration_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:name, :email, :full_name, :avatar_url, :experience_level])
@@ -49,39 +50,19 @@ defmodule DevRound.Accounts.User do
     |> validate_experience_level()
   end
 
-  defp validate_name(changeset, opts) do
+  defp validate_name(changeset, _opts) do
     changeset
     |> validate_required([:name])
     |> validate_length(:name, max: 160)
-    |> maybe_validate_unique_name(opts)
+    |> unique_constraint(:name)
   end
 
-  defp validate_email(changeset, opts) do
+  defp validate_email(changeset, _opts) do
     changeset
     |> validate_required([:email])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
-    |> maybe_validate_unique_email(opts)
-  end
-
-  defp maybe_validate_unique_name(changeset, opts) do
-    if Keyword.get(opts, :validate_name, true) do
-      changeset
-      |> unsafe_validate_unique(:name, DevRound.Repo)
-      |> unique_constraint(:name)
-    else
-      changeset
-    end
-  end
-
-  defp maybe_validate_unique_email(changeset, opts) do
-    if Keyword.get(opts, :validate_email, true) do
-      changeset
-      |> unsafe_validate_unique(:email, DevRound.Repo)
-      |> unique_constraint(:email)
-    else
-      changeset
-    end
+    |> unique_constraint(:email)
   end
 
   @doc """
