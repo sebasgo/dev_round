@@ -89,13 +89,12 @@ defmodule DevRound.LDAP do
   end
 
   defp parse_attributes(attrs) do
-    with {:ok, username} <- get_attribute(attrs, "uid", fn attr -> to_string(hd(attr)) end),
-         {:ok, email} <- get_attribute(attrs, "mail", fn attr -> to_string(hd(attr)) end),
-         {:ok, first_name} <-
-           get_attribute(attrs, "givenName", fn attr -> to_string(hd(attr)) end),
-         {:ok, last_name} <- get_attribute(attrs, "sn", fn attr -> to_string(hd(attr)) end) do
+    with {:ok, username} <- get_attribute(attrs, "uid", &parse_ldap_str_attr/1),
+         {:ok, email} <- get_attribute(attrs, "mail", &parse_ldap_str_attr/1),
+         {:ok, first_name} <- get_attribute(attrs, "givenName", &parse_ldap_str_attr/1),
+         {:ok, last_name} <- get_attribute(attrs, "sn", &parse_ldap_str_attr/1) do
       avatar_data =
-        case get_attribute(attrs, "thumbnailPhoto", fn attr -> :binary.list_to_bin(hd(attr)) end) do
+        case get_attribute(attrs, "thumbnailPhoto", &parse_ldap_bin_attr/1) do
           {:ok, data} -> data
           _ -> nil
         end
@@ -117,5 +116,17 @@ defmodule DevRound.LDAP do
       {_key, attr} -> {:ok, convert_fun.(attr)}
       nil -> {:error, "missing LDAP attribute #{key}"}
     end
+  end
+
+  defp parse_ldap_bin_attr([bytes | _] = _attr) do
+    bytes
+    |> :binary.list_to_bin()
+    |> to_string()
+  end
+
+  defp parse_ldap_str_attr([bytes | _] = _attr) do
+    bytes
+    |> :binary.list_to_bin()
+    |> to_string()
   end
 end
