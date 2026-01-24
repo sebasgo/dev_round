@@ -124,7 +124,11 @@
           <% end %>
         </dt>
         <dd class="flex flex-wrap gap-2">
-          <.user_badge :for={user <- @event.hosts} :key={user.id} user={user} />
+          <DevRoundWeb.AvatarComponents.user_badge
+            :for={user <- @event.hosts}
+            :key={user.id}
+            user={user}
+          />
         </dd>
         <dt class="flex gap-1 md:col-span-2 md:mt-4">
           <.icon name="hero-user-group" class="" /> Participants:
@@ -133,7 +137,7 @@
           <p :if={Enum.empty?(@event.events_attendees)} class="italic opacity-75">
             None yet. Be the first to register.
           </p>
-          <.user_badge
+          <DevRoundWeb.AvatarComponents.user_badge
             :for={attendee <- @event.events_attendees}
             :key={attendee.id}
             user={attendee.user}
@@ -142,7 +146,7 @@
             <p :if={@multiple_langs} class="text-sm">
               {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
             </p>
-          </.user_badge>
+          </DevRoundWeb.AvatarComponents.user_badge>
         </dd>
       </dl>
     </div>

@@ -23,7 +23,7 @@ defmodule DevRound.Formats do
     "#{format_time(dt1)} – #{format_time(dt2)}"
   end
 
-  def format_avatar_placeholder(%DevRound.Accounts.User{avatar_url: nil, full_name: full_name}) do
+  def format_avatar_placeholder(%DevRound.Accounts.User{avatar: nil, full_name: full_name}) do
     parts = String.split(full_name, " ")
     String.first(hd(parts)) <> String.first(List.last(parts))
   end

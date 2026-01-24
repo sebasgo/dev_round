@@ -37,7 +37,7 @@ defmodule DevRoundWeb.EventComponents do
                 <div class="mx-1px border-t border-neutral" />
               <% attendee -> %>
                 <div class="">
-                  <DevRoundWeb.CoreComponents.user_badge
+                  <DevRoundWeb.AvatarComponents.user_badge
                     user={attendee.user}
                     remote={attendee.is_remote}
                     experience_level={
@@ -48,7 +48,7 @@ defmodule DevRoundWeb.EventComponents do
                       {Enum.map(attendee.langs, fn lang -> lang.name end)
                       |> Enum.intersperse(", ")}
                     </p>
-                  </DevRoundWeb.CoreComponents.user_badge>
+                  </DevRoundWeb.AvatarComponents.user_badge>
                 </div>
             <% end %>
           <% end %>

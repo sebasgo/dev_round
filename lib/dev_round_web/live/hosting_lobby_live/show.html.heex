@@ -35,7 +35,7 @@
                 />
               </td>
               <td>
-                <.user_badge
+                <DevRoundWeb.AvatarComponents.user_badge
                   user={attendee.user}
                   remote={attendee.is_remote}
                   experience_level={attendee.experience_level}
@@ -43,7 +43,7 @@
                   <p :if={@multiple_langs} class="text-sm">
                     {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
                   </p>
-                </.user_badge>
+                </DevRoundWeb.AvatarComponents.user_badge>
               </td>
               <td class="flex gap-2">
                 <.button

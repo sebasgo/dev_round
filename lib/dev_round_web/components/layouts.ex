@@ -157,7 +157,7 @@ defmodule DevRoundWeb.Layouts do
     ~H"""
     <.dropdown id="topbar-dropdown" class="dropdown-end">
       <:trigger>
-        <.user_avatar
+        <DevRoundWeb.AvatarComponents.user_avatar
           user={@current_user}
           class="border-2 border-neutral-content rounded-full cursor-pointer"
         />

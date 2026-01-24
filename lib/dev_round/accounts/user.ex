@@ -7,7 +7,7 @@ defmodule DevRound.Accounts.User do
     field :name, :string
     field :email, :string
     field :full_name, :string
-    field :avatar_url, :string
+    field :avatar, :string
     field :experience_level, :integer, default: 5
 
     timestamps(type: :utc_datetime)
@@ -32,7 +32,7 @@ defmodule DevRound.Accounts.User do
 
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:name, :email, :full_name, :avatar_url, :experience_level])
+    |> cast(attrs, [:name, :email, :full_name, :avatar, :experience_level])
     |> validate_name(opts)
     |> validate_email(opts)
   end
@@ -45,7 +45,7 @@ defmodule DevRound.Accounts.User do
 
   def admin_changeset(user, attrs, _opts \\ []) do
     user
-    |> cast(attrs, [:experience_level, :avatar_url])
+    |> cast(attrs, [:experience_level])
     |> validate_required(:experience_level)
     |> validate_experience_level()
   end

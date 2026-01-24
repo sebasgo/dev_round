@@ -79,6 +79,12 @@ defmodule DevRoundWeb.Router do
   end
 
   scope "/", DevRoundWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    get "/avatar/:name", AvatarController, :show
+  end
+
+  scope "/", DevRoundWeb do
     pipe_through [:browser]
 
     live_session :require_authenticated_user,
