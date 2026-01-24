@@ -38,7 +38,11 @@ defmodule DevRound.Accounts do
   def authenticate_user_via_ldap(user, password) do
     case LDAP.authenticate(user, password) do
       {:ok, ldap_attrs} ->
-        upsert_user(ldap_attrs)
+        if MapSet.member?(ldap_attrs.groups, Application.get_env(:dev_round, :ldap_user_group)) do
+          upsert_user(ldap_attrs)
+        else
+          {:error, :access_denied}
+        end
 
       {:error, _reason} = error ->
         error

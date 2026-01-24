@@ -92,7 +92,8 @@ defmodule DevRound.LDAP do
     with {:ok, username} <- get_attribute(attrs, "uid", &parse_ldap_str_attr/1),
          {:ok, email} <- get_attribute(attrs, "mail", &parse_ldap_str_attr/1),
          {:ok, first_name} <- get_attribute(attrs, "givenName", &parse_ldap_str_attr/1),
-         {:ok, last_name} <- get_attribute(attrs, "sn", &parse_ldap_str_attr/1) do
+         {:ok, last_name} <- get_attribute(attrs, "sn", &parse_ldap_str_attr/1),
+         {:ok, group_dns} <- get_attribute(attrs, "memberOf", &parse_ldap_str_list_attr/1) do
       avatar_data =
         case get_attribute(attrs, "thumbnailPhoto", &parse_ldap_bin_attr/1) do
           {:ok, data} -> data
@@ -104,7 +105,8 @@ defmodule DevRound.LDAP do
          name: username,
          email: email,
          full_name: "#{first_name} #{last_name}",
-         avatar: avatar_data
+         avatar: avatar_data,
+         groups: Enum.map(group_dns, &parse_ldap_dn/1) |> MapSet.new()
        }}
     else
       {:error, _reason} = error -> error
@@ -128,5 +130,19 @@ defmodule DevRound.LDAP do
     bytes
     |> :binary.list_to_bin()
     |> to_string()
+  end
+
+  defp parse_ldap_str_list_attr(attr) do
+    attr
+    |> Enum.map(&:binary.list_to_bin/1)
+  end
+
+  defp parse_ldap_dn(dn) do
+    dn
+    |> String.split(",")
+    |> Enum.map(fn dn_comp -> dn_comp |> String.split("=", parts: 2) |> List.to_tuple() end)
+    |> Enum.filter(fn {key, _value} -> key == "CN" end)
+    |> Enum.map(fn {_key, value} -> value end)
+    |> hd()
   end
 end

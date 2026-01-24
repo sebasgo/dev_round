@@ -11,7 +11,8 @@ config :dev_round,
   ecto_repos: [DevRound.Repo],
   generators: [timestamp_type: :utc_datetime],
   time_zone: "Europe/Berlin",
-  mail_from: {"DevRound", "devround@localhost"}
+  mail_from: {"DevRound", "devround@localhost"},
+  ldap_user_group: System.get_env("LDAP_USER_GROUP")
 
 # Configure the endpoint
 config :dev_round, DevRoundWeb.Endpoint,

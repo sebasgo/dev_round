@@ -67,6 +67,14 @@ if config_env() == :prod do
            For example: devround@localhost
            """)
 
+  config :dev_round,
+         :mail_from,
+         System.get_env(LDAP_USER_GROUP) ||
+           raise("""
+           environment variable LDAP_USER_GROUP is missing.
+           For example: devround_users
+           """)
+
   config :dev_round, DevRoundWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [

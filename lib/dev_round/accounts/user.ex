@@ -14,7 +14,6 @@ defmodule DevRound.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
-
   def upsert_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:name, :email, :full_name, :avatar, :experience_level])
@@ -56,6 +55,7 @@ defmodule DevRound.Accounts.User do
       nil ->
         changeset
         |> put_change(:avatar_hash, nil)
+
       avatar ->
         changeset
         |> put_change(:avatar_hash, :crypto.hash(:sha, avatar))

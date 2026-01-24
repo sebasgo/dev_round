@@ -21,6 +21,11 @@ defmodule DevRoundWeb.UserSessionController do
         conn
         |> put_flash(:error, "Invalid user name or password!")
         |> redirect(to: ~p"/users/log_in")
+
+      {:error, :access_denied} ->
+        conn
+        |> put_flash(:error, "Access to this service is not permitted for your account.")
+        |> redirect(to: ~p"/users/log_in")
     end
   end
 
