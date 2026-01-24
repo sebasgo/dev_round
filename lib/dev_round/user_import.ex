@@ -66,7 +66,7 @@ defmodule DevRound.UserImport do
   end
 
   defp import_single_user(user_data) do
-    changeset = User.registration_changeset(%User{}, user_data)
+    changeset = User.upsert_changeset(%User{}, user_data)
 
     case Repo.insert(changeset) do
       {:ok, user} ->

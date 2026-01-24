@@ -13,24 +13,8 @@ defmodule DevRound.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
-  @doc """
-  A user changeset for registration.
 
-  It is important to validate the length of both email and password.
-  Otherwise databases may truncate the email without warnings, which
-  could lead to unpredictable or insecure behaviour. Long passwords may
-  also be very expensive to hash for certain algorithms.
-
-  ## Options
-
-    * `:validate_email` - Validates the uniqueness of the email, in case
-      you don't want to validate the uniqueness of the email (like when
-      using this changeset for validations on a LiveView form before
-      submitting the form), this option can be set to `false`.
-      Defaults to `true`.
-  """
-
-  def registration_changeset(user, attrs, opts \\ []) do
+  def upsert_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:name, :email, :full_name, :avatar, :experience_level])
     |> validate_name(opts)

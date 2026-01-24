@@ -50,7 +50,7 @@ defmodule DevRound.Accounts do
   """
   def upsert_user(attrs) do
     %User{}
-    |> User.registration_changeset(attrs)
+    |> User.upsert_changeset(attrs)
     |> Repo.insert(
       on_conflict: {:replace_all_except, [:id, :inserted_at]},
       conflict_target: [:name],
@@ -73,39 +73,6 @@ defmodule DevRound.Accounts do
 
   """
   def get_user!(id), do: Repo.get!(User, id)
-
-  ## User registration
-
-  @doc """
-  Registers a user.
-
-  ## Examples
-
-      iex> register_user(%{field: value})
-      {:ok, %User{}}
-
-      iex> register_user(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def register_user(attrs) do
-    %User{}
-    |> User.registration_changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking user changes.
-
-  ## Examples
-
-      iex> change_user_registration(user)
-      %Ecto.Changeset{data: %User{}}
-
-  """
-  def change_user_registration(%User{} = user, attrs \\ %{}) do
-    User.registration_changeset(user, attrs, validate_email: false)
-  end
 
   def change_user_profile(user, attrs \\ %{}) do
     User.profile_changeset(user, attrs)
