@@ -104,7 +104,7 @@ defmodule DevRound.LDAP do
          name: username,
          email: email,
          full_name: "#{first_name} #{last_name}",
-         avatar_data: avatar_data
+         avatar: avatar_data
        }}
     else
       {:error, _reason} = error -> error

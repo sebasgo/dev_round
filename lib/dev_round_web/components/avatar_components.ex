@@ -55,7 +55,7 @@ defmodule DevRoundWeb.AvatarComponents do
     ~H"""
     <div class={["avatar", @class]}>
       <div class="w-10 rounded-full">
-        <img class="inline" src={~p"/avatar/#{@user}"} alt="" />
+        <img class="inline" src={~p"/avatar/#{@user}/#{Base.encode64(@user.avatar_hash)}"} alt="" />
       </div>
     </div>
     """

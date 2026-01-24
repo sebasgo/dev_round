@@ -7,7 +7,8 @@ defmodule DevRound.Accounts.User do
     field :name, :string
     field :email, :string
     field :full_name, :string
-    field :avatar, :string
+    field :avatar, :binary
+    field :avatar_hash, :binary
     field :experience_level, :integer, default: 5
 
     timestamps(type: :utc_datetime)
@@ -17,6 +18,7 @@ defmodule DevRound.Accounts.User do
   def upsert_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:name, :email, :full_name, :avatar, :experience_level])
+    |> update_avatar_hash()
     |> validate_name(opts)
     |> validate_email(opts)
   end
@@ -47,6 +49,17 @@ defmodule DevRound.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> unique_constraint(:email)
+  end
+
+  defp update_avatar_hash(changeset) do
+    case get_field(changeset, :avatar) do
+      nil ->
+        changeset
+        |> put_change(:avatar_hash, nil)
+      avatar ->
+        changeset
+        |> put_change(:avatar_hash, :crypto.hash(:sha, avatar))
+    end
   end
 
   @doc """
