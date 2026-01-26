@@ -71,12 +71,12 @@ config :backpex,
 
 # Configure LDAP
 config :exldap, :settings,
-  server: System.get_env("LDAP_SERVER"),
-  base: System.get_env("LDAP_BASE"),
-  port: String.to_integer(System.get_env("LDAP_PORT") || "636"),
+  server: System.get_env("LDAP_SERVER", "localhost"),
+  base: System.get_env("LDAP_BASE", "ou=users,dc=dev,dc=local"),
+  port: String.to_integer(System.get_env("LDAP_PORT", "5389")),
   ssl: System.get_env("LDAP_SSL") == "on",
-  user_dn: System.get_env("LDAP_BIND_DN"),
-  password: System.get_env("LDAP_BIND_PASSWORD"),
+  user_dn: System.get_env("LDAP_BIND_DN", "cn=admin,dc=dev,dc=local"),
+  password: System.get_env("LDAP_BIND_PASSWORD", "admin"),
   sslopts: [verify: :verify_peer, cacerts: :public_key.cacerts_get()],
   search_timeout: 10_000
 

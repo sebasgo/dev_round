@@ -65,7 +65,7 @@ defmodule DevRound.LDAP do
   end
 
   defp find_user(ldap_conn, username, tries \\ 3) do
-    case Exldap.search_field(ldap_conn, "uid", username) do
+    case search_field(ldap_conn, "uid", username) do
       {:ok, [result | _]} ->
         {:ok, result}
 
@@ -79,6 +79,24 @@ defmodule DevRound.LDAP do
       {:error, reason} ->
         {:error, reason}
     end
+  end
+
+  defp search_field(connection, field, value) do
+    settings = Application.get_env(:exldap, :settings, [])
+    search_timeout = settings |> Keyword.get(:search_timeout) || 0
+    base = settings |> Keyword.get(:base)
+
+    base_config = {:base, to_charlist(base)}
+    scope = {:scope, :eldap.wholeSubtree()}
+    filter = {:filter, :eldap.equalityMatch(to_charlist(field), value)}
+    timeout = {:timeout, search_timeout}
+
+    attributes =
+      {:attributes, [~c"uid", ~c"mail", ~c"givenName", ~c"sn", ~c"memberOf", ~c"thumbnailPhoto"]}
+
+    options = [base_config, scope, filter, timeout, attributes]
+
+    Exldap.search(connection, options)
   end
 
   defp verify_credentials(ldap_conn, user_dn, password) do
@@ -141,7 +159,7 @@ defmodule DevRound.LDAP do
     dn
     |> String.split(",")
     |> Enum.map(fn dn_comp -> dn_comp |> String.split("=", parts: 2) |> List.to_tuple() end)
-    |> Enum.filter(fn {key, _value} -> key == "CN" end)
+    |> Enum.filter(fn {key, _value} -> String.downcase(key) == "cn" end)
     |> Enum.map(fn {_key, value} -> value end)
     |> hd()
   end

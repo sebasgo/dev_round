@@ -1,0 +1,17 @@
+SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
+
+podman run \
+    --replace \
+    -p 5389:389 \
+    -p 5636:636 \
+    -e 'LDAP_ORGANISATION="Development Corp"' \
+    -e 'LDAP_DOMAIN=dev.local' \
+    -e 'LDAP_TLS_VERIFY_CLIENT="never"' \
+    -e "LDAP_TLS=false" \
+    -v "$SCRIPT_DIR/bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/bootstrap.ldif" \
+    --name openldap \
+    --uidmap=0:1:999 --uidmap=999:0:1 --uidmap=1000:1000:64536 \
+    --gidmap=0:1:999 --gidmap=999:0:1 --gidmap=1000:1000:64536 \
+    -d \
+    docker.io/osixia/openldap:1.5.0 \
+    --copy-service

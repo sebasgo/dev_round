@@ -1,0 +1,600 @@
+dn: olcOverlay=memberof,olcDatabase={1}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcMemberOf
+olcOverlay: memberof
+olcMemberOfRefint: TRUE
+
+dn: ou=users,dc=dev,dc=local
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=dev,dc=local
+objectClass: organizationalUnit
+ou: groups
+
+dn: uid=jdoe,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: jdoe
+sn: Doe
+givenName: John
+cn: John Doe
+displayName: John Doe
+uidNumber: 10000
+gidNumber: 5000
+userPassword: jdoe
+gecos: John Doe
+loginShell: /bin/bash
+homeDirectory: /home/jdoe
+mail: john.doe@dev.local
+
+dn: uid=asmith,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: asmith
+sn: Smith
+givenName: Alice
+cn: Alice Smith
+displayName: Alice Smith
+uidNumber: 10001
+gidNumber: 5000
+userPassword: asmith
+gecos: Alice Smith
+loginShell: /bin/bash
+homeDirectory: /home/asmith
+mail: alice.smith@dev.local
+
+dn: uid=bwilson,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: bwilson
+sn: Wilson
+givenName: Bob
+cn: Bob Wilson
+displayName: Bob Wilson
+uidNumber: 10002
+gidNumber: 5000
+userPassword: bwilson
+gecos: Bob Wilson
+loginShell: /bin/bash
+homeDirectory: /home/bwilson
+mail: bob.wilson@dev.local
+
+dn: uid=cjohnson,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: cjohnson
+sn: Johnson
+givenName: Carol
+cn: Carol Johnson
+displayName: Carol Johnson
+uidNumber: 10003
+gidNumber: 5000
+userPassword: cjohnson
+gecos: Carol Johnson
+loginShell: /bin/bash
+homeDirectory: /home/cjohnson
+mail: carol.johnson@dev.local
+
+dn: uid=dlee,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: dlee
+sn: Lee
+givenName: David
+cn: David Lee
+displayName: David Lee
+uidNumber: 10004
+gidNumber: 5000
+userPassword: dlee
+gecos: David Lee
+loginShell: /bin/bash
+homeDirectory: /home/dlee
+mail: david.lee@dev.local
+
+dn: uid=emartinez,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: emartinez
+sn: Martinez
+givenName: Elena
+cn: Elena Martinez
+displayName: Elena Martinez
+uidNumber: 10005
+gidNumber: 5000
+userPassword: emartinez
+gecos: Elena Martinez
+loginShell: /bin/bash
+homeDirectory: /home/emartinez
+mail: elena.martinez@dev.local
+
+dn: uid=fgarcia,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: fgarcia
+sn: Garcia
+givenName: Frank
+cn: Frank Garcia
+displayName: Frank Garcia
+uidNumber: 10006
+gidNumber: 5000
+userPassword: fgarcia
+gecos: Frank Garcia
+loginShell: /bin/bash
+homeDirectory: /home/fgarcia
+mail: frank.garcia@dev.local
+
+dn: uid=gdavis,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: gdavis
+sn: Davis
+givenName: Grace
+cn: Grace Davis
+displayName: Grace Davis
+uidNumber: 10007
+gidNumber: 5000
+userPassword: gdavis
+gecos: Grace Davis
+loginShell: /bin/bash
+homeDirectory: /home/gdavis
+mail: grace.davis@dev.local
+
+dn: uid=hbrown,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: hbrown
+sn: Brown
+givenName: Henry
+cn: Henry Brown
+displayName: Henry Brown
+uidNumber: 10008
+gidNumber: 5000
+userPassword: hbrown
+gecos: Henry Brown
+loginShell: /bin/bash
+homeDirectory: /home/hbrown
+mail: henry.brown@dev.local
+
+dn: uid=ithompson,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: ithompson
+sn: Thompson
+givenName: Isabel
+cn: Isabel Thompson
+displayName: Isabel Thompson
+uidNumber: 10009
+gidNumber: 5000
+userPassword: ithompson
+gecos: Isabel Thompson
+loginShell: /bin/bash
+homeDirectory: /home/ithompson
+mail: isabel.thompson@dev.local
+
+dn: uid=jwhite,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: jwhite
+sn: White
+givenName: James
+cn: James White
+displayName: James White
+uidNumber: 10010
+gidNumber: 5000
+userPassword: jwhite
+gecos: James White
+loginShell: /bin/bash
+homeDirectory: /home/jwhite
+mail: james.white@dev.local
+
+dn: uid=kharris,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: kharris
+sn: Harris
+givenName: Kate
+cn: Kate Harris
+displayName: Kate Harris
+uidNumber: 10011
+gidNumber: 5000
+userPassword: kharris
+gecos: Kate Harris
+loginShell: /bin/bash
+homeDirectory: /home/kharris
+mail: kate.harris@dev.local
+
+dn: uid=lmartin,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: lmartin
+sn: Martin
+givenName: Lucas
+cn: Lucas Martin
+displayName: Lucas Martin
+uidNumber: 10012
+gidNumber: 5000
+userPassword: lmartin
+gecos: Lucas Martin
+loginShell: /bin/bash
+homeDirectory: /home/lmartin
+mail: lucas.martin@dev.local
+
+dn: uid=mclark,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: mclark
+sn: Clark
+givenName: Maria
+cn: Maria Clark
+displayName: Maria Clark
+uidNumber: 10013
+gidNumber: 5000
+userPassword: mclark
+gecos: Maria Clark
+loginShell: /bin/bash
+homeDirectory: /home/mclark
+mail: maria.clark@dev.local
+
+dn: uid=nlewis,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: nlewis
+sn: Lewis
+givenName: Nathan
+cn: Nathan Lewis
+displayName: Nathan Lewis
+uidNumber: 10014
+gidNumber: 5000
+userPassword: nlewis
+gecos: Nathan Lewis
+loginShell: /bin/bash
+homeDirectory: /home/nlewis
+mail: nathan.lewis@dev.local
+
+dn: uid=owalker,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: owalker
+sn: Walker
+givenName: Olivia
+cn: Olivia Walker
+displayName: Olivia Walker
+uidNumber: 10015
+gidNumber: 5000
+userPassword: owalker
+gecos: Olivia Walker
+loginShell: /bin/bash
+homeDirectory: /home/owalker
+mail: olivia.walker@dev.local
+
+dn: uid=phall,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: phall
+sn: Hall
+givenName: Peter
+cn: Peter Hall
+displayName: Peter Hall
+uidNumber: 10016
+gidNumber: 5000
+userPassword: phall
+gecos: Peter Hall
+loginShell: /bin/bash
+homeDirectory: /home/phall
+mail: peter.hall@dev.local
+
+dn: uid=qallen,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: qallen
+sn: Allen
+givenName: Quinn
+cn: Quinn Allen
+displayName: Quinn Allen
+uidNumber: 10017
+gidNumber: 5000
+userPassword: qallen
+gecos: Quinn Allen
+loginShell: /bin/bash
+homeDirectory: /home/qallen
+mail: quinn.allen@dev.local
+
+dn: uid=ryoung,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: ryoung
+sn: Young
+givenName: Rachel
+cn: Rachel Young
+displayName: Rachel Young
+uidNumber: 10018
+gidNumber: 5000
+userPassword: ryoung
+gecos: Rachel Young
+loginShell: /bin/bash
+homeDirectory: /home/ryoung
+mail: rachel.young@dev.local
+
+dn: uid=sking,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: sking
+sn: King
+givenName: Samuel
+cn: Samuel King
+displayName: Samuel King
+uidNumber: 10019
+gidNumber: 5000
+userPassword: sking
+gecos: Samuel King
+loginShell: /bin/bash
+homeDirectory: /home/sking
+mail: samuel.king@dev.local
+
+dn: uid=twright,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: twright
+sn: Wright
+givenName: Taylor
+cn: Taylor Wright
+displayName: Taylor Wright
+uidNumber: 10020
+gidNumber: 5000
+userPassword: twright
+gecos: Taylor Wright
+loginShell: /bin/bash
+homeDirectory: /home/twright
+mail: taylor.wright@dev.local
+
+dn: uid=ulopez,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: ulopez
+sn: Lopez
+givenName: Uma
+cn: Uma Lopez
+displayName: Uma Lopez
+uidNumber: 10021
+gidNumber: 5000
+userPassword: ulopez
+gecos: Uma Lopez
+loginShell: /bin/bash
+homeDirectory: /home/ulopez
+mail: uma.lopez@dev.local
+
+dn: uid=vhill,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: vhill
+sn: Hill
+givenName: Victor
+cn: Victor Hill
+displayName: Victor Hill
+uidNumber: 10022
+gidNumber: 5000
+userPassword: vhill
+gecos: Victor Hill
+loginShell: /bin/bash
+homeDirectory: /home/vhill
+mail: victor.hill@dev.local
+
+dn: uid=wscott,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: wscott
+sn: Scott
+givenName: Wendy
+cn: Wendy Scott
+displayName: Wendy Scott
+uidNumber: 10023
+gidNumber: 5000
+userPassword: wscott
+gecos: Wendy Scott
+loginShell: /bin/bash
+homeDirectory: /home/wscott
+mail: wendy.scott@dev.local
+
+dn: uid=xgreen,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: xgreen
+sn: Green
+givenName: Xavier
+cn: Xavier Green
+displayName: Xavier Green
+uidNumber: 10024
+gidNumber: 5000
+userPassword: xgreen
+gecos: Xavier Green
+loginShell: /bin/bash
+homeDirectory: /home/xgreen
+mail: xavier.green@dev.local
+
+dn: uid=yadams,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: yadams
+sn: Adams
+givenName: Yara
+cn: Yara Adams
+displayName: Yara Adams
+uidNumber: 10025
+gidNumber: 5000
+userPassword: yadams
+gecos: Yara Adams
+loginShell: /bin/bash
+homeDirectory: /home/yadams
+mail: yara.adams@dev.local
+
+dn: uid=zbaker,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: zbaker
+sn: Baker
+givenName: Zachary
+cn: Zachary Baker
+displayName: Zachary Baker
+uidNumber: 10026
+gidNumber: 5000
+userPassword: zbaker
+gecos: Zachary Baker
+loginShell: /bin/bash
+homeDirectory: /home/zbaker
+mail: zachary.baker@dev.local
+
+dn: uid=anelson,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: anelson
+sn: Nelson
+givenName: Amanda
+cn: Amanda Nelson
+displayName: Amanda Nelson
+uidNumber: 10027
+gidNumber: 5000
+userPassword: anelson
+gecos: Amanda Nelson
+loginShell: /bin/bash
+homeDirectory: /home/anelson
+mail: amanda.nelson@dev.local
+
+dn: uid=bcarter,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: bcarter
+sn: Carter
+givenName: Brandon
+cn: Brandon Carter
+displayName: Brandon Carter
+uidNumber: 10028
+gidNumber: 5000
+userPassword: bcarter
+gecos: Brandon Carter
+loginShell: /bin/bash
+homeDirectory: /home/bcarter
+mail: brandon.carter@dev.local
+
+dn: uid=cmitchell,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: cmitchell
+sn: Mitchell
+givenName: Christina
+cn: Christina Mitchell
+displayName: Christina Mitchell
+uidNumber: 10029
+gidNumber: 5000
+userPassword: cmitchell
+gecos: Christina Mitchell
+loginShell: /bin/bash
+homeDirectory: /home/cmitchell
+mail: christina.mitchell@dev.local
+
+dn: uid=dperez,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: dperez
+sn: Perez
+givenName: Daniel
+cn: Daniel Perez
+displayName: Daniel Perez
+uidNumber: 10030
+gidNumber: 5000
+userPassword: dperez
+gecos: Daniel Perez
+loginShell: /bin/bash
+homeDirectory: /home/dperez
+mail: daniel.perez@dev.local
+
+dn: uid=eroberts,ou=users,dc=dev,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: eroberts
+sn: Roberts
+givenName: Emma
+cn: Emma Roberts
+displayName: Emma Roberts
+uidNumber: 10031
+gidNumber: 5000
+userPassword: eroberts
+gecos: Emma Roberts
+loginShell: /bin/bash
+homeDirectory: /home/eroberts
+mail: emma.roberts@dev.local
+
+dn: cn=dev_round_users,ou=groups,dc=dev,dc=local
+objectClass: groupOfNames
+cn: users
+description: Regular users group
+member: uid=jdoe,ou=users,dc=dev,dc=local
+member: uid=asmith,ou=users,dc=dev,dc=local
+member: uid=bwilson,ou=users,dc=dev,dc=local
+member: uid=cjohnson,ou=users,dc=dev,dc=local
+member: uid=dlee,ou=users,dc=dev,dc=local
+member: uid=emartinez,ou=users,dc=dev,dc=local
+member: uid=fgarcia,ou=users,dc=dev,dc=local
+member: uid=gdavis,ou=users,dc=dev,dc=local
+member: uid=hbrown,ou=users,dc=dev,dc=local
+member: uid=ithompson,ou=users,dc=dev,dc=local
+member: uid=jwhite,ou=users,dc=dev,dc=local
+member: uid=kharris,ou=users,dc=dev,dc=local
+member: uid=lmartin,ou=users,dc=dev,dc=local
+member: uid=mclark,ou=users,dc=dev,dc=local
+member: uid=nlewis,ou=users,dc=dev,dc=local
+member: uid=owalker,ou=users,dc=dev,dc=local
+member: uid=phall,ou=users,dc=dev,dc=local
+member: uid=qallen,ou=users,dc=dev,dc=local
+member: uid=ryoung,ou=users,dc=dev,dc=local
+member: uid=sking,ou=users,dc=dev,dc=local
+member: uid=twright,ou=users,dc=dev,dc=local
+member: uid=ulopez,ou=users,dc=dev,dc=local
+member: uid=vhill,ou=users,dc=dev,dc=local
+member: uid=wscott,ou=users,dc=dev,dc=local
+member: uid=xgreen,ou=users,dc=dev,dc=local
+member: uid=yadams,ou=users,dc=dev,dc=local
+member: uid=zbaker,ou=users,dc=dev,dc=local
+member: uid=anelson,ou=users,dc=dev,dc=local
+member: uid=bcarter,ou=users,dc=dev,dc=local
+member: uid=cmitchell,ou=users,dc=dev,dc=local
+member: uid=dperez,ou=users,dc=dev,dc=local
+member: uid=eroberts,ou=users,dc=dev,dc=local
+
+dn: cn=dev_round_admins,ou=groups,dc=dev,dc=local
+objectClass: groupOfNames
+cn: dev_round_admins
+description: Administrator group
+member: uid=jdoe,ou=users,dc=dev,dc=local
