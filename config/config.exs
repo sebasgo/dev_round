@@ -12,7 +12,8 @@ config :dev_round,
   generators: [timestamp_type: :utc_datetime],
   time_zone: "Europe/Berlin",
   mail_from: {"DevRound", "devround@localhost"},
-  ldap_user_group: System.get_env("LDAP_USER_GROUP")
+  ldap_user_group: System.get_env("LDAP_USER_GROUP", "dev_round_users"),
+  ldap_admin_group: System.get_env("LDAP_USER_GROUP", "dev_round_admins")
 
 # Configure the endpoint
 config :dev_round, DevRoundWeb.Endpoint,

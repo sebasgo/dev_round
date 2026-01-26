@@ -2,6 +2,7 @@ defmodule DevRound.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
   import DevRound.Changeset
+  alias Ecto.Enum
 
   schema "users" do
     field :name, :string
@@ -10,13 +11,14 @@ defmodule DevRound.Accounts.User do
     field :avatar, :binary
     field :avatar_hash, :binary
     field :experience_level, :integer, default: 5
+    field :role, Enum, values: [user: 0, admin: 1]
 
     timestamps(type: :utc_datetime)
   end
 
   def upsert_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:name, :email, :full_name, :avatar, :experience_level])
+    |> cast(attrs, [:name, :email, :full_name, :avatar, :experience_level, :role])
     |> update_avatar_hash()
     |> validate_name(opts)
     |> validate_email(opts)
