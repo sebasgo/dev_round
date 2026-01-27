@@ -69,12 +69,12 @@ defmodule DevRoundWeb.Router do
   scope "/", DevRoundWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
+    get "/users/create_session", UserSessionController, :create
+
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{DevRoundWeb.UserAuth, :redirect_if_user_is_authenticated}] do
       live "/users/log_in", UserLoginLive, :new
     end
-
-    post "/users/log_in", UserSessionController, :create
   end
 
   scope "/", DevRoundWeb do
@@ -84,7 +84,7 @@ defmodule DevRoundWeb.Router do
   end
 
   scope "/", DevRoundWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
       on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}] do

@@ -253,6 +253,12 @@ code[class*="language-"] *::selection {
 	}
 }
 
+.while-submitting { display: none; }
+.while-not-submitting { display: block; }
+
+.phx-submit-loading .while-submitting { display: block; }
+.phx-submit-loading .while-not-submitting { display: none; }
+
 /*********************************************************
 * Tokens
 */

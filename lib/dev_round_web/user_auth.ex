@@ -14,7 +14,19 @@ defmodule DevRoundWeb.UserAuth do
   @remember_me_options [sign: true, max_age: @max_age, same_site: "Lax"]
 
   @doc """
-  Logs the user in.
+  Log in user
+
+  Creates the session token and redirects to user session contoller
+  handling the actual session creation. This part is not possible in
+  live view as we cannot manipulate the session.
+  """
+  def log_in_user_live(socket, user) do
+    token = Accounts.generate_user_session_token(user)
+    Phoenix.LiveView.redirect(socket, to: ~p"/users/create_session?token=#{Base.encode64(token)}")
+  end
+
+  @doc """
+  Create user session
 
   It renews the session ID and clears the whole session
   to avoid fixation attacks. See the renew_session
@@ -25,23 +37,18 @@ defmodule DevRoundWeb.UserAuth do
   disconnected on log out. The line can be safely removed
   if you are not using LiveView.
   """
-  def log_in_user(conn, user, params \\ %{}) do
-    token = Accounts.generate_user_session_token(user)
+  def create_user_session(conn, token) do
     user_return_to = get_session(conn, :user_return_to)
 
     conn
     |> renew_session()
     |> put_token_in_session(token)
-    |> maybe_write_remember_me_cookie(token, params)
+    |> write_remember_me_cookie(token)
     |> redirect(to: user_return_to || signed_in_path(conn))
   end
 
-  defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
+  defp write_remember_me_cookie(conn, token) do
     put_resp_cookie(conn, @remember_me_cookie, token, @remember_me_options)
-  end
-
-  defp maybe_write_remember_me_cookie(conn, _token, _params) do
-    conn
   end
 
   # This function renews the session ID and erases the whole
@@ -206,7 +213,6 @@ defmodule DevRoundWeb.UserAuth do
       conn
     else
       conn
-      |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log_in")
       |> halt()
@@ -225,5 +231,5 @@ defmodule DevRoundWeb.UserAuth do
 
   defp maybe_store_return_to(conn), do: conn
 
-  defp signed_in_path(_conn), do: ~p"/"
+  defp signed_in_path(_conn), do: ~p"/events"
 end
