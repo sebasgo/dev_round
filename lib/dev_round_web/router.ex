@@ -3,6 +3,7 @@ import Backpex.Router
 defmodule DevRoundWeb.Router do
   use DevRoundWeb, :router
 
+  import Phoenix.LiveDashboard.Router
   import DevRoundWeb.UserAuth
 
   pipeline :browser do
@@ -20,73 +21,12 @@ defmodule DevRoundWeb.Router do
   end
 
   scope "/", DevRoundWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :require_authenticated_user]
 
     get "/", PageController, :home
-  end
-
-  scope "/admin", DevRoundWeb do
-    pipe_through :browser
-
-    backpex_routes()
-
-    get "/", Admin.HomeController, :index
-
-    live_session :admin,
-      on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}, Backpex.InitAssigns] do
-      live_resources "/events", Admin.Event
-      live_resources "/event_attendees", Admin.EventAttendees
-      live_resources "/users", Admin.User
-      live_resources "/langs", Admin.Lang
-      live_resources "/team_names", Admin.TeamName
-    end
-  end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", DevRoundWeb do
-  #   pipe_through :api
-  # end
-
-  # Enable LiveDashboard and Swoosh mailbox preview in development
-  if Application.compile_env(:dev_round, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
-    import Phoenix.LiveDashboard.Router
-
-    scope "/dev" do
-      pipe_through :browser
-
-      live_dashboard "/dashboard", metrics: DevRoundWeb.Telemetry
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
-    end
-  end
-
-  ## Authentication routes
-
-  scope "/", DevRoundWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
-
-    get "/users/create_session", UserSessionController, :create
-
-    live_session :redirect_if_user_is_authenticated,
-      on_mount: [{DevRoundWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-      live "/users/log_in", UserLoginLive, :new
-    end
-  end
-
-  scope "/", DevRoundWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
     get "/avatar/:name/:avatar_hash", AvatarController, :show
-  end
 
-  scope "/", DevRoundWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
-    live_session :require_authenticated_user,
+    live_session :main,
       on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/events", EventLive.Index, :index
@@ -102,6 +42,47 @@ defmodule DevRoundWeb.Router do
 
       live "/events/:slug/hosting/lecture", HostingLectureLive.Show, :show
       live "/events/:slug/hosting/session/:session_slug", HostingSessionLive.Show, :show
+    end
+  end
+
+  scope "/admin", DevRoundWeb do
+    pipe_through [:browser, :require_authenticated_user, :require_admin]
+
+    backpex_routes()
+
+    get "/", Admin.HomeController, :index
+
+    live_session :admin,
+      on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}, Backpex.InitAssigns] do
+      live_resources "/events", Admin.Event
+      live_resources "/event_attendees", Admin.EventAttendees
+      live_resources "/users", Admin.User
+      live_resources "/langs", Admin.Lang
+      live_resources "/team_names", Admin.TeamName
+    end
+
+    live_dashboard "/dashboard", metrics: DevRoundWeb.Telemetry
+  end
+
+  # Enable Swoosh mailbox preview in development
+  if Application.compile_env(:dev_round, :dev_routes) do
+    scope "/dev" do
+      pipe_through :browser
+
+      forward "/mailbox", Plug.Swoosh.MailboxPreview
+    end
+  end
+
+  ## Authentication routes
+
+  scope "/", DevRoundWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    get "/users/create_session", UserSessionController, :create
+
+    live_session :redirect_if_user_is_authenticated,
+      on_mount: [{DevRoundWeb.UserAuth, :redirect_if_user_is_authenticated}] do
+      live "/users/log_in", UserLoginLive, :new
     end
   end
 

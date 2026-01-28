@@ -168,28 +168,30 @@ defmodule DevRoundWeb.Layouts do
             Settings
           </.link>
         </li>
-        <li>
-          <.link href={~p"/admin"}>
-            Admin Panel
-          </.link>
-        </li>
-        <%= if Application.get_env(:dev_round, :dev_routes) do %>
+        <%= if @current_user.role == :admin do %>
           <li>
-            <.link href={~p"/dev/dashboard"}>
+            <.link href={~p"/admin"}>
+              Admin Panel
+            </.link>
+          </li>
+          <li>
+            <.link href={~p"/admin/dashboard"}>
               Phoenix Dashboard
             </.link>
           </li>
+        <% end %>
+        <%= if Application.get_env(:dev_round, :dev_routes) do %>
           <li>
             <.link href={~p"/dev/mailbox"}>
               Swoosh Mailbox
             </.link>
           </li>
-          <li>
-            <.link href={~p"/users/log_out"} method="delete">
-              Log out
-            </.link>
-          </li>
         <% end %>
+        <li>
+          <.link href={~p"/users/log_out"} method="delete">
+            Log out
+          </.link>
+        </li>
       </:menu>
     </.dropdown>
     """

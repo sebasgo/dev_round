@@ -219,6 +219,14 @@ defmodule DevRoundWeb.UserAuth do
     end
   end
 
+  def require_admin(conn, _opts) do
+    if conn.assigns.current_user.role == :admin do
+      conn
+    else
+      raise DevRoundWeb.PermissionError, "admin permissions required"
+    end
+  end
+
   defp put_token_in_session(conn, token) do
     conn
     |> put_session(:user_token, token)
