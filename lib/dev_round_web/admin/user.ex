@@ -11,6 +11,8 @@ defmodule DevRoundWeb.Admin.User do
       topic: "admin.event_langs"
     ]
 
+  import Ecto.Query, warn: false
+
   @impl Backpex.LiveResource
   def singular_name, do: "User"
 
@@ -52,6 +54,30 @@ defmodule DevRoundWeb.Admin.User do
         module: Backpex.Fields.Number,
         label: "Experience Level"
       }
+    ]
+  end
+
+  @impl Backpex.LiveResource
+  def metrics do
+    [
+      registered_users: %{
+        module: Backpex.Metrics.Value,
+        label: "Registered Users",
+        class: "w-48",
+        select: dynamic([i], count(i)),
+        format: fn value ->
+          Integer.to_string(value) <> " Users"
+        end
+      },
+      average_experience_level: %{
+        module: Backpex.Metrics.Value,
+        label: "Average Experience Level",
+        class: "w-48",
+        select: dynamic([i], avg(i.experience_level)),
+        format: fn value ->
+          Decimal.to_string(Decimal.round(value, 1))
+        end
+      },
     ]
   end
 
