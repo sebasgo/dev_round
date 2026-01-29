@@ -31,7 +31,7 @@ defmodule DevRoundWeb.Admin.Event do
     actions ++
       [
         duplicate: %{
-          module: DevRoundWeb.Admin.ItemActions.DuplicateEvent,
+          module: DevRoundWeb.Admin.ItemActions.DuplicateEventAction,
           only: [:row]
         }
       ]

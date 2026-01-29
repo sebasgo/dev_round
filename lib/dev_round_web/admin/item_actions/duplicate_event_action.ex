@@ -1,4 +1,4 @@
-defmodule DevRoundWeb.Admin.ItemActions.DuplicateEvent do
+defmodule DevRoundWeb.Admin.ItemActions.DuplicateEventAction do
   alias DevRound.Events
   use BackpexWeb, :item_action
 

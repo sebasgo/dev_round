@@ -26,6 +26,13 @@ defmodule DevRoundWeb.Admin.User do
   def can?(_assigns, _action, _item), do: true
 
   @impl Backpex.LiveResource
+  def item_actions([show, edit, delete]) do
+    refresh = {:refresh, %{module: DevRoundWeb.Admin.ItemActions.RefreshUserAction}}
+
+    [show, refresh, edit, delete]
+  end
+
+  @impl Backpex.LiveResource
   def fields do
     [
       name: %{
