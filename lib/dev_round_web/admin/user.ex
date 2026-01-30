@@ -6,6 +6,7 @@ defmodule DevRoundWeb.Admin.User do
       update_changeset: &DevRound.Accounts.User.admin_changeset/3,
       create_changeset: &DevRound.Accounts.User.admin_changeset/3
     ],
+    init_order: %{by: :name, direction: :asc},
     layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
       topic: "admin.event_langs"

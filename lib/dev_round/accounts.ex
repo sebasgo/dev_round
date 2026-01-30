@@ -54,6 +54,7 @@ defmodule DevRound.Accounts do
   """
   def upsert_user(attrs) do
     attrs = Map.put(attrs, :role, get_user_role(attrs[:groups]))
+
     %User{}
     |> User.upsert_changeset(attrs)
     |> Repo.insert(
@@ -67,7 +68,6 @@ defmodule DevRound.Accounts do
     admin_group = Application.get_env(:dev_round, :ldap_admin_group)
     if MapSet.member?(ldap_groups, admin_group), do: :admin, else: :user
   end
-
 
   @doc """
   Gets a single user.

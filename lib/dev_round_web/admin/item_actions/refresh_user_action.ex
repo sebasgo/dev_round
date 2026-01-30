@@ -5,7 +5,7 @@ defmodule DevRoundWeb.Admin.ItemActions.RefreshUserAction do
   alias DevRound.Accounts
 
   @impl Backpex.ItemAction
-  def icon(assigns, item) do
+  def icon(assigns, _item) do
     ~H"""
     <Backpex.HTML.CoreComponents.icon
       name="hero-arrow-path"
@@ -34,7 +34,7 @@ defmodule DevRoundWeb.Admin.ItemActions.RefreshUserAction do
   defp build_flash_message([{:ok, user}]), do: {:info, "#{user.full_name} refreshed."}
 
   defp build_flash_message([{:error, :user_not_found, user}]),
-    do: {:error, "Error refreshing #{user.full_name}: not found in LDAP dirctory."}
+    do: {:error, "Error refreshing #{user.full_name}: not found in LDAP directory."}
 
   defp build_flash_message([{:error, _, user}]),
     do: {:error, "Error refreshing #{user.full_name}: internal error."}
