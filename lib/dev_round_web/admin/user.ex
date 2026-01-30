@@ -21,8 +21,6 @@ defmodule DevRoundWeb.Admin.User do
 
   @impl Backpex.LiveResource
   def can?(_assigns, action, _item) when action in [:new, :show], do: false
-
-  @impl Backpex.LiveResource
   def can?(_assigns, _action, _item), do: true
 
   @impl Backpex.LiveResource
@@ -33,11 +31,18 @@ defmodule DevRoundWeb.Admin.User do
   end
 
   @impl Backpex.LiveResource
+  def resource_actions() do
+    [
+      add_from_ldap: %{module: DevRoundWeb.Admin.ResourceActions.AddUserAction}
+    ]
+  end
+
+  @impl Backpex.LiveResource
   def fields do
     [
       name: %{
         module: Backpex.Fields.Text,
-        label: "Username",
+        label: "User Name",
         readonly: true
       },
       email: %{
@@ -84,7 +89,7 @@ defmodule DevRoundWeb.Admin.User do
         format: fn value ->
           Decimal.to_string(Decimal.round(value, 1))
         end
-      },
+      }
     ]
   end
 

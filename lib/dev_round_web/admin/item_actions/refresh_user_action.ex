@@ -32,14 +32,22 @@ defmodule DevRoundWeb.Admin.ItemActions.RefreshUserAction do
   end
 
   defp build_flash_message([{:ok, user}]), do: {:info, "#{user.full_name} refreshed."}
-  defp build_flash_message([{:error, :user_not_found, user}]), do: {:error, "Error refreshing #{user.full_name}: not found in LDAP dirctory."}
-  defp build_flash_message([{:error, _, user}]), do: {:error, "Error refreshing #{user.full_name}: internal error."}
+
+  defp build_flash_message([{:error, :user_not_found, user}]),
+    do: {:error, "Error refreshing #{user.full_name}: not found in LDAP dirctory."}
+
+  defp build_flash_message([{:error, _, user}]),
+    do: {:error, "Error refreshing #{user.full_name}: internal error."}
 
   defp build_flash_message(results) do
     n = length(results)
-    n_ok = Enum.count(results, fn {:ok, _} -> true; _ -> false end)
+
+    n_ok =
+      Enum.count(results, fn
+        {:ok, _} -> true
+        _ -> false
+      end)
+
     {:info, "#{n_ok} of #{n} users refreshed."}
   end
-
-
 end
