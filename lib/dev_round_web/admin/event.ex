@@ -122,25 +122,22 @@ defmodule DevRoundWeb.Admin.Event do
         except: [:index]
       },
       sessions: %{
-        module: DevRoundWeb.Admin.Fields.Sessions,
+        module: Backpex.Fields.InlineCRUD,
         type: :assoc,
         label: "Sessions",
         except: [:index],
         child_fields: [
           title: %{
             module: Backpex.Fields.Text,
-            label: "Title",
-            input_type: :text
+            label: "Title"
           },
           begin_local: %{
             module: Backpex.Fields.DateTime,
-            label: "Begin",
-            input_type: :date_time
+            label: "Begin"
           },
           end_local: %{
             module: Backpex.Fields.DateTime,
-            label: "End",
-            input_type: :date_time
+            label: "End"
           }
         ]
       },
