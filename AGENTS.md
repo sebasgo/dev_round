@@ -466,7 +466,7 @@ DevRound is an event management platform for organizing coding events and progra
 - **Real-time**: Phoenix PubSub for live updates
 - **Markdown**: Earmark for event descriptions
 - **Time Zones**: Automatic UTC/local time conversion with `time_zone_info`
-- **Other**: Slugify, UUID, BCrypt for authentication
+- **Other**: Slugify, BCrypt for authentication
 
 ## Domain Architecture
 

@@ -1,6 +1,7 @@
 defmodule DevRoundWeb.UserMail do
   import Swoosh.Email
   alias DevRoundWeb.UserMailComponents
+  alias Ecto.UUID
 
   def confirm_registration(user, event) do
     html =
@@ -33,7 +34,7 @@ defmodule DevRoundWeb.UserMail do
     VERSION:2.0
     PRODID:-//DevRound//EN
     BEGIN:VEVENT
-    UID:#{UUID.uuid4()}
+    UID:#{UUID.generate()}
     DTSTAMP:#{format_datetime(DateTime.utc_now(:second, Calendar.ISO))}
     DTSTART:#{format_datetime(event.begin)}
     DTEND:#{format_datetime(event.end)}

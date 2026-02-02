@@ -64,7 +64,6 @@ defmodule DevRound.MixProject do
       {:backpex, github: "sebasgo/backpex", branch: "fix/inline-crud-validation-messages"},
       {:earmark, "~> 1.4"},
       {:time_zone_info, "~> 0.7"},
-      {:uuid, "~> 1.1"},
       {:slugify, "~> 1.3"},
       {:exldap, "~> 0.6"}
     ]
