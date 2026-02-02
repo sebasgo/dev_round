@@ -3,13 +3,13 @@
     <.header>
       <:actions>
         <%= if @current_user in @event.hosts do %>
-          <.link patch={~p"/events/#{@event}/hosting/lobby"} phx-click={JS.push_focus()}>
-            <.button class="btn btn-default">Host</.button>
+          <.link patch={~p"/events/#{@event}/hosting/lobby"} class="btn btn-default" phx-click={JS.push_focus()}>
+            Host
           </.link>
         <% end %>
         <%= if @registration_open? do %>
-          <.link patch={~p"/events/#{@event}/registration/new"} phx-click={JS.push_focus()}>
-            <.button class="btn btn-primary">Register</.button>
+          <.link patch={~p"/events/#{@event}/registration/new"} class="btn btn-primary" phx-click={JS.push_focus()}>
+            Register
           </.link>
         <% end %>
       </:actions>
@@ -19,13 +19,13 @@
     <.header>
       <:actions>
         <%= if @current_user in @event.hosts do %>
-          <.link patch={~p"/events/#{@event}/hosting/lobby"} phx-click={JS.push_focus()}>
+          <.link patch={~p"/events/#{@event}/hosting/lobby"} class="btn btn-default" phx-click={JS.push_focus()}>
             <.button class="btn btn-default">Host</.button>
           </.link>
         <% end %>
         <%= if @registration_open? do %>
-          <.link patch={~p"/events/#{@event}/registration/edit"} phx-click={JS.push_focus()}>
-            <.button class="btn btn-primary">Manage Registration</.button>
+          <.link patch={~p"/events/#{@event}/registration/edit"} class="btn btn-primary" phx-click={JS.push_focus()}>
+            Manage Registration
           </.link>
         <% end %>
       </:actions>

@@ -434,16 +434,16 @@ defmodule DevRoundWeb.CoreComponents do
 
   def header(assigns) do
     ~H"""
-    <header class={[@actions != [] && "flex items-start justify-between gap-6", "pb-4", @class]}>
-      <div>
-        <h1 class="text-4xl font-mono font-semibold">
-          {render_slot(@inner_block)}
-        </h1>
-        <p :if={@subtitle != []} class="mt-2 text-lg text-base-content/70">
-          {render_slot(@subtitle)}
-        </p>
+    <header class={["pb-4 text-center", @class]}>
+      <div :if={@actions != []} class="grid grid-cols-1 items-center justify-items-stretch mx-auto gap-4 md:w-full sm:flex sm:justify-end sm:gap-2 mb-8">
+        {render_slot(@actions)}
       </div>
-      <div class="flex-none flex gap-2">{render_slot(@actions)}</div>
+      <h1 class="text-4xl font-mono font-semibold">
+        {render_slot(@inner_block)}
+      </h1>
+      <p :if={@subtitle != []} class="mt-2 text-lg text-base-content/70">
+        {render_slot(@subtitle)}
+      </p>
     </header>
     """
   end
