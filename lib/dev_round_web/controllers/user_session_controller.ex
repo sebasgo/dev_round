@@ -4,7 +4,7 @@ defmodule DevRoundWeb.UserSessionController do
   alias DevRoundWeb.UserAuth
 
   def create(conn, %{"token" => token}) do
-    UserAuth.create_user_session(conn, Base.decode64!(token))
+    UserAuth.create_user_session(conn, Base.url_decode64!(token))
   end
 
   def delete(conn, _params) do
