@@ -1,56 +1,65 @@
 <Layouts.app flash={@flash} current_user={@current_user}>
-  <%= if @attendance == nil do %>
-    <.header>
-      <:actions>
-        <%= if @current_user in @event.hosts do %>
-          <.link patch={~p"/events/#{@event}/hosting/lobby"} class="btn btn-default" phx-click={JS.push_focus()}>
-            Host
-          </.link>
-        <% end %>
-        <%= if @registration_open? do %>
-          <.link patch={~p"/events/#{@event}/registration/new"} class="btn btn-primary" phx-click={JS.push_focus()}>
+  <.header>
+    <:actions>
+      <%= if @current_user in @event.hosts do %>
+        <.link
+          patch={~p"/events/#{@event}/hosting/lobby"}
+          class="btn btn-default"
+          phx-click={JS.push_focus()}
+        >
+          <.button class="btn btn-default">Host</.button>
+        </.link>
+      <% end %>
+      <%= if @registration_open? do %>
+        <%= if @attendance == nil do %>
+          <.link
+            patch={~p"/events/#{@event}/registration/new"}
+            class="btn btn-primary"
+            phx-click={JS.push_focus()}
+          >
             Register
           </.link>
-        <% end %>
-      </:actions>
-      {@event.title}
-    </.header>
-  <% else %>
-    <.header>
-      <:actions>
-        <%= if @current_user in @event.hosts do %>
-          <.link patch={~p"/events/#{@event}/hosting/lobby"} class="btn btn-default" phx-click={JS.push_focus()}>
-            <.button class="btn btn-default">Host</.button>
-          </.link>
-        <% end %>
-        <%= if @registration_open? do %>
-          <.link patch={~p"/events/#{@event}/registration/edit"} class="btn btn-primary" phx-click={JS.push_focus()}>
+        <% else %>
+          <.link
+            patch={~p"/events/#{@event}/registration/edit"}
+            class="btn btn-primary"
+            phx-click={JS.push_focus()}
+          >
             Manage Registration
           </.link>
         <% end %>
-      </:actions>
-      <:subtitle>
-        <div class="badge badge-success gap-2">
-          <.icon name="hero-check" class="inline-block h-4 w-4" />
-          You have registered on {@attendance.inserted_at
-          |> DateTime.shift_zone!(DevRound.Formats.time_zone())
-          |> DevRound.Formats.format_datetime()}
-        </div>
-      </:subtitle>
-      {@event.title}
-    </.header>
-  <% end %>
+      <% end %>
+    </:actions>
+    {@event.title}
+    <:subtitle>
+      <div class="flex flex-wrap items-center justify-center gap-2 mt-4">
+        <DevRoundWeb.AvatarComponents.user_badge
+          :for={user <- @event.hosts}
+          :key={user.id}
+          user={user}
+        />
+      </div>
+      <div :if={@attendance != nil} class="badge badge-success gap-2 mt-6">
+        <.icon name="hero-check" class="inline-block h-4 w-4" />
+        You have registered on {@attendance.inserted_at
+        |> DateTime.shift_zone!(DevRound.Formats.time_zone())
+        |> DevRound.Formats.format_datetime()}.
+      </div>
+    </:subtitle>
+  </.header>
 
-  <div :if={@event.live} class="alert my-8" role="alert">
-    <div class="badge badge-neutral flex items-center gap-2">
+  <div :if={@event.live} class="alert alert-info alert-soft my-8" role="alert">
+    <div class="badge badge-info flex items-center gap-2">
       <span class="relative flex h-3 w-3">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75">
         </span>
         <span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
       </span>
-      <span class="font-semibold uppercase">Live</span>
+      <span class="font-semibold uppercase mt-px">Live</span>
     </div>
-    This event is currently in progress.
+    <div class="mt-px">
+      This event is currently in progress.
+    </div>
     <div>
       <a href={~p"/events/#{@event}/live"} class="btn btn-sm btn-primary">
         <.icon name="hero-eye" class="w-4 h-4" /> Follow Presentation
@@ -61,7 +70,7 @@
   <div class="card bg-base-300 shadow-xl my-8">
     <div class="card-body">
       <dl class="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4 items-center">
-        <dt class="flex gap-1">
+        <dt class="flex items-center gap-1">
           <.icon name="hero-calendar" class="" /> Date and Time:
         </dt>
         <dd class="font-semibold mb-4 md:mb-0">
@@ -70,13 +79,13 @@
             @event.end |> DateTime.shift_zone!(DevRound.Formats.time_zone())
           )}
         </dd>
-        <dt class="flex gap-1">
+        <dt class="flex items-center gap-1">
           <.icon name="hero-map-pin" class="" /> Location:
         </dt>
         <dd class="font-semibold mb-4 md:mb-0">
           {@event.location}
         </dd>
-        <dt class="flex gap-1">
+        <dt class="flex items-center gap-1">
           <.icon name="hero-pencil-square" class="" /> Registration:
         </dt>
         <dd class="mb-4 md:mb-0">
@@ -92,7 +101,7 @@
             </div>
           <% end %>
         </dd>
-        <dt class="flex gap-1">
+        <dt class="flex items-center gap-1">
           <.icon name="hero-language" class="" />
           <%= if Enum.empty?(tl(@event.langs)) do %>
             Language:
@@ -100,10 +109,10 @@
             Languages:
           <% end %>
         </dt>
-        <dd class="mb-4 md:mb-0">
+        <dd class="flex flex-wrap gap-2 mb-4 md:mb-0">
           <.lang_badge :for={lang <- @event.langs} :key={lang.id} lang={lang} />
         </dd>
-        <dt class="flex gap-1">
+        <dt class="flex items-center gap-1">
           <.icon name="hero-paper-clip" class="" /> Slides:
         </dt>
         <dd class="mb-4 md:mb-0">
@@ -115,22 +124,7 @@
             <p class="opacity-70">N/A</p>
           <% end %>
         </dd>
-        <dt class="flex flex-wrap gap-1">
-          <.icon name="hero-academic-cap" class="" />
-          <%= if Enum.empty?(tl(@event.hosts)) do %>
-            Host:
-          <% else %>
-            Hosts:
-          <% end %>
-        </dt>
-        <dd class="flex flex-wrap gap-2">
-          <DevRoundWeb.AvatarComponents.user_badge
-            :for={user <- @event.hosts}
-            :key={user.id}
-            user={user}
-          />
-        </dd>
-        <dt class="flex gap-1 md:col-span-2 md:mt-4">
+        <dt class="flex items-center gap-1 md:col-span-2 md:mt-4">
           <.icon name="hero-user-group" class="" /> Participants:
         </dt>
         <dd class="md:col-span-2 flex flex-wrap gap-2">
@@ -159,7 +153,7 @@
   <p class="my-8 text-sm italic opacity-75">
     Last updated on {@event.modified_at
     |> DateTime.shift_zone!(DevRound.Formats.time_zone())
-    |> DevRound.Formats.format_datetime()}
+    |> DevRound.Formats.format_datetime()}.
   </p>
 
   <.modal

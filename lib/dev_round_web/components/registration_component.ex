@@ -131,7 +131,7 @@ defmodule DevRoundWeb.RegistrationComponent do
 
         {:noreply,
          socket
-         |> maybe_put_flash(:info, "Registration updated.", fn ->
+         |> maybe_put_flash(:info, "Registration information updated.", fn ->
            socket.assigns.mode == :self_registration
          end)
          |> push_patch(to: socket.assigns.patch)}
@@ -162,7 +162,7 @@ defmodule DevRoundWeb.RegistrationComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Registered")
+         |> put_flash(:info, "Registration successful.")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, :registration_closed} ->

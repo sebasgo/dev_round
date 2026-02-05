@@ -22,7 +22,10 @@ defmodule DevRoundWeb.UserAuth do
   """
   def log_in_user_live(socket, user) do
     token = Accounts.generate_user_session_token(user)
-    Phoenix.LiveView.redirect(socket, to: ~p"/users/create_session?token=#{Base.url_encode64(token)}")
+
+    Phoenix.LiveView.redirect(socket,
+      to: ~p"/users/create_session?token=#{Base.url_encode64(token)}"
+    )
   end
 
   @doc """

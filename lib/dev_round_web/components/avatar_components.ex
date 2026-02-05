@@ -13,7 +13,7 @@ defmodule DevRoundWeb.AvatarComponents do
 
   def user_badge(assigns) do
     ~H"""
-    <div class="flex items-center bg-neutral-content text-neutral rounded-full border border-neutral-content whitespace-nowrap">
+    <div class="flex items-center bg-neutral-content font-normal font-sans text-base text-neutral rounded-full border border-neutral-content whitespace-nowrap">
       <div class="relative w-10 h-10">
         <.user_avatar user={@user} />
         <%= if @remote do %>

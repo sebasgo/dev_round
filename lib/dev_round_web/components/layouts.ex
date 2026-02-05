@@ -80,7 +80,7 @@ defmodule DevRoundWeb.Layouts do
           </header>
 
           <main class="h-[calc(100vh-4rem)] mt-[4rem]">
-            <div class={[" px-4 py-5 sm:px-6 lg:px-8 mx-auto", !@fluid && "max-w-3xl"]}>
+            <div class={["px-4 py-5 sm:px-6 lg:px-8 mx-auto", !@fluid && "max-w-3xl"]}>
               {render_slot(@inner_block)}
             </div>
           </main>
