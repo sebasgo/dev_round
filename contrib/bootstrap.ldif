@@ -591,7 +591,6 @@ member: uid=anelson,ou=users,dc=dev,dc=local
 member: uid=bcarter,ou=users,dc=dev,dc=local
 member: uid=cmitchell,ou=users,dc=dev,dc=local
 member: uid=dperez,ou=users,dc=dev,dc=local
-member: uid=eroberts,ou=users,dc=dev,dc=local
 
 dn: cn=dev_round_admins,ou=groups,dc=dev,dc=local
 objectClass: groupOfNames

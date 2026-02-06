@@ -1,0 +1,20 @@
+[
+  {
+    "name": "invalid1",
+    "email": "not-an-email",
+    "experience_level": 5,
+    "full_name": "Invalid User 1"
+  },
+  {
+    "name": "invalid2",
+    "email": "missing-name@example.com",
+    "experience_level": 3,
+    "full_name": "Invalid User 2"
+  },
+  {
+    "name": "invalid3",
+    "email": "invalid3@example.com",
+    "experience_level": 10,
+    "full_name": "Invalid User 3"
+  }
+]

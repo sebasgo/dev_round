@@ -1,0 +1,20 @@
+[
+  {
+    "name": "jdoe",
+    "email": "john.doe@example.com",
+    "experience_level": 5,
+    "full_name": "John Doe"
+  },
+  {
+    "name": "asmith",
+    "email": "alice.smith@example.com",
+    "experience_level": 3,
+    "full_name": "Alice Smith"
+  },
+  {
+    "name": "bwilson",
+    "email": "bob.wilson@example.com",
+    "experience_level": 7,
+    "full_name": "Bob Wilson"
+  }
+]

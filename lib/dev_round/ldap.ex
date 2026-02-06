@@ -110,12 +110,17 @@ defmodule DevRound.LDAP do
     with {:ok, username} <- get_attribute(attrs, "uid", &parse_ldap_str_attr/1),
          {:ok, email} <- get_attribute(attrs, "mail", &parse_ldap_str_attr/1),
          {:ok, first_name} <- get_attribute(attrs, "givenName", &parse_ldap_str_attr/1),
-         {:ok, last_name} <- get_attribute(attrs, "sn", &parse_ldap_str_attr/1),
-         {:ok, group_dns} <- get_attribute(attrs, "memberOf", &parse_ldap_str_list_attr/1) do
+         {:ok, last_name} <- get_attribute(attrs, "sn", &parse_ldap_str_attr/1) do
       avatar_data =
         case get_attribute(attrs, "thumbnailPhoto", &parse_ldap_bin_attr/1) do
           {:ok, data} -> data
           _ -> nil
+        end
+
+      group_dns =
+        case get_attribute(attrs, "memberOf", &parse_ldap_str_list_attr/1) do
+          {:ok, data} -> data
+          _ -> []
         end
 
       {:ok,

@@ -20,8 +20,8 @@ defmodule DevRound.UserImport do
   ## Example JSON format:
   ```json
   [
-    {"name": "John Doe", "email": "john@example.com", "experience_level": 5},
-    {"name": "Jane Smith", "email": "jane@example.com", "experience_level": 3}
+    {"name": "jdoe", "email": "john@example.com", "experience_level": 5, "full_name": "John Doe"},
+    {"name": "jsmith", "email": "jane@example.com", "experience_level": 0, "full_name": "Jane Smith"}
   ]
   ```
   """

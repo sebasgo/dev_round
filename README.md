@@ -162,7 +162,7 @@ and the password are identical.
 | Brandon Carter     | bcarter        | User  |
 | Christina Mitchell | cmitchell      | User  |
 | Daniel Perez       | dperez         | User  |
-| Emma Roberts       | eroberts       | User  |
+| Emma Roberts       | eroberts       |       |
 
 ### For Event Organizers
 

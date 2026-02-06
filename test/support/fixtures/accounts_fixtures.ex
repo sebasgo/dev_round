@@ -4,23 +4,26 @@ defmodule DevRound.AccountsFixtures do
   entities via the `DevRound.Accounts` context.
   """
 
+  alias DevRound.Repo
+  alias DevRound.Accounts.User
+
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
-  def valid_user_password, do: "dev_round world!"
+  def unique_user_name, do: "user#{System.unique_integer()}"
 
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
+      name: unique_user_name(),
       email: unique_user_email(),
-      password: valid_user_password()
+      full_name: "Test User"
     })
   end
 
   def user_fixture(attrs \\ %{}) do
-    {:ok, user} =
-      attrs
-      |> valid_user_attributes()
-      |> DevRound.Accounts.register_user()
+    attrs = valid_user_attributes(attrs)
 
-    user
+    %User{}
+    |> User.upsert_changeset(attrs)
+    |> Repo.insert!()
   end
 
   def extract_user_token(fun) do

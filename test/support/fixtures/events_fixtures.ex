@@ -41,4 +41,19 @@ defmodule DevRound.EventsFixtures do
 
     event_session
   end
+
+  @doc """
+  Generate a lang.
+  """
+  def lang_fixture(attrs \\ %{}) do
+    {:ok, lang} =
+      attrs
+      |> Enum.into(%{
+        name: "some name",
+        icon_path: "elixir.png"
+      })
+      |> DevRound.Events.create_lang()
+
+    lang
+  end
 end
