@@ -16,6 +16,7 @@ defmodule DevRoundWeb.CoreComponents do
   """
   use Phoenix.Component
   use Gettext, backend: DevRoundWeb.Gettext
+  use Phoenix.VerifiedRoutes, endpoint: DevRoundWeb.Endpoint, router: DevRoundWeb.Router
 
   alias Phoenix.LiveView.JS
 
@@ -680,17 +681,22 @@ defmodule DevRoundWeb.CoreComponents do
   attr :lang, DevRound.Events.Lang, required: true
 
   def lang_badge(assigns) do
-    static_path = Path.join(["uploads", "langs", "icon", assigns.lang.icon_path])
-    icon_url = Phoenix.VerifiedRoutes.static_url(DevRoundWeb.Endpoint, "/" <> static_path)
+    icon_url = lang_icon_url(assigns.lang)
     assigns = assign(assigns, :icon_url, icon_url)
 
     ~H"""
     <div class="badge badge-neutral badge-lg pd-0 gap-2 font-semibold">
-      <img src={@icon_url} class="h-4 w-4" alt="" />
+      <img :if={@icon_url} src={@icon_url} class="h-4 w-4" alt="" />
       <p>{@lang.name}</p>
     </div>
     """
   end
+
+  defp lang_icon_url(%{id: id, icon_path: icon_path}) when not is_nil(icon_path) do
+    ~p"/lang-icon/#{icon_path}"
+  end
+
+  defp lang_icon_url(_lang), do: nil
 
   slot :inner_block
 

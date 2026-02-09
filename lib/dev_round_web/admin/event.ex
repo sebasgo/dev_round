@@ -3,6 +3,8 @@ defmodule DevRoundWeb.Admin.Event do
     upload_dir: DevRound.Events.event_slides_dir(),
     field: :slides_filename
 
+  use DevRoundWeb, :verified_routes
+
   use Backpex.LiveResource,
     adapter_config: [
       schema: DevRound.Events.Event,
@@ -113,7 +115,7 @@ defmodule DevRoundWeb.Admin.Event do
           assigns ->
             ~H"""
             <p>
-              <Phoenix.Component.link navigate={file_url(@value)}>
+              <Phoenix.Component.link navigate={~p"/uploads/events/slides/#{@value}"}>
                 {Backpex.HTML.pretty_value(@value)}
               </Phoenix.Component.link>
             </p>

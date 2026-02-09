@@ -13,6 +13,8 @@ defmodule DevRoundWeb.Admin.Lang do
       topic: "admin.langs"
     ]
 
+  use DevRoundWeb, :verified_routes
+
   @impl Backpex.LiveResource
   def singular_name, do: "Programming Language"
 
@@ -41,7 +43,9 @@ defmodule DevRoundWeb.Admin.Lang do
             ~H"<p>{Backpex.HTML.pretty_value(@value)}</p>"
 
           assigns ->
-            ~H'<img class="h-10 w-auto" src={file_url(@value)} />'
+            ~H"""
+            <img class="h-10 w-auto" src={~p"/lang-icon/#{@value}"} />
+            """
         end
       }
     ]

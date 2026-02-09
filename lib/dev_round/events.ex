@@ -290,6 +290,13 @@ defmodule DevRound.Events do
     Repo.one(from l in Lang, where: l.name == ^name)
   end
 
+  @doc """
+  Gets a single lang by id.
+
+  Raises `Ecto.NoResultsError` if the Lang does not exist.
+  """
+  def get_lang!(id), do: Repo.get!(Lang, id)
+
   alias DevRound.Events.EventSession
 
   @doc """

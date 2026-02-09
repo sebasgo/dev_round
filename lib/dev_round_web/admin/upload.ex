@@ -35,27 +35,21 @@ defmodule DevRoundWeb.Admin.Upload do
 
       def consume_upload(_socket, _item, %{path: path} = _meta, entry) do
         file_name = file_name(entry)
-        dest = Path.join([:code.priv_dir(:dev_round), "static", upload_dir(), file_name])
+        dest = Path.join([:code.priv_dir(:dev_round), upload_dir(), file_name])
 
         File.cp!(path, dest)
 
-        {:ok, file_url(file_name)}
+        {:ok, file_name}
       end
 
       def remove_uploads(_socket, _item, removed_entries) do
         for file <- removed_entries do
-          path = Path.join([:code.priv_dir(:dev_round), "static", upload_dir(), file])
+          path = Path.join([:code.priv_dir(:dev_round), upload_dir(), file])
           File.rm!(path)
         end
       end
 
-      def file_url(file_name) do
-        static_path = Path.join([upload_dir(), file_name])
-        Phoenix.VerifiedRoutes.static_url(DevRoundWeb.Endpoint, "/" <> static_path)
-      end
-
       def file_name(entry) do
-        IO.inspect(entry, label: "ENTRY")
         [ext | _tail] = MIME.extensions(entry.client_type)
         "#{entry.uuid}.#{ext}"
       end
