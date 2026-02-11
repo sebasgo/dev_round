@@ -44,8 +44,5 @@ defmodule DevRoundWeb.UserSettingsLiveTest do
       assert result =~ "Profile updated."
       assert Accounts.get_user_by_name(user.name).full_name == new_name
     end
-
   end
-
-
 end

@@ -89,9 +89,7 @@ defmodule DevRoundWeb.UserLoginLiveTest do
       {:ok, lv, _html} = live(conn, ~p"/users/log_in")
 
       form =
-        form(lv, "#login_form",
-          user: %{name: "nonexistent", password: "password"}
-        )
+        form(lv, "#login_form", user: %{name: "nonexistent", password: "password"})
 
       # For error cases, we can check the rendered HTML for flash messages
       html = render_submit(form)
@@ -106,9 +104,7 @@ defmodule DevRoundWeb.UserLoginLiveTest do
       {:ok, lv, _html} = live(conn, ~p"/users/log_in")
 
       form =
-        form(lv, "#login_form",
-          user: %{name: "eroberts", password: "eroberts"}
-        )
+        form(lv, "#login_form", user: %{name: "eroberts", password: "eroberts"})
 
       # For error cases, we can check the rendered HTML for flash messages
       html = render_submit(form)
