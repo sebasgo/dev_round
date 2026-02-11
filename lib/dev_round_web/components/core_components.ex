@@ -562,10 +562,11 @@ defmodule DevRoundWeb.CoreComponents do
   """
   attr :name, :string, required: true
   attr :class, :string, default: "size-4"
+  attr :rest, :global
 
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
-    <span class={[@name, @class]} />
+    <span class={[@name, @class]} {@rest} />
     """
   end
 
@@ -692,7 +693,7 @@ defmodule DevRoundWeb.CoreComponents do
     """
   end
 
-  defp lang_icon_url(%{id: id, icon_path: icon_path}) when not is_nil(icon_path) do
+  defp lang_icon_url(%{icon_path: icon_path}) when not is_nil(icon_path) do
     ~p"/lang-icon/#{icon_path}"
   end
 

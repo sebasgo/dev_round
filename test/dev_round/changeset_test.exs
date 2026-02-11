@@ -1,8 +1,6 @@
 defmodule DevRound.ChangesetTest do
   use DevRound.DataCase, async: true
 
-  alias DevRound.Changeset
-
   describe "validate_option_selected/2" do
     test "adds error when field is nil" do
       # Create a changeset with a field that has nil value

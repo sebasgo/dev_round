@@ -18,7 +18,7 @@ defmodule DevRoundWeb.UserSettingsLiveTest do
     test "redirects if user is not logged in", %{conn: conn} do
       assert {:error, redirect} = live(conn, ~p"/users/settings")
 
-      assert {:redirect, %{to: path, flash: flash}} = redirect
+      assert {:redirect, %{to: path}} = redirect
       assert path == ~p"/users/log_in"
     end
   end
