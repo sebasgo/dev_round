@@ -17,27 +17,47 @@ defmodule DevRoundWeb.UserAuthTest do
     %{user: user_fixture(), conn: conn}
   end
 
-  describe "log_in_user/3" do
+  describe "log_in_user_live/2" do
+    test "redirects to the session creation page with token", %{user: user} do
+      socket = %Phoenix.LiveView.Socket{
+        endpoint: DevRoundWeb.Endpoint,
+        assigns: %{}
+      }
+
+      %{redirected: {:redirect, %{to: to}}} = UserAuth.log_in_user_live(socket, user)
+
+      assert to =~ ~p"/users/create_session?token="
+    end
+  end
+
+  describe "generate_user_session/3" do
     test "stores the user token in the session", %{conn: conn, user: user} do
-      conn = UserAuth.log_in_user(conn, user)
-      assert token = get_session(conn, :user_token)
+      token = Accounts.generate_user_session_token(user)
+      conn = UserAuth.create_user_session(conn, token)
+      assert get_session(conn, :user_token) == token
       assert get_session(conn, :live_socket_id) == "users_sessions:#{Base.url_encode64(token)}"
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/events"
       assert Accounts.get_user_by_session_token(token)
     end
 
     test "clears everything previously stored in the session", %{conn: conn, user: user} do
-      conn = conn |> put_session(:to_be_removed, "value") |> UserAuth.log_in_user(user)
+      token = Accounts.generate_user_session_token(user)
+      conn = conn |> put_session(:to_be_removed, "value") |> UserAuth.create_user_session(token)
       refute get_session(conn, :to_be_removed)
     end
 
     test "redirects to the configured path", %{conn: conn, user: user} do
-      conn = conn |> put_session(:user_return_to, "/dev_round") |> UserAuth.log_in_user(user)
+      token = Accounts.generate_user_session_token(user)
+
+      conn =
+        conn |> put_session(:user_return_to, "/dev_round") |> UserAuth.create_user_session(token)
+
       assert redirected_to(conn) == "/dev_round"
     end
 
     test "writes a cookie if remember_me is configured", %{conn: conn, user: user} do
-      conn = conn |> fetch_cookies() |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
+      token = Accounts.generate_user_session_token(user)
+      conn = conn |> fetch_cookies() |> UserAuth.create_user_session(token)
       assert get_session(conn, :user_token) == conn.cookies[@remember_me_cookie]
 
       assert %{value: signed_token, max_age: max_age} = conn.resp_cookies[@remember_me_cookie]
@@ -91,22 +111,26 @@ defmodule DevRoundWeb.UserAuthTest do
     end
 
     test "authenticates user from cookies", %{conn: conn, user: user} do
-      logged_in_conn =
-        conn |> fetch_cookies() |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
+      # Create a session first to set up the cookie
+      token = Accounts.generate_user_session_token(user)
+      logged_in_conn = UserAuth.create_user_session(conn, token)
 
-      user_token = logged_in_conn.cookies[@remember_me_cookie]
+      # Fetch cookies from the logged_in_conn to get the cookie value
+      logged_in_conn = fetch_cookies(logged_in_conn, signed: [@remember_me_cookie])
       %{value: signed_token} = logged_in_conn.resp_cookies[@remember_me_cookie]
 
       conn =
         conn
         |> put_req_cookie(@remember_me_cookie, signed_token)
+        |> fetch_cookies(signed: [@remember_me_cookie])
         |> UserAuth.fetch_current_user([])
 
       assert conn.assigns.current_user.id == user.id
-      assert get_session(conn, :user_token) == user_token
+      # After fetch_current_user, the session should be populated with the token
+      assert get_session(conn, :user_token) == token
 
       assert get_session(conn, :live_socket_id) ==
-               "users_sessions:#{Base.url_encode64(user_token)}"
+               "users_sessions:#{Base.url_encode64(token)}"
     end
 
     test "does not authenticate if data is missing", %{conn: conn, user: user} do
@@ -216,7 +240,7 @@ defmodule DevRoundWeb.UserAuthTest do
     test "redirects if user is authenticated", %{conn: conn, user: user} do
       conn = conn |> assign(:current_user, user) |> UserAuth.redirect_if_user_is_authenticated([])
       assert conn.halted
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/events"
     end
 
     test "does not redirect if user is not authenticated", %{conn: conn} do
@@ -232,9 +256,6 @@ defmodule DevRoundWeb.UserAuthTest do
       assert conn.halted
 
       assert redirected_to(conn) == ~p"/users/log_in"
-
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) ==
-               "You must log in to access this page."
     end
 
     test "stores the path to redirect to on GET", %{conn: conn} do

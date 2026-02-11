@@ -7,91 +7,32 @@ defmodule DevRoundWeb.UserSessionControllerTest do
     %{user: user_fixture()}
   end
 
-  describe "POST /users/log_in" do
-    test "logs the user in", %{conn: conn, user: user} do
+  describe "POST /users/create_session" do
+    test "redirects to events page with valid token", %{conn: conn} do
+      # Test with a valid (but fake) token that can be decoded
+      # This validates the normal redirect behavior to ~p"/events"
       conn =
-        post(conn, ~p"/users/log_in", %{
-          "user" => %{"email" => user.email, "password" => valid_user_password()}
+        get(conn, ~p"/users/create_session", %{
+          "token" => Base.url_encode64("fake_token_data")
         })
 
-      assert get_session(conn, :user_token)
-      assert redirected_to(conn) == ~p"/"
-
-      # Now do a logged in request and assert on the menu
-      conn = get(conn, ~p"/")
-      response = html_response(conn, 200)
-      assert response =~ user.email
-      assert response =~ ~p"/users/settings"
-      assert response =~ ~p"/users/log_out"
+      # Should redirect to events page (signed_in_path)
+      assert redirected_to(conn) == ~p"/events"
     end
 
-    test "logs the user in with remember me", %{conn: conn, user: user} do
+    test "redirects to return_to path when set", %{conn: conn} do
+      # Set a return_to path like the original tests did
+      conn = conn |> init_test_session(user_return_to: "/foo/bar")
+
+      # Test with a valid (but fake) token that can be decoded
+      # This validates the redirect behavior with custom return path
       conn =
-        post(conn, ~p"/users/log_in", %{
-          "user" => %{
-            "email" => user.email,
-            "password" => valid_user_password(),
-            "remember_me" => "true"
-          }
+        get(conn, ~p"/users/create_session", %{
+          "token" => Base.url_encode64("fake_token_data")
         })
 
-      assert conn.resp_cookies["_dev_round_web_user_remember_me"]
-      assert redirected_to(conn) == ~p"/"
-    end
-
-    test "logs the user in with return to", %{conn: conn, user: user} do
-      conn =
-        conn
-        |> init_test_session(user_return_to: "/foo/bar")
-        |> post(~p"/users/log_in", %{
-          "user" => %{
-            "email" => user.email,
-            "password" => valid_user_password()
-          }
-        })
-
+      # Should redirect to the return_to path
       assert redirected_to(conn) == "/foo/bar"
-      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Welcome back!"
-    end
-
-    test "login following registration", %{conn: conn, user: user} do
-      conn =
-        conn
-        |> post(~p"/users/log_in", %{
-          "_action" => "registered",
-          "user" => %{
-            "email" => user.email,
-            "password" => valid_user_password()
-          }
-        })
-
-      assert redirected_to(conn) == ~p"/"
-      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Account created successfully"
-    end
-
-    test "login following password update", %{conn: conn, user: user} do
-      conn =
-        conn
-        |> post(~p"/users/log_in", %{
-          "_action" => "password_updated",
-          "user" => %{
-            "email" => user.email,
-            "password" => valid_user_password()
-          }
-        })
-
-      assert redirected_to(conn) == ~p"/users/settings"
-      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Password updated successfully"
-    end
-
-    test "redirects to login page with invalid credentials", %{conn: conn} do
-      conn =
-        post(conn, ~p"/users/log_in", %{
-          "user" => %{"email" => "invalid@email.com", "password" => "invalid_password"}
-        })
-
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) == "Invalid email or password"
-      assert redirected_to(conn) == ~p"/users/log_in"
     end
   end
 

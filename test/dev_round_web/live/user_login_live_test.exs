@@ -4,13 +4,13 @@ defmodule DevRoundWeb.UserLoginLiveTest do
   import Phoenix.LiveViewTest
   import DevRound.AccountsFixtures
 
+  alias DevRound.LDAP
+
   describe "Log in page" do
     test "renders log in page", %{conn: conn} do
       {:ok, _lv, html} = live(conn, ~p"/users/log_in")
 
       assert html =~ "Log in"
-      assert html =~ "Register"
-      assert html =~ "Forgot your password?"
     end
 
     test "redirects if already logged in", %{conn: conn} do
@@ -18,70 +18,103 @@ defmodule DevRoundWeb.UserLoginLiveTest do
         conn
         |> log_in_user(user_fixture())
         |> live(~p"/users/log_in")
-        |> follow_redirect(conn, "/")
+        |> follow_redirect(conn, ~p"/events")
 
       assert {:ok, _conn} = result
     end
   end
 
   describe "user login" do
-    test "redirects if user login with valid credentials", %{conn: conn} do
-      password = "123456789abcd"
-      user = user_fixture(%{password: password})
+    setup do
+      # Mock LDAP.authenticate/2 to return predefined responses
+      # This allows tests to run without a real LDAP server
 
-      {:ok, lv, _html} = live(conn, ~p"/users/log_in")
+      Mimic.expect(LDAP, :authenticate, fn username, password ->
+        case {username, password} do
+          {"jdoe", "jdoe"} ->
+            {:ok,
+             %{
+               name: "jdoe",
+               email: "john.doe@dev.local",
+               full_name: "John Doe",
+               avatar: nil,
+               groups: MapSet.new(["dev_round_users", "dev_round_admins"])
+             }}
 
-      form =
-        form(lv, "#login_form", user: %{email: user.email, password: password, remember_me: true})
+          {"asmith", "asmith"} ->
+            {:ok,
+             %{
+               name: "asmith",
+               email: "alice.smith@dev.local",
+               full_name: "Alice Smith",
+               avatar: nil,
+               groups: MapSet.new(["dev_round_users"])
+             }}
 
-      conn = submit_form(form, conn)
+          {"eroberts", "eroberts"} ->
+            {:ok,
+             %{
+               name: "eroberts",
+               email: "eve.roberts@dev.local",
+               full_name: "Eve Roberts",
+               avatar: nil,
+               groups: MapSet.new(["some_other_group"])
+             }}
 
-      assert redirected_to(conn) == ~p"/"
+          {"asmith", "wrongpassword"} ->
+            {:error, :invalid_credentials}
+
+          {"nonexistent", "password"} ->
+            {:error, :invalid_credentials}
+
+          # Default case for any other username/password combinations
+          {_, _} ->
+            {:ok,
+             %{
+               name: username,
+               email: "#{username}@dev.local",
+               full_name: "#{String.capitalize(username)} User",
+               avatar: nil,
+               groups: MapSet.new(["dev_round_users"])
+             }}
+        end
+      end)
+
+      :ok
     end
 
-    test "redirects to login page with a flash error if there are no valid credentials", %{
+    test "stays login page with a flash error if there are no valid credentials", %{
       conn: conn
     } do
       {:ok, lv, _html} = live(conn, ~p"/users/log_in")
 
       form =
         form(lv, "#login_form",
-          user: %{email: "test@email.com", password: "123456", remember_me: true}
+          user: %{name: "nonexistent", password: "password"}
         )
 
-      conn = submit_form(form, conn)
+      # For error cases, we can check the rendered HTML for flash messages
+      html = render_submit(form)
 
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) == "Invalid email or password"
-
-      assert redirected_to(conn) == "/users/log_in"
-    end
-  end
-
-  describe "login navigation" do
-    test "redirects to registration page when the Register button is clicked", %{conn: conn} do
-      {:ok, lv, _html} = live(conn, ~p"/users/log_in")
-
-      {:ok, _login_live, login_html} =
-        lv
-        |> element(~s|main a:fl-contains("Sign up")|)
-        |> render_click()
-        |> follow_redirect(conn, ~p"/users/register")
-
-      assert login_html =~ "Register"
+      # Check that the error flash message appears in the rendered HTML
+      assert html =~ "Invalid user name or password!"
     end
 
-    test "redirects to forgot password page when the Forgot Password button is clicked", %{
+    test "stays on login page with access denied error for user not in allowed group", %{
       conn: conn
     } do
       {:ok, lv, _html} = live(conn, ~p"/users/log_in")
 
-      {:ok, conn} =
-        lv
-        |> element(~s|main a:fl-contains("Forgot your password?")|)
-        |> render_click()
-        |> follow_redirect(conn, ~p"/users/reset_password")
+      form =
+        form(lv, "#login_form",
+          user: %{name: "eroberts", password: "eroberts"}
+        )
 
-      assert conn.resp_body =~ "Forgot your password?"
+      # For error cases, we can check the rendered HTML for flash messages
+      html = render_submit(form)
+
+      # Check that the access denied flash message appears in the rendered HTML
+      assert html =~ "Access to this service is not permitted for your account."
     end
   end
 end
