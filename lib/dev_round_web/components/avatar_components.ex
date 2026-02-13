@@ -9,13 +9,30 @@ defmodule DevRoundWeb.AvatarComponents do
   attr :user, DevRound.Accounts.User, required: true
   attr :remote, :boolean, default: false
   attr :experience_level, :integer, default: nil
+  attr :soft, :boolean, default: false
   slot :inner_block
 
   def user_badge(assigns) do
+    assigns =
+      assign(
+        assigns,
+        if assigns.soft do
+          %{
+            class: "gap-1 text-base-content/70",
+            avatar_class: "border-2 border-neutral-content rounded-full "
+          }
+        else
+          %{
+            class: "bg-neutral-content text-neutral rounded-full border border-neutral-content",
+            avatar_class: ""
+          }
+        end
+      )
+
     ~H"""
-    <div class="flex items-center bg-neutral-content font-normal font-sans text-base text-neutral rounded-full border border-neutral-content whitespace-nowrap">
+    <div class={["flex items-center font-normal font-sans text-base whitespace-nowrap", @class]}>
       <div class="relative w-10 h-10">
-        <.user_avatar user={@user} />
+        <.user_avatar user={@user} class={@avatar_class} />
         <%= if @remote do %>
           <div class="absolute top-0 right-0 w-4 h-4 bg-white rounded-full flex">
             <.icon name="hero-globe-alt" class="w-4 h-4" />

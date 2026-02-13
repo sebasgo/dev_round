@@ -37,6 +37,7 @@
           :for={user <- @event.hosts}
           :key={user.id}
           user={user}
+          soft={true}
         />
       </div>
       <div :if={@attendance != nil} class="badge badge-success gap-2 mt-6">
@@ -61,7 +62,7 @@
       This event is currently in progress.
     </div>
     <div>
-      <a href={~p"/events/#{@event}/live"} class="btn btn-sm btn-primary">
+      <a href={~p"/events/#{@event}/live"} class="btn btn-sm btn-info">
         <.icon name="hero-eye" class="w-4 h-4" /> Follow Presentation
       </a>
     </div>
