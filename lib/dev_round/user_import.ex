@@ -105,7 +105,7 @@ defmodule DevRound.UserImport do
         IO.puts("  - Imported: #{imported} users")
         IO.puts("  - Skipped (duplicates): #{skipped} users")
 
-        if length(errors) > 0 do
+        if errors != [] do
           IO.puts("  - Errors: #{length(errors)}")
 
           Enum.each(errors, fn error ->

@@ -80,8 +80,8 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
       :gt ->
         diff = DateTime.diff(end_datetime, now, :second)
 
-        days = div(diff, 86400)
-        hours = div(rem(diff, 86400), 3600)
+        days = div(diff, 86_400)
+        hours = div(rem(diff, 86_400), 3600)
         minutes = div(rem(diff, 3600), 60)
         seconds = rem(diff, 60)
 

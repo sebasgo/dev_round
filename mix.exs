@@ -66,7 +66,8 @@ defmodule DevRound.MixProject do
       {:earmark, "~> 1.4"},
       {:time_zone_info, "~> 0.7"},
       {:slugify, "~> 1.3"},
-      {:exldap, "~> 0.6"}
+      {:exldap, "~> 0.6"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 

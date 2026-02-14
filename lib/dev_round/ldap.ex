@@ -11,21 +11,22 @@ defmodule DevRound.LDAP do
   """
 
   def authenticate(username, password) do
-    with {:ok, ldap_conn} <- connect() do
-      try do
-        with {:ok, result} <- find_user(ldap_conn, username),
-             :ok <- verify_credentials(ldap_conn, result.object_name, password),
-             {:ok, user} <- parse_attributes(result.attributes) do
-          {:ok, user}
-        else
-          {:error, reason} = error ->
-            Logger.warning("LDAP authentication failed for #{username}: #{inspect(reason)}")
-            error
+    case connect() do
+      {:ok, ldap_conn} ->
+        try do
+          with {:ok, result} <- find_user(ldap_conn, username),
+               :ok <- verify_credentials(ldap_conn, result.object_name, password),
+               {:ok, user} <- parse_attributes(result.attributes) do
+            {:ok, user}
+          else
+            {:error, reason} = error ->
+              Logger.warning("LDAP authentication failed for #{username}: #{inspect(reason)}")
+              error
+          end
+        after
+          Exldap.close(ldap_conn)
         end
-      after
-        Exldap.close(ldap_conn)
-      end
-    else
+
       {:error, reason} = error ->
         Logger.warning("LDAP connection failed for #{username}: #{inspect(reason)}")
         error
@@ -37,20 +38,21 @@ defmodule DevRound.LDAP do
   Returns {:ok, user} on success, {:error, reason} on failure.
   """
   def lookup_user(username) do
-    with {:ok, ldap_conn} <- connect() do
-      try do
-        with {:ok, result} <- find_user(ldap_conn, username),
-             {:ok, user} <- parse_attributes(result.attributes) do
-          {:ok, user}
-        else
-          {:error, reason} = error ->
-            Logger.warning("LDAP lookup failed for #{username}: #{inspect(reason)}")
-            error
+    case connect() do
+      {:ok, ldap_conn} ->
+        try do
+          with {:ok, result} <- find_user(ldap_conn, username),
+               {:ok, user} <- parse_attributes(result.attributes) do
+            {:ok, user}
+          else
+            {:error, reason} = error ->
+              Logger.warning("LDAP lookup failed for #{username}: #{inspect(reason)}")
+              error
+          end
+        after
+          Exldap.close(ldap_conn)
         end
-      after
-        Exldap.close(ldap_conn)
-      end
-    else
+
       {:error, reason} = error ->
         Logger.warning("LDAP lookup failed for #{username}: #{inspect(reason)}")
         error

@@ -9,10 +9,7 @@ defmodule DevRoundWeb.EventSlidesController do
   end
 
   defp read_data(file_name) do
-    IO.puts(:code.priv_dir(:dev_round))
-    IO.puts(Events.event_slides_dir())
     src_path = Path.join([:code.priv_dir(:dev_round), Events.event_slides_dir(), file_name])
-    IO.inspect(src_path, label: "PATH")
     File.read(src_path)
   end
 
