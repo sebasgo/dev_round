@@ -435,10 +435,10 @@ defmodule DevRoundWeb.CoreComponents do
 
   def header(assigns) do
     ~H"""
-    <header class={["pb-4 text-center", @class]}>
+    <header class={["py-5 text-center", @class]}>
       <div
         :if={@actions != []}
-        class="grid grid-cols-1 items-center justify-items-stretch mx-auto gap-4 md:w-full sm:flex sm:justify-end sm:gap-2 mb-8"
+        class="grid grid-cols-1 items-center justify-items-stretch mx-auto gap-4 md:w-full sm:flex sm:justify-end sm:gap-2 mb-10"
       >
         {render_slot(@actions)}
       </div>

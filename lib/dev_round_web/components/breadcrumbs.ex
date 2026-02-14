@@ -6,7 +6,7 @@ defmodule DevRoundWeb.Breadcrumbs do
 
   def breadcrumbs(assigns) do
     ~H"""
-    <div class="breadcrumbs">
+    <div class="breadcrumbs mb-5 text-sm text-base-content/70">
       <ul>
         <.breadcrumb :for={item <- @items} item={item} />
       </ul>
