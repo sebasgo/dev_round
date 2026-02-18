@@ -19,6 +19,8 @@ defmodule DevRoundWeb.Admin.Event do
     init_order: %{by: :begin, direction: :desc},
     save_and_continue_button?: true
 
+  import Ecto.Query
+
   @impl Backpex.LiveResource
   def singular_name, do: "Event"
 
@@ -75,13 +77,20 @@ defmodule DevRoundWeb.Admin.Event do
         not_found_text: "No languages found",
         except: [:index]
       },
-      hosts: %{
-        module: Backpex.Fields.HasMany,
+      event_hosts: %{
+        module: DevRoundWeb.Admin.Fields.InlineCRUD,
         label: "Hosts",
-        display_field: :full_name,
-        live_resource: DevRoundWeb.Admin.User,
-        prompt: "Select users",
-        not_found_text: "No users found",
+        type: :assoc,
+        child_fields: [
+          user: %{
+            module: DevRoundWeb.Admin.Fields.BelongsTo,
+            label: "User",
+            display_field: :full_name,
+            live_resource: DevRoundWeb.Admin.User,
+            prompt: "Select user",
+            options_query: fn query, _field -> query |> order_by(asc: :full_name) end
+          }
+        ],
         except: [:index]
       },
       teaser: %{

@@ -4,8 +4,8 @@ defmodule DevRound.Events.Event do
   import DevRound.Changeset
   alias DevRound.Events.Lang
   alias DevRound.Events.EventAttendee
+  alias DevRound.Events.EventHost
   alias DevRound.Events.EventSession
-  alias DevRound.Accounts.User
 
   schema "events" do
     field :title, :string
@@ -26,7 +26,13 @@ defmodule DevRound.Events.Event do
     field :modified_at, :utc_datetime
 
     many_to_many :langs, Lang, join_through: "event_langs", on_replace: :delete
-    many_to_many :hosts, User, join_through: "event_hosts", on_replace: :delete
+
+    has_many :event_hosts, EventHost,
+      preload_order: [asc: :position],
+      on_replace: :delete,
+      on_delete: :delete_all
+
+    has_many :hosts, through: [:event_hosts, :user]
     has_many :events_attendees, EventAttendee, on_replace: :delete, on_delete: :delete_all
     has_many :attendees, through: [:events_attendees, :user]
     has_many :sessions, EventSession, on_replace: :delete, on_delete: :delete_all
@@ -49,6 +55,13 @@ defmodule DevRound.Events.Event do
       :registration_deadline_local,
       :slides_filename
     ])
+    |> cast_assoc(:event_hosts,
+      with: &EventHost.changeset/3,
+      required: true,
+      required_message: "At least one session is required.",
+      sort_param: :event_hosts_order,
+      drop_param: :event_hosts_delete
+    )
     |> cast_assoc(:sessions,
       with: &EventSession.changeset/2,
       required: true,
@@ -57,7 +70,6 @@ defmodule DevRound.Events.Event do
       drop_param: :sessions_delete
     )
     |> put_langs_assoc(Keyword.get(opts, :put_langs))
-    |> put_hosts_assoc(Keyword.get(opts, :put_hosts))
     |> validate_required(
       [
         :title,
@@ -80,7 +92,7 @@ defmodule DevRound.Events.Event do
     |> validate_registration_deadline_before_begin()
     |> validate_sessions_within_event_dates()
     |> validate_sessions_do_not_overlap()
-    |> validate_option_selected([:langs, :hosts])
+    |> validate_option_selected([:langs])
     |> generate_date_title_slug()
     |> validate_change(:slides_filename, fn :slides_filename, path ->
       case path do
@@ -106,9 +118,6 @@ defmodule DevRound.Events.Event do
 
   defp put_langs_assoc(changeset, nil = _langs), do: changeset
   defp put_langs_assoc(changeset, langs), do: put_assoc(changeset, :langs, langs)
-
-  defp put_hosts_assoc(changeset, nil = _hosts), do: changeset
-  defp put_hosts_assoc(changeset, hosts), do: put_assoc(changeset, :hosts, hosts)
 
   defp validate_registration_deadline_before_begin(changeset) do
     registration_deadline = get_field(changeset, :registration_deadline)

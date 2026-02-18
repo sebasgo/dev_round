@@ -13,6 +13,8 @@ defmodule DevRound.Accounts.User do
     field :experience_level, :integer, default: 5
     field :role, Enum, values: [user: 0, admin: 1]
 
+    has_many :event_host, DevRound.Events.EventHost
+
     timestamps(type: :utc_datetime)
   end
 
