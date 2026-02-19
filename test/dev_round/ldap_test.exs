@@ -7,12 +7,16 @@ defmodule DevRound.LDAPTest do
 
       ./contrib/run-openldap-podman
 
-  The tests will be skipped if the LDAP server is not available.
+  They can be skipped in CI pipelines using the :ldap tag:
+
+      mix test --exclude ldap
   """
 
   use DevRound.DataCase, async: true
 
   alias DevRound.LDAP
+
+  @moduletag :ldap
 
   describe "authenticate/2" do
     test "authenticates a valid user" do
