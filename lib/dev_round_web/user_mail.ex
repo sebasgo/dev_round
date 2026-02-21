@@ -1,4 +1,11 @@
 defmodule DevRoundWeb.UserMail do
+  @moduledoc """
+  Handles email sending for user-related notifications.
+
+  Provides functionality to send registration confirmation emails
+  with ICS calendar attachments for events.
+  """
+
   import Swoosh.Email
   alias DevRoundWeb.UserMailComponents
   alias Ecto.UUID

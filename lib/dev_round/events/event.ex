@@ -1,4 +1,11 @@
 defmodule DevRound.Events.Event do
+  @moduledoc """
+  Event schema for managing coding events and workshops.
+
+  Events can have multiple sessions, languages, hosts, and attendees.
+  Supports registration deadlines, slide presentations, and live sessions.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   import DevRound.Changeset

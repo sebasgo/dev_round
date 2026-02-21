@@ -1,4 +1,11 @@
 defmodule DevRoundWeb.Admin.EventAttendees do
+  @moduledoc """
+  Backpex resource configuration for managing event attendees.
+
+  Provides CRUD operations for event attendee records with
+  associations to events, users, and programming languages.
+  """
+
   use Backpex.LiveResource,
     adapter_config: [
       schema: DevRound.Events.EventAttendee,

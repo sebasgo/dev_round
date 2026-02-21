@@ -1,4 +1,11 @@
 defmodule DevRoundWeb.UserAuth do
+  @moduledoc """
+  Handles user authentication and session management.
+
+  Provides functions for logging in/out users, managing sessions,
+  and authenticating users in both regular controllers and LiveViews.
+  """
+
   use DevRoundWeb, :verified_routes
 
   import Plug.Conn

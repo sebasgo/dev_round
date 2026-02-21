@@ -1,4 +1,10 @@
 defmodule DevRoundWeb.Admin.TeamName do
+  @moduledoc """
+  Backpex resource configuration for managing team names.
+
+  Provides CRUD operations for team name management.
+  """
+
   use Backpex.LiveResource,
     adapter_config: [
       schema: DevRound.Hosting.TeamName,

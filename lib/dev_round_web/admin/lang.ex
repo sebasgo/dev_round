@@ -1,4 +1,10 @@
 defmodule DevRoundWeb.Admin.Lang do
+  @moduledoc """
+  Backpex resource configuration for managing programming languages.
+
+  Provides CRUD operations for programming languages with icon uploads.
+  """
+
   use DevRoundWeb.Admin.Upload, upload_dir: DevRound.Events.lang_icon_dir(), field: :icon_path
 
   use Backpex.LiveResource,

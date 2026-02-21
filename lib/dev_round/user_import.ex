@@ -1,7 +1,9 @@
 defmodule DevRound.UserImport do
   @moduledoc """
-  Script to import users from a JSON file into the Phoenix application.
-  Ignores users that violate unique index constraints.
+  Module for importing users from JSON files.
+
+  Provides functionality to import user data from JSON files into the
+  application database, handling duplicates gracefully by skipping them.
   """
 
   alias DevRound.Repo
@@ -100,24 +102,29 @@ defmodule DevRound.UserImport do
     IO.puts("Starting user import from: #{file_path}")
 
     case import_from_file(file_path) do
-      {:ok, %{imported: imported, skipped: skipped, errors: errors}} ->
-        IO.puts("Import completed:")
-        IO.puts("  - Imported: #{imported} users")
-        IO.puts("  - Skipped (duplicates): #{skipped} users")
-
-        if errors != [] do
-          IO.puts("  - Errors: #{length(errors)}")
-
-          Enum.each(errors, fn error ->
-            IO.puts("    * #{error}")
-          end)
-        end
-
-        {:ok, %{imported: imported, skipped: skipped, errors: errors}}
-
-      {:error, reason} ->
-        IO.puts("Import failed: #{reason}")
-        {:error, reason}
+      {:ok, result} -> handle_import_success(result)
+      {:error, reason} -> handle_import_error(reason)
     end
+  end
+
+  defp handle_import_success(%{imported: imported, skipped: skipped, errors: errors}) do
+    IO.puts("Import completed:")
+    IO.puts("  - Imported: #{imported} users")
+    IO.puts("  - Skipped (duplicates): #{skipped} users")
+
+    if errors != [] do
+      IO.puts("  - Errors: #{length(errors)}")
+
+      Enum.each(errors, fn error ->
+        IO.puts("    * #{error}")
+      end)
+    end
+
+    {:ok, %{imported: imported, skipped: skipped, errors: errors}}
+  end
+
+  defp handle_import_error(reason) do
+    IO.puts("Import failed: #{reason}")
+    {:error, reason}
   end
 end

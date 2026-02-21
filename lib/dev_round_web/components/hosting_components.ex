@@ -1,4 +1,13 @@
 defmodule DevRoundWeb.HostingComponents do
+  @moduledoc """
+  Components for hosting interfaces.
+
+  Provides UI components for event hosting including:
+  - Header with breadcrumbs
+  - Tab navigation
+  - Validation messages display
+  """
+
   use Phoenix.Component
   use DevRoundWeb, :verified_routes
   import DevRoundWeb.Breadcrumbs

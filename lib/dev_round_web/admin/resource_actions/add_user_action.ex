@@ -1,4 +1,11 @@
 defmodule DevRoundWeb.Admin.ResourceActions.AddUserAction do
+  @moduledoc """
+  Backpex resource action for adding users from LDAP.
+
+  Allows administrators to add new users by searching LDAP directory
+  and importing their information with specified experience level.
+  """
+
   use Backpex.ResourceAction
   import Ecto.Changeset
   import Phoenix.LiveView

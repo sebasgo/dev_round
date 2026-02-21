@@ -1,4 +1,12 @@
 defmodule DevRoundWeb.Admin.ItemActions.DuplicateEventAction do
+  @moduledoc """
+  Backpex item action for duplicating events.
+
+  Allows administrators to duplicate existing events with modified dates
+  and titles, preserving all associated data including sessions, languages,
+  and hosts.
+  """
+
   alias DevRound.Events
   use BackpexWeb, :item_action
 

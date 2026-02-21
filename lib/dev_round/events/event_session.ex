@@ -1,4 +1,11 @@
 defmodule DevRound.Events.EventSession do
+  @moduledoc """
+  Event session schema for managing sessions within events.
+
+  Each event can have multiple sessions with their own scheduling,
+  live status, and team management.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   import DevRound.Changeset

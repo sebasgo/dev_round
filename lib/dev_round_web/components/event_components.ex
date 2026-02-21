@@ -1,4 +1,11 @@
 defmodule DevRoundWeb.EventComponents do
+  @moduledoc """
+  Components for event-related UI elements.
+
+  Provides reusable UI components for displaying event information,
+  team structures, and attendee details.
+  """
+
   use Phoenix.Component
   use DevRoundWeb, :verified_routes
   alias DevRound.Hosting.Team

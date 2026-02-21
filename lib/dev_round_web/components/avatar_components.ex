@@ -1,4 +1,11 @@
 defmodule DevRoundWeb.AvatarComponents do
+  @moduledoc """
+  Avatar and user badge components.
+
+  Provides UI components for displaying user avatars and badges with
+  support for remote status indicators and experience level badges.
+  """
+
   use Phoenix.Component
   use DevRoundWeb, :verified_routes
   import DevRoundWeb.CoreComponents

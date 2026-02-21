@@ -1,4 +1,11 @@
 defmodule DevRound.Hosting.Team do
+  @moduledoc """
+  Team schema for hosting team formation during events.
+
+  Represents teams formed during event sessions, linking attendees,
+  sessions, and programming languages.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias DevRound.Events.EventSession

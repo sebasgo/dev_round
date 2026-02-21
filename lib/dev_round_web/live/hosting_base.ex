@@ -1,4 +1,14 @@
 defmodule DevRoundWeb.HostingBase do
+  @moduledoc """
+  Base module for hosting LiveViews.
+
+  Provides common functionality for hosting interfaces including:
+  - Event assignment
+  - Team name assignment
+  - Host permission checking
+  - Team generation validation messages
+  """
+
   import Phoenix.Component
   alias DevRound.{Events, Hosting}
 

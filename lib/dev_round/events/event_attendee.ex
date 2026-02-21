@@ -1,5 +1,10 @@
 defmodule DevRound.Events.EventAttendee do
-  @moduledoc false
+  @moduledoc """
+  Event attendee schema for tracking user registration and participation.
+
+  Links users to events with registration details including remote status,
+  experience level, and check-in status.
+  """
 
   use Ecto.Schema
   import Ecto.Changeset

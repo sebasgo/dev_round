@@ -1,4 +1,11 @@
 defmodule DevRoundWeb.Admin.ItemActions.RefreshUserAction do
+  @moduledoc """
+  Backpex item action for refreshing user data from LDAP.
+
+  Allows administrators to refresh user information from the LDAP directory
+  for individual users or multiple users at once.
+  """
+
   use BackpexWeb, :item_action
 
   alias DevRound.LDAP

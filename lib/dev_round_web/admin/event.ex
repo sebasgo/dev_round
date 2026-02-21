@@ -1,4 +1,15 @@
 defmodule DevRoundWeb.Admin.Event do
+  @moduledoc """
+  Backpex resource configuration for managing events.
+
+  Provides CRUD operations for events with support for:
+  - Event scheduling and session management
+  - Language and host associations
+  - Slide uploads
+  - Markdown body content
+  - Registration deadline settings
+  """
+
   use DevRoundWeb.Admin.Upload,
     upload_dir: DevRound.Events.event_slides_dir(),
     field: :slides_filename

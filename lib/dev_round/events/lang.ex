@@ -1,4 +1,11 @@
 defmodule DevRound.Events.Lang do
+  @moduledoc """
+  Programming language schema for events.
+
+  Represents programming languages used in events, with associated
+  icons and team assignments.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias DevRound.Hosting.Team

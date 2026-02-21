@@ -1,6 +1,9 @@
 defmodule DevRound.LDAP do
   @moduledoc """
-  LDAP authentication module.
+  LDAP authentication module for user authentication and lookup.
+
+  Provides functionality to authenticate users against an LDAP directory
+  and lookup user information for profile updates and synchronization.
   """
 
   require Logger

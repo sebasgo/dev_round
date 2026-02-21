@@ -1,4 +1,11 @@
 defmodule DevRound.Accounts.UserToken do
+  @moduledoc """
+  User token schema for authentication and email verification.
+
+  Manages session tokens, email confirmation tokens, password reset tokens,
+  and email change tokens with appropriate expiry times.
+  """
+
   use Ecto.Schema
   import Ecto.Query
   alias DevRound.Accounts.UserToken

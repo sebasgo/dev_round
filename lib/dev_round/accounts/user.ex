@@ -1,4 +1,11 @@
 defmodule DevRound.Accounts.User do
+  @moduledoc """
+  User schema for authentication and profile management.
+
+  Manages user accounts with LDAP integration, experience levels,
+  and role-based access control (user/admin).
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   import DevRound.Changeset

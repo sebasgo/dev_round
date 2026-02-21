@@ -1,4 +1,11 @@
 defmodule DevRound.Hosting.TeamName do
+  @moduledoc """
+  Team name schema for hosting team formation.
+
+  Provides predefined team names for use in team formation algorithms
+  during events.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

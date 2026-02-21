@@ -95,8 +95,6 @@ defmodule DevRoundWeb.Admin.Fields.BelongsTo do
   @impl Backpex.Field
   def render_value(assigns) do
     %{value: value, display_field: display_field} = assigns
-    IO.inspect(value, label: "VALUES")
-    IO.inspect(display_field, label: "VALUES FIELD")
 
     assigns =
       assigns

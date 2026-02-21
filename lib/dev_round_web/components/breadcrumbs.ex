@@ -1,4 +1,11 @@
 defmodule DevRoundWeb.Breadcrumbs do
+  @moduledoc """
+  Breadcrumb navigation components.
+
+  Provides reusable breadcrumb navigation elements for the application,
+  helping users understand their current location within the site hierarchy.
+  """
+
   use Phoenix.Component
   use DevRoundWeb, :verified_routes
 

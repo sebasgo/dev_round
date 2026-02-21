@@ -1,4 +1,14 @@
 defmodule DevRoundWeb.Admin.Upload do
+  @moduledoc """
+  Upload helper module for handling file uploads in Backpex resources.
+
+  Provides macros for managing file uploads including:
+  - Listing existing files
+  - Handling upload changes
+  - Consuming uploaded files
+  - Removing uploads
+  """
+
   defmacro __using__(opts) do
     quote do
       def list_existing_files(%{unquote(opts[:field]) => path} = _item)

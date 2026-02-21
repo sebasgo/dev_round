@@ -1,4 +1,12 @@
 defmodule DevRoundWeb.RegistrationComponent do
+  @moduledoc """
+  LiveComponent for handling event registration forms.
+
+  Provides functionality for users to register for events, including
+  selecting attendance type (remote/in-person), experience level, and
+  programming languages.
+  """
+
   alias DevRound.Events.EventAttendee
   use DevRoundWeb, :live_component
 

@@ -1,4 +1,10 @@
 defmodule DevRoundWeb.Admin.User do
+  @moduledoc """
+  Backpex resource configuration for managing users.
+
+  Provides CRUD operations for user management with LDAP integration.
+  """
+
   use Backpex.LiveResource,
     adapter_config: [
       schema: DevRound.Accounts.User,

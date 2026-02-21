@@ -1,4 +1,20 @@
 defmodule DevRound.Events.EventHost do
+  @moduledoc """
+  Represents the many-to-many relationship between events and hosts (users).
+
+  This module defines the schema for the `event_hosts` join table, which links
+  users to events they host. It also stores the position/order of hosts within
+  an event.
+
+  ## Schema Fields
+  - `position` - Integer representing the host's order/position in the event
+  - `event_id` - Foreign key referencing the event
+  - `user_id` - Foreign key referencing the user (host)
+
+  ## Usage
+      changeset = %DevRound.Events.EventHost{}
+      |> DevRound.Events.EventHost.changeset(attrs, position)
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
