@@ -68,6 +68,7 @@ defmodule DevRoundWeb.EventLive.Show do
   defp update_assigns(socket) do
     slug = socket.assigns.slug
     event = Events.get_event!(slug)
+    %{end: end_dt} = event
 
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action, event))
@@ -76,6 +77,7 @@ defmodule DevRoundWeb.EventLive.Show do
     |> assign(:registration_open?, Events.event_open_for_registration?(event))
     |> assign(:multiple_langs, Events.event_has_multiple_langs?(event))
     |> assign(:pdf_url, Events.get_event_pdf_url(event))
+    |> assign(:archived, DateTime.before?(end_dt, Events.get_event_archival_datetime_utc()))
   end
 
   defp page_title(:show, event), do: event.title

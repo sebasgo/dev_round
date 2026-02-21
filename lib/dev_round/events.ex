@@ -24,17 +24,34 @@ defmodule DevRound.Events do
     Repo.all(Event)
   end
 
-  def list_events(:upcoming) do
-    from(e in Event, where: e.end > ^DateTime.utc_now() and e.published, order_by: [asc: e.begin])
+  def list_events(:current) do
+    from(e in Event,
+      where: e.end >= ^get_event_archival_datetime_utc() and e.published,
+      order_by: [asc: e.begin]
+    )
     |> Repo.all()
   end
 
-  def list_events(:past) do
+  def list_events(:archived) do
     from(e in Event,
-      where: e.end <= ^DateTime.utc_now() and e.published,
+      where: e.end < ^get_event_archival_datetime_utc() and e.published,
       order_by: [desc: e.begin]
     )
     |> Repo.all()
+  end
+
+  def get_event_archival_datetime_utc do
+    tz = Application.get_env(:dev_round, :time_zone)
+
+    {:ok, now} = DateTime.now(tz)
+
+    next_midnight_local =
+      now
+      |> DateTime.to_date()
+      |> Date.shift(day: 1)
+      |> DateTime.new!(~T[00:00:00], tz)
+
+    DateTime.shift_zone!(next_midnight_local, "Etc/UTC")
   end
 
   @doc """

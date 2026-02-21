@@ -5,9 +5,9 @@ defmodule DevRoundWeb.EventLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    upcoming_events = Events.list_events(:upcoming)
-    past_events = Events.list_events(:past)
-    {:ok, assign(socket, upcoming_events: upcoming_events, past_events: past_events)}
+    current_events = Events.list_events(:current)
+    archived_events = Events.list_events(:archived)
+    {:ok, assign(socket, current_events: current_events, archived_events: archived_events)}
   end
 
   @impl true

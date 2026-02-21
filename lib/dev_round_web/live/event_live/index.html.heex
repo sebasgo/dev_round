@@ -1,10 +1,10 @@
 <Layouts.app flash={@flash} current_user={@current_user}>
   <.header class="mb-8">
     Events
-    <:subtitle>Discover upcoming and past events</:subtitle>
+    <:subtitle>Discover current and archived events</:subtitle>
   </.header>
 
-  <.event_list events={@upcoming_events} title="Upcoming Events" accent_class="primary">
+  <.event_list events={@current_events} title="Current Events" accent_class="primary">
     <:placeholder>
       <div class="card bg-base-200 shadow-sm">
         <div class="card-body text-center py-12">
@@ -19,9 +19,9 @@
   </.event_list>
 
   <.event_list
-    :if={not Enum.empty?(@past_events)}
-    events={@past_events}
-    title="Past Events"
+    :if={not Enum.empty?(@archived_events)}
+    events={@archived_events}
+    title="Archived Events"
     accent_class="neutral"
   />
 </Layouts.app>

@@ -49,6 +49,14 @@
     </:subtitle>
   </.header>
 
+  <div
+    :if={@archived}
+    class="alert alert-warning alert-soft flex items-center gap-2 my-8"
+    role="alert"
+  >
+    <.icon name="hero-exclamation-triangle" class="h-5 w-5" /> This event has been archived.
+  </div>
+
   <div :if={@event.live} class="alert alert-info alert-soft my-8" role="alert">
     <div class="badge badge-info flex items-center gap-2">
       <span class="relative flex h-3 w-3">
@@ -86,22 +94,24 @@
         <dd class="font-semibold mb-4 md:mb-0">
           {@event.location}
         </dd>
-        <dt class="flex items-center gap-1">
-          <.icon name="hero-pencil-square" class="" /> Registration:
-        </dt>
-        <dd class="mb-4 md:mb-0">
-          <%= if @registration_open?  do %>
-            <div class="badge badge-success">
-              Open until {@event.registration_deadline
-              |> DateTime.shift_zone!(DevRound.Formats.time_zone())
-              |> DevRound.Formats.format_datetime()}
-            </div>
-          <% else %>
-            <div class="badge badge-neutral">
-              Closed
-            </div>
-          <% end %>
-        </dd>
+        <%= if not @archived do %>
+          <dt class="flex items-center gap-1">
+            <.icon name="hero-pencil-square" class="" /> Registration:
+          </dt>
+          <dd class="mb-4 md:mb-0">
+            <%= if @registration_open?  do %>
+              <div class="badge badge-success">
+                Open until {@event.registration_deadline
+                |> DateTime.shift_zone!(DevRound.Formats.time_zone())
+                |> DevRound.Formats.format_datetime()}
+              </div>
+            <% else %>
+              <div class="badge badge-neutral">
+                Closed
+              </div>
+            <% end %>
+          </dd>
+        <% end %>
         <dt class="flex items-center gap-1">
           <.icon name="hero-language" class="" />
           <%= if Enum.empty?(tl(@event.langs)) do %>
@@ -125,24 +135,26 @@
             <p class="opacity-70">N/A</p>
           <% end %>
         </dd>
-        <dt class="flex items-center gap-1 md:col-span-2 md:mt-4">
-          <.icon name="hero-user-group" class="" /> Participants:
-        </dt>
-        <dd class="md:col-span-2 flex flex-wrap gap-2">
-          <p :if={Enum.empty?(@event.events_attendees)} class="italic opacity-75">
-            None yet. Be the first to register.
-          </p>
-          <DevRoundWeb.AvatarComponents.user_badge
-            :for={attendee <- @event.events_attendees}
-            :key={attendee.id}
-            user={attendee.user}
-            remote={attendee.is_remote}
-          >
-            <p :if={@multiple_langs} class="text-sm">
-              {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
+        <%= if not @archived do %>
+          <dt class="flex items-center gap-1 md:col-span-2 md:mt-4">
+            <.icon name="hero-user-group" class="" /> Participants:
+          </dt>
+          <dd class="md:col-span-2 flex flex-wrap gap-2">
+            <p :if={Enum.empty?(@event.events_attendees)} class="italic opacity-75">
+              None yet. Be the first to register.
             </p>
-          </DevRoundWeb.AvatarComponents.user_badge>
-        </dd>
+            <DevRoundWeb.AvatarComponents.user_badge
+              :for={attendee <- @event.events_attendees}
+              :key={attendee.id}
+              user={attendee.user}
+              remote={attendee.is_remote}
+            >
+              <p :if={@multiple_langs} class="text-sm">
+                {Enum.map(attendee.langs, fn lang -> lang.name end) |> Enum.intersperse(", ")}
+              </p>
+            </DevRoundWeb.AvatarComponents.user_badge>
+          </dd>
+        <% end %>
       </dl>
     </div>
   </div>
