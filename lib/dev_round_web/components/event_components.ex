@@ -11,8 +11,8 @@ defmodule DevRoundWeb.EventComponents do
   alias DevRound.Hosting.Team
 
   attr :team, Team, required: true
-  attr :show_attendee_experience_level, :boolean, required: true
-  attr :show_attendee_langs, :boolean, required: true
+  attr :show_member_experience_level, :boolean, required: true
+  attr :show_member_langs, :boolean, required: true
   attr :multiple_langs, :boolean, required: true
   attr :class, :string, default: nil
   attr :zoom, :float, default: nil
@@ -38,21 +38,21 @@ defmodule DevRoundWeb.EventComponents do
           class="grid gap-0.5 bg-neutral-content border-neutral-content"
           style="border-radius: 24px"
         >
-          <%= for item <- Enum.intersperse(@team.attendees, :divider) do %>
+          <%= for item <- Enum.intersperse(@team.members, :divider) do %>
             <%= case item do %>
               <% :divider -> %>
                 <div class="mx-1px border-t border-neutral" />
-              <% attendee -> %>
+              <% member -> %>
                 <div class="">
                   <DevRoundWeb.AvatarComponents.user_badge
-                    user={attendee.user}
-                    remote={attendee.is_remote}
+                    user={member.user}
+                    remote={member.is_remote}
                     experience_level={
-                      (@show_attendee_experience_level && attendee.experience_level) || nil
+                      (@show_member_experience_level && member.experience_level) || nil
                     }
                   >
-                    <p :if={@show_attendee_langs and @multiple_langs} class="text-sm">
-                      {Enum.map(attendee.langs, fn lang -> lang.name end)
+                    <p :if={@show_member_langs and @multiple_langs} class="text-sm">
+                      {Enum.map(member.langs, fn lang -> lang.name end)
                       |> Enum.intersperse(", ")}
                     </p>
                   </DevRoundWeb.AvatarComponents.user_badge>

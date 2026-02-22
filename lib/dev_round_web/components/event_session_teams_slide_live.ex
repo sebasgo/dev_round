@@ -57,8 +57,8 @@ defmodule DevRoundWeb.EventSessionTeamsSlideLive do
           :for={team <- @teams}
           :key={team.id}
           team={team}
-          show_attendee_experience_level={false}
-          show_attendee_langs={false}
+          show_member_experience_level={false}
+          show_member_langs={false}
           multiple_langs={@multiple_langs}
           class="invisible"
         />

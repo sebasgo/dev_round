@@ -16,6 +16,7 @@ defmodule DevRound.Hosting do
   alias DevRound.Repo
 
   alias DevRound.Hosting.Team
+  alias DevRound.Hosting.TeamMember
   alias DevRound.Hosting.TeamName
   alias DevRound.Events.EventSession
 
@@ -173,13 +174,13 @@ defmodule DevRound.Hosting do
   end
 
   def list_teams_for_session(%EventSession{} = session) do
-    attendee_query =
-      from ea in EventAttendee, join: u in assoc(ea, :user), order_by: [asc: u.full_name]
+    member_query =
+      from(m in TeamMember, join: u in assoc(m, :user), order_by: [asc: u.full_name])
 
     from(t in Team, where: t.session_id == ^session.id)
     |> Repo.all()
     |> Repo.preload(:lang)
-    |> Repo.preload(attendees: {attendee_query, [:user, :langs]})
+    |> Repo.preload(members: {member_query, [:user, :langs]})
   end
 
   def build_teams_for_session(%EventSession{} = session, attendees, team_names) do
@@ -286,6 +287,17 @@ defmodule DevRound.Hosting do
       lang = Enum.random(team_langs)
       is_remote = hd(team_attendees).is_remote
 
+      members =
+        Enum.map(team_attendees, fn attendee ->
+          %TeamMember{}
+          |> Changeset.change(
+            is_remote: attendee.is_remote,
+            experience_level: attendee.experience_level,
+            user: attendee.user
+          )
+          |> Changeset.put_assoc(:langs, attendee.langs)
+        end)
+
       %Team{}
       |> Changeset.change(
         name: name.name,
@@ -294,7 +306,7 @@ defmodule DevRound.Hosting do
         session: session,
         lang: lang
       )
-      |> Changeset.put_assoc(:attendees, team_attendees)
+      |> Changeset.put_assoc(:members, members)
     end)
   end
 end

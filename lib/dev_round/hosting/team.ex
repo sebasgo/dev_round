@@ -2,15 +2,16 @@ defmodule DevRound.Hosting.Team do
   @moduledoc """
   Team schema for hosting team formation during events.
 
-  Represents teams formed during event sessions, linking attendees,
-  sessions, and programming languages.
+  Represents teams formed during event sessions. Team members are stored
+  as snapshots of attendee data at team formation time, decoupled from
+  live registration records.
   """
 
   use Ecto.Schema
   import Ecto.Changeset
   alias DevRound.Events.EventSession
-  alias DevRound.Events.EventAttendee
   alias DevRound.Events.Lang
+  alias DevRound.Hosting.TeamMember
 
   schema "teams" do
     field :name, :string
@@ -19,7 +20,7 @@ defmodule DevRound.Hosting.Team do
 
     belongs_to :session, EventSession
     belongs_to :lang, Lang
-    many_to_many :attendees, EventAttendee, join_through: "team_members"
+    has_many :members, TeamMember, on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
