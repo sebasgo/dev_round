@@ -8,7 +8,7 @@
     "daisyui": "^5.0.50"
   },
   "dependencies": {
-    "pdfjs-dist": "^5.4.394",
+    "pdfjs-dist": "^5.4.624",
     "prismjs": "^1.30.0"
   }
 }
