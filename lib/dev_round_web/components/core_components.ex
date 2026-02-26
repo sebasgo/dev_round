@@ -777,4 +777,15 @@ defmodule DevRoundWeb.CoreComponents do
     </div>
     """
   end
+
+  slot :inner_block
+
+  def usage_hint(assigns) do
+    ~H"""
+    <p class="flex items-center gap-1 text-sm text-base-content/70">
+      <.icon name="hero-information-circle w-5 h-5" />
+      {render_slot(@inner_block)}
+    </p>
+    """
+  end
 end

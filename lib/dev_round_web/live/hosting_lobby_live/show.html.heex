@@ -2,10 +2,6 @@
   <DevRoundWeb.HostingComponents.header event={@event} tab={:lobby} />
   <DevRoundWeb.HostingComponents.messages messages={@messages} />
 
-  <p class="my-8">
-    Check in participants to include them in the team generation for the pair programming sessions:
-  </p>
-
   <div class="relative">
     <div class="bg-base-300 rounded-box my-4 overflow-hidden shadow-sm">
       <div class="overflow-x-auto">
@@ -75,6 +71,10 @@
       </div>
     </div>
   </div>
+
+  <.usage_hint>
+    Check in participants to include them in the team generation for the pair programming sessions.
+  </.usage_hint>
 
   <.modal
     :if={@live_action == :edit_registration}
