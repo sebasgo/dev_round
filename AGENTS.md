@@ -2,7 +2,7 @@ This is a web application written using the Phoenix web framework.
 
 ## Project guidelines
 
-- Use `mix precommit` alias when you are done with all changes and fix any pending issues
+- Use `MIX_ENV=test mix precommit` alias when you are done with all changes and fix any pending issues
 - Use the already included and available `:req` (`Req`) library for HTTP requests, **avoid** `:httpoison`, `:tesla`, and `:httpc`. Req is included by default and is the preferred HTTP client for Phoenix apps
 
 ### Phoenix v1.8 guidelines
@@ -93,6 +93,9 @@ custom classes must fully style the input
 
 ## Test guidelines
 
+- The test and the development environments use different databases. Migrations applied against
+  the development database to not affect the test database, or vice versa.
+- Each test run starts with a clean database the current database schema. **Never run** migration steps for the test environment manually.
 - **Always use `start_supervised!/1`** to start processes in tests as it guarantees cleanup between tests
 - **Avoid** `Process.sleep/1` and `Process.alive?/1` in tests
   - Instead of sleeping to wait for a process to finish, **always** use `Process.monitor/1` and assert on the DOWN message:
@@ -530,7 +533,7 @@ Advanced team formation and event hosting:
 
 #### Event (`lib/dev_round/events/event.ex`)
 ```elixir
-fields: title, location, begin/end (UTC+local), teaser, body, 
+fields: title, location, begin/end (UTC+local), teaser, body,
         registration_deadline, slug, published, slides_filename,
         slides_page_number, live, modified_at
 associations: langs (many_to_many), hosts (many_to_many),
@@ -592,7 +595,7 @@ associations: session (belongs_to), lang (belongs_to),
 - **EventLive.Index** (`lib/dev_round_web/live/event_live/index.ex`)
   - Lists upcoming and past events
   - Real-time updates via PubSub
-  
+
 - **EventLive.Show** (`lib/dev_round_web/live/event_live/show.ex`)
   - Event details with registration
   - Real-time registration updates
@@ -607,10 +610,10 @@ associations: session (belongs_to), lang (belongs_to),
 #### Component Libraries
 - **CoreComponents** (`lib/dev_round_web/components/core_components.ex`)
   - Standard Phoenix components: buttons, forms, inputs, modals, tables, etc.
-  
+
 - **EventComponents** (`lib/dev_round_web/components/event_components.ex`)
   - Event-specific UI components
-  
+
 - **HostingComponents** (`lib/dev_round_web/components/hosting_components.ex`)
   - Hosting interface components
 
@@ -768,4 +771,3 @@ Two ordering strategies available:
 - Run migrations: `mix ecto.migrate`
 - Build assets: `mix assets.deploy`
 - Consider using `mix release` for production deployment
-

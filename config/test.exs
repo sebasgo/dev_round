@@ -23,6 +23,9 @@ config :dev_round, DevRoundWeb.Endpoint,
   secret_key_base: "bDwYi0303k7Ignjn1T+KvwjfciQXU+/ZHZfKefyifSSdwFGLwqPVyfTnlKmmxFT6",
   server: false
 
+# Enable dev routes (important to avoid compiler warnings during test builds)
+config :dev_round, dev_routes: true
+
 # In test we don't send emails
 config :dev_round, DevRound.Mailer, adapter: Swoosh.Adapters.Test
 
