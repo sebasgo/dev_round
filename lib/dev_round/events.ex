@@ -314,21 +314,6 @@ defmodule DevRound.Events do
   """
   def get_lang!(id), do: Repo.get!(Lang, id)
 
-  alias DevRound.Events.EventSession
-
-  @doc """
-  Returns the list of event_session.
-
-  ## Examples
-
-      iex> list_event_session()
-      [%EventSession{}, ...]
-
-  """
-  def list_event_session do
-    Repo.all(EventSession)
-  end
-
   @doc """
   Gets a single event_session.
 
@@ -344,42 +329,6 @@ defmodule DevRound.Events do
 
   """
   def get_event_session!(id), do: Repo.get!(EventSession, id)
-
-  @doc """
-  Creates a event_session.
-
-  ## Examples
-
-      iex> create_event_session(%{field: value})
-      {:ok, %EventSession{}}
-
-      iex> create_event_session(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_event_session(attrs \\ %{}) do
-    %EventSession{}
-    |> EventSession.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a event_session.
-
-  ## Examples
-
-      iex> update_event_session(event_session, %{field: new_value})
-      {:ok, %EventSession{}}
-
-      iex> update_event_session(event_session, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_event_session(%EventSession{} = event_session, attrs) do
-    event_session
-    |> EventSession.changeset(attrs)
-    |> Repo.update()
-  end
 
   def start_event_session(%Event{} = event, %EventSession{} = session) do
     Ecto.Multi.new()
