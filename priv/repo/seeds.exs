@@ -88,7 +88,7 @@ end)
     dst_filename = "#{Ecto.UUID.generate()}.#{ext}"
 
     dst_icon_path =
-      Path.join([priv_path, "static", DevRound.Events.lang_icon_dir(), dst_filename])
+      Path.join([priv_path, DevRound.Events.lang_icon_dir(), dst_filename])
 
     File.cp!(src_icon_path, dst_icon_path)
     {:ok, _} = DevRound.Events.create_lang(%{attrs | icon_path: dst_filename})
