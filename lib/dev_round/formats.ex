@@ -138,6 +138,17 @@ defmodule DevRound.Formats do
     "#{format_time(dt1)} – #{format_time(dt2)}"
   end
 
+  # FIXME: tests, docs
+  def format_datetime_range_compact(dt1, dt2) do
+    {:ok, now} = DateTime.now(dt1.time_zone)
+
+    if Date.compare(now, dt1) == :eq and Date.compare(dt1, dt2) == :eq do
+      format_time_range(dt1, dt2)
+    else
+      format_datetime_range(dt1, dt2)
+    end
+  end
+
   @doc """
   Generates an avatar placeholder from a user's full name.
 

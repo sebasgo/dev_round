@@ -106,6 +106,51 @@ defmodule DevRound.FormatsTest do
     end
   end
 
+  describe "format_datetime_range_compact/2" do
+    test "formats only time range if datetime is today" do
+      tz = Formats.time_zone()
+      {:ok, now} = DateTime.now(tz)
+      dt1 = DateTime.to_naive(now) |> NaiveDateTime.truncate(:second) |> DateTime.from_naive!(tz)
+      dt1 = %{dt1 | hour: 16, minute: 0, second: 0}
+      dt2 = %{dt1 | hour: 18, minute: 0, second: 0}
+
+      assert Formats.format_datetime_range_compact(dt1, dt2) == "16:00 – 18:00"
+    end
+
+    test "formats full datetime range if datetime is NOT today" do
+      tz = Formats.time_zone()
+      {:ok, now} = DateTime.now(tz)
+      yesterday = DateTime.add(now, -1, :day)
+
+      dt1 =
+        DateTime.to_naive(yesterday)
+        |> NaiveDateTime.truncate(:second)
+        |> DateTime.from_naive!(tz)
+
+      dt1 = %{dt1 | hour: 16, minute: 0, second: 0}
+      dt2 = %{dt1 | hour: 18, minute: 0, second: 0}
+
+      expected = Formats.format_datetime_range(dt1, dt2)
+      assert Formats.format_datetime_range_compact(dt1, dt2) == expected
+    end
+
+    test "formats full datetime range if start and end are on different days" do
+      tz = Formats.time_zone()
+      {:ok, now} = DateTime.now(tz)
+      dt1 = DateTime.to_naive(now) |> NaiveDateTime.truncate(:second) |> DateTime.from_naive!(tz)
+      dt1 = %{dt1 | hour: 23, minute: 0, second: 0}
+      tomorrow = DateTime.add(now, 1, :day)
+
+      dt2 =
+        DateTime.to_naive(tomorrow) |> NaiveDateTime.truncate(:second) |> DateTime.from_naive!(tz)
+
+      dt2 = %{dt2 | hour: 1, minute: 0, second: 0}
+
+      expected = Formats.format_datetime_range(dt1, dt2)
+      assert Formats.format_datetime_range_compact(dt1, dt2) == expected
+    end
+  end
+
   describe "format_avatar_placeholder/1" do
     test "generates initials from first and last name" do
       user = %User{avatar: nil, full_name: "John Doe"}

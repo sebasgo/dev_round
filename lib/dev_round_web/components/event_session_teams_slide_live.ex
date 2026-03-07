@@ -73,21 +73,10 @@ defmodule DevRoundWeb.EventSessionTeamsSlideLive do
   end
 
   defp assign_dates(socket, event_session) do
-    {:ok, now} = DateTime.now(Formats.time_zone())
-
-    if Date.compare(now, event_session.begin_local) == :eq and
-         Date.compare(event_session.begin_local, event_session.end_local) == :eq do
-      socket
-      |> assign(
-        :time,
-        Formats.format_time_range(event_session.begin_local, event_session.end_local)
-      )
-    else
-      socket
-      |> assign(
-        :time,
-        Formats.format_datetime_range(event_session.begin_local, event_session.end_local)
-      )
-    end
+    assign(
+      socket,
+      :time,
+      Formats.format_datetime_range_compact(event_session.begin, event_session.end)
+    )
   end
 end

@@ -30,6 +30,7 @@ defmodule DevRoundWeb.Router do
 
     live_session :main,
       on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}] do
+      live "/user/events", UserEventsLive, :show
       live "/users/settings", UserSettingsLive, :edit
       live "/events", EventLive.Index, :index
       live "/events/:slug", EventLive.Show, :show
