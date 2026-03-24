@@ -10,7 +10,6 @@ defmodule DevRoundWeb.UserEventsLive do
     if connected?(socket) do
       DevRoundWeb.Endpoint.subscribe("registrations")
       DevRoundWeb.Endpoint.subscribe("admin.events")
-      DevRoundWeb.Endpoint.subscribe("event_slides")
       DevRoundWeb.Endpoint.subscribe("event_sessions")
 
       # Schedule midnight rollover check
@@ -194,14 +193,6 @@ defmodule DevRoundWeb.UserEventsLive do
     end
   end
 
-  def handle_info(:refresh_events, socket) do
-    {:noreply, socket |> assign_events()}
-  end
-
-  def handle_info({topic, _msg}, socket) when topic in [:admin_events, :event_slides] do
-    {:noreply, socket |> assign_events()}
-  end
-
   def handle_info(_, socket) do
     {:noreply, socket |> assign_events()}
   end
@@ -215,8 +206,8 @@ defmodule DevRoundWeb.UserEventsLive do
 
     underway =
       Enum.filter(events, fn e ->
-        begin_local = DateTime.from_naive!(e.begin, "Etc/UTC") |> DateTime.shift_zone!(tz)
-        end_local = DateTime.from_naive!(e.end, "Etc/UTC") |> DateTime.shift_zone!(tz)
+        begin_local = e.begin |> DateTime.shift_zone!(tz)
+        end_local = e.end |> DateTime.shift_zone!(tz)
 
         archival_datetime =
           end_local
@@ -230,13 +221,13 @@ defmodule DevRoundWeb.UserEventsLive do
 
     upcoming =
       Enum.filter(events, fn e ->
-        begin_local = DateTime.from_naive!(e.begin, "Etc/UTC") |> DateTime.shift_zone!(tz)
+        begin_local = e.begin |> DateTime.shift_zone!(tz)
         DateTime.compare(begin_local, now) == :gt
       end)
 
     archived =
       Enum.filter(events, fn e ->
-        end_local = DateTime.from_naive!(e.end, "Etc/UTC") |> DateTime.shift_zone!(tz)
+        end_local = e.end |> DateTime.shift_zone!(tz)
 
         archival_datetime =
           end_local

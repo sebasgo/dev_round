@@ -11,7 +11,7 @@ defmodule DevRoundWeb.UserEventsLiveTest do
     %{conn: log_in_user(conn, user), user: user}
   end
 
-  describe "User Dashboard" do
+  describe "User Events" do
     test "renders empty state when no registrations", %{conn: conn} do
       {:ok, _view, html} = live(conn, ~p"/user/events")
       assert html =~ "No registrations found"
@@ -76,7 +76,7 @@ defmodule DevRoundWeb.UserEventsLiveTest do
       assert has_element?(view, "a", "Multi-day Underway Event")
 
       assert has_element?(view, "#upcoming-events")
-      # assert has_element?(view, "a", "Future Event")
+      assert has_element?(view, "a", "Future Event")
 
       assert has_element?(view, "#archived-events")
       assert has_element?(view, "a", "Past Multi-day Event")
@@ -163,6 +163,62 @@ defmodule DevRoundWeb.UserEventsLiveTest do
       {:ok, _view, html} = live(conn, ~p"/user/events")
 
       assert html =~ "The Dream Team"
+    end
+
+    test "expands multiple archived events", %{conn: conn, user: user} do
+      tz = Application.get_env(:dev_round, :time_zone)
+      {:ok, now} = DateTime.now(tz)
+
+      # Archived events
+      begin_archived = NaiveDateTime.add(DateTime.to_naive(now), -10, :day)
+      end_archived = NaiveDateTime.add(DateTime.to_naive(now), -8, :day)
+
+      archived_attrs = %{
+        begin_local: begin_archived,
+        end_local: end_archived,
+        registration_deadline_local: NaiveDateTime.add(begin_archived, -1, :day)
+      }
+
+      event1 = event_fixture(Map.merge(archived_attrs, %{title: "Event 1"}))
+      event2 = event_fixture(Map.merge(archived_attrs, %{title: "Event 2"}))
+
+      for {event, index} <- Enum.with_index([event1, event2]) do
+        Events.create_event_attendee(
+          event,
+          user,
+          %{"lang_ids" => [Enum.at(event.langs, 0).id]},
+          :host
+        )
+
+        # Mark sessions as team locked and give unique title
+        for {session, s_index} <- Enum.with_index(event.sessions) do
+          session
+          |> Ecto.Changeset.change(%{
+            teams_locked: true,
+            title: "Archived Event #{index + 1} Session #{s_index + 1}"
+          })
+          |> DevRound.Repo.update!()
+        end
+      end
+
+      {:ok, view, _html} = live(conn, ~p"/user/events")
+
+      # Initially not expanded
+      refute has_element?(view, "h2", "Archived Event 1 Session 1")
+      refute has_element?(view, "h2", "Archived Event 1 Session 1")
+      refute has_element?(view, "h2", "Archived Event 2 Session 1")
+
+      # Expand event 1
+      view |> render_click("toggle_expand", %{"id" => to_string(event1.id), "expanded" => false})
+      assert has_element?(view, "h2", "Archived Event 1 Session 1")
+      assert has_element?(view, "h2", "Archived Event 1 Session 1")
+      refute has_element?(view, "h2", "Archived Event 2 Session 1")
+
+      # Expand event 2
+      view |> render_click("toggle_expand", %{"id" => to_string(event2.id), "expanded" => false})
+      assert has_element?(view, "h2", "Archived Event 1 Session 1")
+      assert has_element?(view, "h2", "Archived Event 1 Session 1")
+      assert has_element?(view, "h2", "Archived Event 2 Session 1")
     end
   end
 end
