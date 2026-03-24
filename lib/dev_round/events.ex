@@ -40,6 +40,16 @@ defmodule DevRound.Events do
     |> Repo.all()
   end
 
+  def list_registered_events_for_user(user_id) do
+    from(e in Event,
+      join: ea in assoc(e, :events_attendees),
+      where: ea.user_id == ^user_id and e.published,
+      order_by: [asc: e.begin]
+    )
+    |> Repo.all()
+    |> Repo.preload([:langs, sessions: from(s in EventSession, order_by: s.begin)])
+  end
+
   def get_event_archival_datetime_utc do
     tz = Application.get_env(:dev_round, :time_zone)
 

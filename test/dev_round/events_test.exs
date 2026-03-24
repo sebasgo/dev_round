@@ -53,6 +53,23 @@ defmodule DevRound.EventsTest do
       event_fixture(%{published: false})
       assert Events.list_events(:current) == []
     end
+
+    test "list_registered_events_for_user/1 returns registered events" do
+      future_deadline = NaiveDateTime.add(NaiveDateTime.local_now(), 12, :hour)
+      event = event_fixture(%{registration_deadline_local: future_deadline})
+      user = user_fixture()
+
+      {:ok, _attendee} =
+        Events.create_event_attendee(event, user, %{
+          "lang_ids" => [Enum.at(event.langs, 0).id]
+        })
+
+      registered_events = Events.list_registered_events_for_user(user.id)
+      assert length(registered_events) == 1
+      assert hd(registered_events).id == event.id
+      assert hd(registered_events).sessions != []
+      assert hd(registered_events).langs != []
+    end
   end
 
   describe "get_event!" do

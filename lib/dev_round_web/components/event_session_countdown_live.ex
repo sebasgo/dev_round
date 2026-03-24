@@ -43,7 +43,7 @@ defmodule DevRoundWeb.EventSessionCountdownLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class={@class} style={@style}>
+    <div class={["pt-[2px]", @class]} style={@style}>
       <%= if @time_remaining do %>
         <div class="countdown">
           <%= if @time_remaining.day_digits > 0 do %>

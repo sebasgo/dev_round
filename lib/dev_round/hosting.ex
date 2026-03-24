@@ -183,6 +183,20 @@ defmodule DevRound.Hosting do
     |> Repo.preload(members: {member_query, [:user, :langs]})
   end
 
+  @doc """
+  Lists all teams for a given user across multiple sessions.
+  Returns a map of session_id => team
+  """
+  def list_teams_for_user_in_sessions(user_id, session_ids) do
+    from(t in Team,
+      join: m in assoc(t, :members),
+      where: t.session_id in ^session_ids and m.user_id == ^user_id
+    )
+    |> Repo.all()
+    |> Repo.preload([:lang, members: [:user, :langs]])
+    |> Enum.into(%{}, fn team -> {team.session_id, team} end)
+  end
+
   def build_teams_for_session(%EventSession{} = session, attendees, team_names) do
     attendees = filter_checked(attendees)
     {:ok, []} = validate_team_generation_constraints(attendees, team_names)

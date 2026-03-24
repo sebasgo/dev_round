@@ -164,6 +164,11 @@ defmodule DevRoundWeb.Layouts do
       </:trigger>
       <:menu class="w-52 p-2">
         <li>
+          <.link href={~p"/user/events"}>
+            Your Events
+          </.link>
+        </li>
+        <li>
           <.link href={~p"/users/settings"}>
             Settings
           </.link>

@@ -139,6 +139,40 @@ defmodule DevRound.Formats do
   end
 
   @doc """
+  Formats a datetime range into a compact string.
+
+  The formatting adapts based on whether the dates are the same and match the current date:
+  - Today and same day: Shows time range (e.g., "16:00 – 18:00")
+  - Otherwise: Shows full datetime range (see `format_datetime_range/2`)
+
+  ## Examples
+
+      iex> format_datetime_range_compact(~U[2026-03-24 16:00:00Z], ~U[2026-03-24 18:00:00Z])
+      "16:00 – 18:00"
+
+      iex> format_datetime_range_compact(~U[2025-03-14 16:00:00Z], ~U[2025-03-15 18:00:00Z])
+      "14.03.2025 16:00 – 15.03.2025 18:00"
+
+  ## Parameters
+
+  - `dt1`: The start datetime
+  - `dt2`: The end datetime
+
+  ## Returns
+
+  A formatted string representing the date/time range or just the time range.
+  """
+  def format_datetime_range_compact(dt1, dt2) do
+    {:ok, now} = DateTime.now(dt1.time_zone)
+
+    if Date.compare(now, dt1) == :eq and Date.compare(dt1, dt2) == :eq do
+      format_time_range(dt1, dt2)
+    else
+      format_datetime_range(dt1, dt2)
+    end
+  end
+
+  @doc """
   Generates an avatar placeholder from a user's full name.
 
   Creates initials by taking the first letter of the first name and the first
