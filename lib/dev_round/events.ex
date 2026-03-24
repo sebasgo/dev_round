@@ -43,7 +43,7 @@ defmodule DevRound.Events do
   def list_registered_events_for_user(user_id) do
     from(e in Event,
       join: ea in assoc(e, :events_attendees),
-      where: ea.user_id == ^user_id,
+      where: ea.user_id == ^user_id and e.published,
       order_by: [asc: e.begin]
     )
     |> Repo.all()
