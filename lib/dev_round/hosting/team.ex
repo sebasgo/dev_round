@@ -17,6 +17,7 @@ defmodule DevRound.Hosting.Team do
     field :name, :string
     field :slug, :string
     field :is_remote, :boolean, default: false
+    field :video_conference_room_url, :string
 
     belongs_to :session, EventSession
     belongs_to :lang, Lang
@@ -28,7 +29,7 @@ defmodule DevRound.Hosting.Team do
   @doc false
   def changeset(team, attrs) do
     team
-    |> cast(attrs, [:name, :slug, :is_remote])
+    |> cast(attrs, [:name, :slug, :is_remote, :video_conference_room_url])
     |> validate_required([:name, :slug, :is_remote])
   end
 end

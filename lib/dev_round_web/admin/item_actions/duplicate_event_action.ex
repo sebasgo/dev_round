@@ -85,11 +85,21 @@ defmodule DevRoundWeb.Admin.ItemActions.DuplicateEventAction do
       |> Map.merge(data)
       |> shift_event_dates(date_diff)
       |> Map.put(:sessions, Enum.map(item.sessions, &process_session(&1, date_diff)))
+      |> Map.put(
+        :event_hosts,
+        Enum.map(item.event_hosts, &Map.take(&1, [:event_id, :user_id, :position]))
+      )
+      |> Map.put(
+        :team_video_conference_rooms,
+        Enum.map(item.team_video_conference_rooms, &Map.take(&1, [:url]))
+      )
       |> Map.put(:published, false)
 
     opts = [
       put_langs: item.langs,
-      put_hosts: item.hosts
+      put_hosts: item.hosts,
+      put_team_video_conference_rooms:
+        Enum.map(item.team_video_conference_rooms, &Map.take(&1, [:url]))
     ]
 
     case Events.create_event(attrs, opts) do

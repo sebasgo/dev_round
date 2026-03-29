@@ -105,7 +105,13 @@ defmodule DevRound.Events do
     sessions_query = from s in EventSession, order_by: s.begin
 
     event
-    |> Repo.preload([:langs, :hosts, :last_live_session, sessions: sessions_query])
+    |> Repo.preload([
+      :langs,
+      :hosts,
+      :last_live_session,
+      :team_video_conference_rooms,
+      sessions: sessions_query
+    ])
     |> Repo.preload(events_attendees: {attendee_query, [:user, :langs]})
   end
 

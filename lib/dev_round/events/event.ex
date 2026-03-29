@@ -31,8 +31,13 @@ defmodule DevRound.Events.Event do
     field :slides_page_number, :integer
     field :live, :boolean
     field :modified_at, :utc_datetime
+    field :main_video_conference_room_url, :string
 
     many_to_many :langs, Lang, join_through: "event_langs", on_replace: :delete
+
+    has_many :team_video_conference_rooms, DevRound.Events.TeamVideoConferenceRoom,
+      on_replace: :delete,
+      on_delete: :delete_all
 
     has_many :event_hosts, EventHost,
       preload_order: [asc: :position],
@@ -60,7 +65,8 @@ defmodule DevRound.Events.Event do
       :location,
       :published,
       :registration_deadline_local,
-      :slides_filename
+      :slides_filename,
+      :main_video_conference_room_url
     ])
     |> cast_assoc(:event_hosts,
       with: &EventHost.changeset/3,
@@ -75,6 +81,11 @@ defmodule DevRound.Events.Event do
       required_message: "At least one session is required.",
       sort_param: :sessions_order,
       drop_param: :sessions_delete
+    )
+    |> cast_assoc(:team_video_conference_rooms,
+      with: &DevRound.Events.TeamVideoConferenceRoom.changeset/2,
+      sort_param: :team_video_conference_rooms_order,
+      drop_param: :team_video_conference_rooms_delete
     )
     |> put_langs_assoc(Keyword.get(opts, :put_langs))
     |> validate_required(
@@ -107,6 +118,7 @@ defmodule DevRound.Events.Event do
         _ -> []
       end
     end)
+    |> validate_http_url(:main_video_conference_room_url)
     |> unique_constraint(:slug)
     |> change(modified_at: DateTime.utc_now(:second))
   end

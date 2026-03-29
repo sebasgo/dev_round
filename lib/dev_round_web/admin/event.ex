@@ -53,11 +53,36 @@ defmodule DevRoundWeb.Admin.Event do
   end
 
   @impl Backpex.LiveResource
+  def panels do
+    [
+      content: "Content",
+      video_conference_rooms: "Video Conference Rooms",
+      settings: "Settings"
+    ]
+  end
+
+  @impl Backpex.LiveResource
   def fields do
     [
       title: %{
         module: Backpex.Fields.Text,
         label: "Title"
+      },
+      event_hosts: %{
+        module: DevRoundWeb.Admin.Fields.InlineCRUD,
+        label: "Hosts",
+        type: :assoc,
+        child_fields: [
+          user: %{
+            module: DevRoundWeb.Admin.Fields.BelongsTo,
+            label: "User",
+            display_field: :full_name,
+            live_resource: DevRoundWeb.Admin.User,
+            prompt: "Select user",
+            options_query: fn query, _field -> query |> order_by(asc: :full_name) end
+          }
+        ],
+        except: [:index]
       },
       begin_local: %{
         module: Backpex.Fields.DateTime,
@@ -86,22 +111,7 @@ defmodule DevRoundWeb.Admin.Event do
         live_resource: DevRoundWeb.Admin.Lang,
         prompt: "Select",
         not_found_text: "No languages found",
-        except: [:index]
-      },
-      event_hosts: %{
-        module: DevRoundWeb.Admin.Fields.InlineCRUD,
-        label: "Hosts",
-        type: :assoc,
-        child_fields: [
-          user: %{
-            module: DevRoundWeb.Admin.Fields.BelongsTo,
-            label: "User",
-            display_field: :full_name,
-            live_resource: DevRoundWeb.Admin.User,
-            prompt: "Select user",
-            options_query: fn query, _field -> query |> order_by(asc: :full_name) end
-          }
-        ],
+        panel: :content,
         except: [:index]
       },
       teaser: %{
@@ -109,6 +119,7 @@ defmodule DevRoundWeb.Admin.Event do
         label: "Teaser",
         help_text: "Shown on event listing page.",
         rows: 5,
+        panel: :content,
         except: [:index]
       },
       body: %{
@@ -116,6 +127,7 @@ defmodule DevRoundWeb.Admin.Event do
         label: "Body",
         help_text: "Markdown is supported.",
         rows: 15,
+        panel: :content,
         except: [:index]
       },
       slides_filename: %{
@@ -141,6 +153,7 @@ defmodule DevRoundWeb.Admin.Event do
             </p>
             """
         end,
+        panel: :content,
         except: [:index]
       },
       sessions: %{
@@ -161,11 +174,33 @@ defmodule DevRoundWeb.Admin.Event do
             module: Backpex.Fields.DateTime,
             label: "End"
           }
-        ]
+        ],
+        panel: :content
+      },
+      main_video_conference_room_url: %{
+        module: Backpex.Fields.URL,
+        label: "Main Video Conference Room URL",
+        panel: :video_conference_rooms,
+        except: [:index]
+      },
+      team_video_conference_rooms: %{
+        module: Backpex.Fields.InlineCRUD,
+        type: :assoc,
+        label: "Team Video Conference Rooms",
+        child_fields: [
+          url: %{
+            module: Backpex.Fields.URL,
+            label: "URL"
+          }
+        ],
+        help_text: "Used for teams with remote attendees.",
+        panel: :video_conference_rooms,
+        except: [:index]
       },
       published: %{
         module: Backpex.Fields.Boolean,
-        label: "Published"
+        label: "Published",
+        panel: :settings
       }
     ]
   end

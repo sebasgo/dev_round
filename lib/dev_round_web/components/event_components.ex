@@ -70,6 +70,7 @@ defmodule DevRoundWeb.EventComponents do
   attr :show_member_experience_level, :boolean, required: true
   attr :show_member_langs, :boolean, required: true
   attr :multiple_langs, :boolean, required: true
+  attr :show_video_conference_room_url, :boolean, default: false
   attr :class, :string, default: nil
   attr :zoom, :float, default: nil
 
@@ -78,15 +79,15 @@ defmodule DevRoundWeb.EventComponents do
     <div class={["card bg-base-300", @class]}>
       <div class="card-body p-2 gap-2">
         <h2 class="card-title grid gap-2">
-          <span class="flex items-start">
-            <span class="grow text-lg font-mono font-semibold text-base-content">
+          <span class="flex items-start flex-col gap-1 grow">
+            <span class="text-lg font-mono font-semibold text-base-content flex items-center gap-2">
               {@team.name}
+              <DevRoundWeb.CoreComponents.icon
+                :if={@team.is_remote}
+                name="hero-globe-alt"
+                class="w-6 h-6"
+              />
             </span>
-            <DevRoundWeb.CoreComponents.icon
-              :if={@team.is_remote}
-              name="hero-globe-alt"
-              class="w-6 h-8"
-            />
           </span>
           <DevRoundWeb.CoreComponents.lang_badge :if={@multiple_langs} lang={@team.lang} />
         </h2>
@@ -115,6 +116,15 @@ defmodule DevRoundWeb.EventComponents do
                 </div>
             <% end %>
           <% end %>
+        </div>
+        <div class="text-center">
+          <.external_link
+            :if={@show_video_conference_room_url && @team.video_conference_room_url}
+            href={@team.video_conference_room_url}
+            class="link link-info"
+          >
+            Video Conference
+          </.external_link>
         </div>
       </div>
     </div>

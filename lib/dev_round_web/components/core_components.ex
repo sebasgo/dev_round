@@ -788,4 +788,17 @@ defmodule DevRoundWeb.CoreComponents do
     </p>
     """
   end
+
+  attr :href, :string
+  attr :class, :any, default: nil, doc: "additional classes for the link element"
+  slot :inner_block
+
+  def external_link(assigns) do
+    ~H"""
+    <.link href={@href} target="_blank" class={["inline-flex gap-1 items-center", @class]}>
+      {render_slot(@inner_block)}
+      <.icon name="hero-arrow-top-right-on-square" class="w-[1em] h-[1em] opacity-70" />
+    </.link>
+    """
+  end
 end

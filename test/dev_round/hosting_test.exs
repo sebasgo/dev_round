@@ -182,7 +182,13 @@ defmodule DevRound.HostingTest do
 
       attendees = [r1, r2, r3, r4, r5, l1, l2, l3, l4, l5, u1_remote, u2_local]
 
-      assert {:ok, _} = Hosting.build_teams_for_session(session, attendees, team_names)
+      # We need at least as many rooms as remote teams (5 remote -> 3 teams needed: 2 + 3, wait, 5 remote? `Integer.floor_div(5, 2) = 2`? No, 5 remote participants in 2 categories (Split into [A, B] and [C, D, E])), wait `order_attendees_by_experience` sorts them first.
+      # 5 remote participants -> 3 teams. 3 rooms needed.
+      team_rooms =
+        for _ <- 1..3, do: %DevRound.Events.TeamVideoConferenceRoom{url: "http://room.com"}
+
+      assert {:ok, _} =
+               Hosting.build_teams_for_session(session, attendees, team_names, team_rooms)
 
       teams = Hosting.list_teams_for_session(session)
 
@@ -240,13 +246,13 @@ defmodule DevRound.HostingTest do
       u1 = register_attendee(event, "u1", false, [lang1])
 
       assert {:error, ["Not enough checked participants to build teams."]} =
-               Hosting.validate_team_generation_constraints([u1], team_names)
+               Hosting.validate_team_generation_constraints([u1], team_names, [])
 
       # 2. No compatible mate (different remote status)
       u2 = register_attendee(event, "u2", true, [lang1])
 
       assert {:error, messages} =
-               Hosting.validate_team_generation_constraints([u1, u2], team_names)
+               Hosting.validate_team_generation_constraints([u1, u2], team_names, [])
 
       assert Enum.any?(messages, fn m -> m =~ "No team mate for u1" end)
       assert Enum.any?(messages, fn m -> m =~ "No team mate for u2" end)
@@ -255,7 +261,7 @@ defmodule DevRound.HostingTest do
       u3 = register_attendee(event, "u3", false, [lang2])
 
       assert {:error, messages} =
-               Hosting.validate_team_generation_constraints([u1, u3], team_names)
+               Hosting.validate_team_generation_constraints([u1, u3], team_names, [])
 
       assert Enum.any?(messages, fn m -> m =~ "No team mate for u1" end)
 
@@ -264,9 +270,26 @@ defmodule DevRound.HostingTest do
       # 3 checked in-person, needs 1 team. 1 remote (u2), not enough.
       # Total 4. Needs 2 teams.
       assert {:error, messages} =
-               Hosting.validate_team_generation_constraints([u1, u3, u4, u2], [hd(team_names)])
+               Hosting.validate_team_generation_constraints(
+                 [u1, u3, u4, u2],
+                 [hd(team_names)],
+                 []
+               )
 
       assert Enum.member?(messages, "Not enough team names for checked participants.")
+
+      # 5. Not enough video conference rooms (needs 1 team for u2)
+      assert {:error, messages} =
+               Hosting.validate_team_generation_constraints(
+                 [u2, register_attendee(event, "u5", true, [lang1])],
+                 team_names,
+                 []
+               )
+
+      assert Enum.member?(
+               messages,
+               "Not enough session video conference room URLs to build teams for checked remote participants."
+             )
     end
   end
 end

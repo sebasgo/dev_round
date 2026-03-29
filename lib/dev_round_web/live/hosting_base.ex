@@ -38,7 +38,8 @@ defmodule DevRoundWeb.HostingBase do
     {_, messages} =
       Hosting.validate_team_generation_constraints(
         socket.assigns.event.events_attendees,
-        socket.assigns.team_names
+        socket.assigns.team_names,
+        socket.assigns.event.team_video_conference_rooms
       )
 
     assign(socket, :messages, messages)
