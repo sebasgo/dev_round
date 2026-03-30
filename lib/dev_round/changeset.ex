@@ -157,4 +157,31 @@ defmodule DevRound.Changeset do
         end
     end
   end
+
+  @doc """
+  Validates that given field contains a valid HTTP or HTTPS URL.
+
+  ## Examples
+
+      iex> changeset = %Ecto.Changeset{changes: %{url: "http://example.com"}}
+      iex> Changeset.validate_http_url(changeset, :url)
+      # No error added
+
+      iex> changeset = %Ecto.Changeset{changes: %{url: "invalid"}}
+      iex> Changeset.validate_http_url(changeset, :url)
+      # Adds error to url field
+
+  """
+  def validate_http_url(changeset, field) do
+    validate_change(changeset, field, fn field, url ->
+      case URI.parse(url) do
+        %URI{scheme: scheme, host: host}
+        when scheme in ["http", "https"] and not is_nil(host) and host != "" ->
+          []
+
+        _ ->
+          [{field, "Must be a valid HTTP(S) URL."}]
+      end
+    end)
+  end
 end

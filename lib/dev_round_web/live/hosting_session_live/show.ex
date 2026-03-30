@@ -83,7 +83,12 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     false = session.teams_locked
 
     {:ok, _} =
-      Hosting.build_teams_for_session(session, event.events_attendees, team_names)
+      Hosting.build_teams_for_session(
+        session,
+        event.events_attendees,
+        team_names,
+        event.team_video_conference_rooms
+      )
 
     broadcast_teams_build(session)
 

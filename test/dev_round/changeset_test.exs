@@ -310,4 +310,59 @@ defmodule DevRound.ChangesetTest do
       refute Map.has_key?(changeset.changes, :slug)
     end
   end
+
+  describe "validate_http_url/2" do
+    test "accepts valid http url" do
+      data = %{}
+      types = %{url: :string}
+      params = %{url: "http://example.com"}
+
+      changeset =
+        {data, types}
+        |> Ecto.Changeset.cast(params, [:url])
+        |> DevRound.Changeset.validate_http_url(:url)
+
+      refute changeset.errors[:url]
+    end
+
+    test "accepts valid https url" do
+      data = %{}
+      types = %{url: :string}
+      params = %{url: "https://example.com"}
+
+      changeset =
+        {data, types}
+        |> Ecto.Changeset.cast(params, [:url])
+        |> DevRound.Changeset.validate_http_url(:url)
+
+      refute changeset.errors[:url]
+    end
+
+    test "rejects invalid url scheme" do
+      data = %{}
+      types = %{url: :string}
+      params = %{url: "ftp://example.com"}
+
+      changeset =
+        {data, types}
+        |> Ecto.Changeset.cast(params, [:url])
+        |> DevRound.Changeset.validate_http_url(:url)
+
+      assert %{errors: [url: {"Must be a valid HTTP(S) URL.", _}]} = changeset
+    end
+
+    test "rejects invalid url (no host)" do
+      data = %{}
+      types = %{url: :string}
+      params = %{url: "http://"}
+
+      changeset =
+        {data, types}
+        |> Ecto.Changeset.cast(params, [:url])
+        |> Ecto.Changeset.validate_required([:url])
+        |> DevRound.Changeset.validate_http_url(:url)
+
+      assert %{errors: [url: {"Must be a valid HTTP(S) URL.", _}]} = changeset
+    end
+  end
 end

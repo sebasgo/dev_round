@@ -124,11 +124,11 @@ defmodule DevRound.Hosting do
     EventAttendee.check_changeset(attendee, %{checked: checked})
   end
 
-  def validate_team_generation_constraints(attendees, team_names) do
+  def validate_team_generation_constraints(attendees, team_names, team_rooms) do
     attendees = filter_checked(attendees)
 
     if Enum.count(attendees) >= 2 do
-      messages = build_validation_messages(attendees, team_names)
+      messages = build_validation_messages(attendees, team_names, team_rooms)
 
       case messages do
         [] -> {:ok, []}
@@ -139,7 +139,7 @@ defmodule DevRound.Hosting do
     end
   end
 
-  defp build_validation_messages(attendees, team_names) do
+  defp build_validation_messages(attendees, team_names, team_rooms) do
     attendee_messages =
       for attendee <- attendees do
         potential_team_mates =
@@ -162,7 +162,18 @@ defmodule DevRound.Hosting do
         []
       end
 
-    attendee_messages ++ team_names_message
+    remote_attendees = Enum.filter(attendees, & &1.is_remote)
+
+    video_conference_rooms_message =
+      if Integer.floor_div(length(remote_attendees), 2) > length(team_rooms) do
+        [
+          "Not enough session video conference room URLs to build teams for checked remote participants."
+        ]
+      else
+        []
+      end
+
+    attendee_messages ++ team_names_message ++ video_conference_rooms_message
   end
 
   defp filter_checked(attendees) do
@@ -197,29 +208,34 @@ defmodule DevRound.Hosting do
     |> Enum.into(%{}, fn team -> {team.session_id, team} end)
   end
 
-  def build_teams_for_session(%EventSession{} = session, attendees, team_names) do
+  def build_teams_for_session(%EventSession{} = session, attendees, team_names, team_rooms) do
     attendees = filter_checked(attendees)
-    {:ok, []} = validate_team_generation_constraints(attendees, team_names)
+    {:ok, []} = validate_team_generation_constraints(attendees, team_names, team_rooms)
 
     Multi.new()
     |> Multi.delete_all(:teams, Ecto.assoc(session, :teams))
-    |> insert_teams(session, attendees, team_names)
+    |> insert_teams(session, attendees, team_names, team_rooms)
     |> Repo.transaction()
   end
 
-  defp insert_teams(multi, session, attendees, team_names) do
-    generate_team_changesets(session, attendees, team_names)
+  defp insert_teams(multi, session, attendees, team_names, team_rooms) do
+    generate_team_changesets(session, attendees, team_names, team_rooms)
     |> Enum.reduce(multi, &Multi.insert(&2, Changeset.get_change(&1, :slug), &1))
   end
 
-  defp generate_team_changesets(session, attendees, team_names) do
+  defp generate_team_changesets(session, attendees, team_names, team_rooms) do
     {local_teams, local_langs} = generate_teams_langs(attendees, false)
     {remote_teams, remote_langs} = generate_teams_langs(attendees, true)
+
+    room_urls = team_rooms |> Enum.map(& &1.url)
+    local_room_urls = List.duplicate(nil, length(local_teams))
+    remote_room_urls = Enum.take(room_urls, length(remote_teams))
 
     create_team_changesets(
       {local_teams ++ remote_teams, local_langs ++ remote_langs},
       session,
-      team_names
+      team_names,
+      local_room_urls ++ remote_room_urls
     )
   end
 
@@ -293,11 +309,11 @@ defmodule DevRound.Hosting do
     MapSet.new()
   end
 
-  defp create_team_changesets({teams_attendees, teams_langs}, session, team_names) do
+  defp create_team_changesets({teams_attendees, teams_langs}, session, team_names, room_urls) do
     names = team_names |> Enum.shuffle() |> Enum.take(length(teams_attendees))
 
-    Enum.zip([teams_attendees, teams_langs, names])
-    |> Enum.map(fn {team_attendees, team_langs, name} ->
+    Enum.zip([teams_attendees, teams_langs, names, room_urls])
+    |> Enum.map(fn {team_attendees, team_langs, name, room_url} ->
       lang = Enum.random(team_langs)
       is_remote = hd(team_attendees).is_remote
 
@@ -318,7 +334,8 @@ defmodule DevRound.Hosting do
         slug: name.slug,
         is_remote: is_remote,
         session: session,
-        lang: lang
+        lang: lang,
+        video_conference_room_url: room_url
       )
       |> Changeset.put_assoc(:members, members)
     end)

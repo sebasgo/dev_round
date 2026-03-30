@@ -49,7 +49,12 @@ defmodule DevRoundWeb.UserEventsLive do
             Up Next
           </h2>
           <div class="grid grid-cols-1 gap-8">
-            <.event_card :for={event <- @underway_events} event={event} teams_map={@teams_map} />
+            <.event_card
+              :for={event <- @underway_events}
+              event={event}
+              teams_map={@teams_map}
+              show_video_conference_room_url={true}
+            />
           </div>
         </section>
 
@@ -97,6 +102,7 @@ defmodule DevRoundWeb.UserEventsLive do
   attr :teams_map, :map, required: true
   attr :collapsable, :boolean, default: false
   attr :expanded, :boolean, default: true
+  attr :show_video_conference_room_url, :boolean, default: false
 
   defp event_card(assigns) do
     ~H"""
@@ -151,6 +157,7 @@ defmodule DevRoundWeb.UserEventsLive do
                 show_member_experience_level={false}
                 show_member_langs={false}
                 multiple_langs={tl(@event.langs) != []}
+                show_video_conference_room_url={@show_video_conference_room_url}
                 class="border border-base-content/5"
               />
             <% else %>

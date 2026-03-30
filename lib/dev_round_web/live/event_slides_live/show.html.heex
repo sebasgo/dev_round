@@ -60,6 +60,15 @@
   </div>
 
   <.usage_hint>
-    You can follow the presentation through the slides here. Audio is not provided.
+    You can follow the presentation through the slides here.
+    <%= if @event.main_video_conference_room_url do %>
+      Join the
+      <.external_link href={@event.main_video_conference_room_url} class="link">
+        video conference
+      </.external_link>
+      for full video/audio content.
+    <% else %>
+      Audio is not provided.
+    <% end %>
   </.usage_hint>
 </Layouts.app>
