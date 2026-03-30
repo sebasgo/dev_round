@@ -228,12 +228,14 @@ defmodule DevRound.Hosting do
     {remote_teams, remote_langs} = generate_teams_langs(attendees, true)
 
     room_urls = team_rooms |> Enum.map(& &1.url)
+    local_room_urls = List.duplicate(nil, length(local_teams))
+    remote_room_urls = Enum.take(room_urls, length(remote_teams))
 
     create_team_changesets(
       {local_teams ++ remote_teams, local_langs ++ remote_langs},
       session,
       team_names,
-      room_urls
+      local_room_urls ++ remote_room_urls
     )
   end
 
@@ -310,45 +312,32 @@ defmodule DevRound.Hosting do
   defp create_team_changesets({teams_attendees, teams_langs}, session, team_names, room_urls) do
     names = team_names |> Enum.shuffle() |> Enum.take(length(teams_attendees))
 
-    {changesets, _remaining_urls} =
-      Enum.zip([teams_attendees, teams_langs, names])
-      |> Enum.map_reduce(room_urls, fn {team_attendees, team_langs, name}, available_urls ->
-        lang = Enum.random(team_langs)
-        is_remote = hd(team_attendees).is_remote
+    Enum.zip([teams_attendees, teams_langs, names, room_urls])
+    |> Enum.map(fn {team_attendees, team_langs, name, room_url} ->
+      lang = Enum.random(team_langs)
+      is_remote = hd(team_attendees).is_remote
 
-        {room_url, next_urls} =
-          if is_remote && available_urls != [] do
-            {hd(available_urls), tl(available_urls)}
-          else
-            {nil, available_urls}
-          end
-
-        members =
-          Enum.map(team_attendees, fn attendee ->
-            %TeamMember{}
-            |> Changeset.change(
-              is_remote: attendee.is_remote,
-              experience_level: attendee.experience_level,
-              user: attendee.user
-            )
-            |> Changeset.put_assoc(:langs, attendee.langs)
-          end)
-
-        changeset =
-          %Team{}
+      members =
+        Enum.map(team_attendees, fn attendee ->
+          %TeamMember{}
           |> Changeset.change(
-            name: name.name,
-            slug: name.slug,
-            is_remote: is_remote,
-            session: session,
-            lang: lang,
-            video_conference_room_url: room_url
+            is_remote: attendee.is_remote,
+            experience_level: attendee.experience_level,
+            user: attendee.user
           )
-          |> Changeset.put_assoc(:members, members)
+          |> Changeset.put_assoc(:langs, attendee.langs)
+        end)
 
-        {changeset, next_urls}
-      end)
-
-    changesets
+      %Team{}
+      |> Changeset.change(
+        name: name.name,
+        slug: name.slug,
+        is_remote: is_remote,
+        session: session,
+        lang: lang,
+        video_conference_room_url: room_url
+      )
+      |> Changeset.put_assoc(:members, members)
+    end)
   end
 end
