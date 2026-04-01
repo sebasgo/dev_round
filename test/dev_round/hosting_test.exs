@@ -7,17 +7,7 @@ defmodule DevRound.HostingTest do
 
   import DevRound.EventsFixtures
   import DevRound.AccountsFixtures
-
-  defp team_name_fixture(attrs \\ %{}) do
-    {:ok, team_name} =
-      attrs
-      |> Enum.into(%{
-        name: "some name #{System.unique_integer()}"
-      })
-      |> Hosting.create_team_name()
-
-    team_name
-  end
+  import DevRound.HostingFixtures
 
   describe "team_names" do
     test "list_team_names/0 returns all team_names" do
