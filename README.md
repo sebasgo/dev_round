@@ -228,4 +228,5 @@ For detailed technical documentation, architecture details, and development guid
 
 ## License
 
-All rights reserved.
+Licensed under the terms and conditions of the GPL-3.0 license, see 
+[LICENSE](LICENSE) for details.
