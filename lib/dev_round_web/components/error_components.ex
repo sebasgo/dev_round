@@ -1,4 +1,7 @@
 defmodule DevRoundWeb.ErrorComponents do
+  @moduledoc """
+  Shared components for the error pages.
+  """
   use DevRoundWeb, :html
 
   attr :code, :integer, required: true
