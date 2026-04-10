@@ -65,7 +65,7 @@ defmodule DevRoundWeb.UserLoginLiveTest do
             {:error, :invalid_credentials}
 
           {"nonexistent", "password"} ->
-            {:error, :invalid_credentials}
+            {:error, :user_not_found}
 
           # Default case for any other username/password combinations
           {_, _} ->

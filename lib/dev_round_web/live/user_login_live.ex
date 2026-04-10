@@ -47,7 +47,7 @@ defmodule DevRoundWeb.UserLoginLive do
          socket
          |> UserAuth.log_in_user_live(user)}
 
-      {:error, :invalid_credentials} ->
+      {:error, reason} when reason in [:invalid_credentials, :user_not_found] ->
         {:noreply,
          socket
          |> put_flash(:error, "Invalid user name or password!")}
