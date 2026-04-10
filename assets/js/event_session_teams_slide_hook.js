@@ -8,9 +8,9 @@ const EventSessionTeamsSlideHook = {
   },
 
   setUpLayout() {
+    this.zoomFactor = 1;
     this.grid = document.getElementById("event-teams-grid");
     this.teams = this.grid.querySelectorAll(":scope > div");
-    this.teamHeights = this.measureHeights(this.teams);
     this.isNewSession = this.el.dataset.isNewSession !== undefined;
 
 
@@ -25,15 +25,20 @@ const EventSessionTeamsSlideHook = {
   },
 
   updateLayout() {
-    this.setGridZoom(this.cols, this.calcZoomFactor(this.cols))
+    // we might need multiple passes when reflowed test is split across lines 
+    do {
+      this.measureHeights();
+      this.setGridZoom(this.cols, this.calcZoomFactor(this.cols));
+      var lastZoomFactor = this.zoomFactor;
+    } while (Math.abs(this.zoomFactor - lastZoomFactor) > .001);
   },
 
   measureHeight(el) {
     return el.getBoundingClientRect().height;
   },
 
-  measureHeights(els) {
-    return Array.from(els).map(el => el.getBoundingClientRect().height)
+  measureHeights() {
+    this.teamHeights =  Array.from(this.teams).map(el => el.getBoundingClientRect().height / this.zoomFactor)
   },
 
   calcZoomFactor(cols) {
@@ -52,6 +57,7 @@ const EventSessionTeamsSlideHook = {
   },
 
   setGridZoom(cols, factor) {
+    this.zoomFactor = factor;
     this.grid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
     for (let el of this.teams) {
       el.style.zoom = factor;
