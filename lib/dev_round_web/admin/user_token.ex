@@ -11,13 +11,15 @@ defmodule DevRoundWeb.Admin.UserToken do
       repo: DevRound.Repo,
       item_query: &__MODULE__.item_query/3
     ],
-    layout: {DevRoundWeb.Layouts, :admin},
     init_order: %{by: :inserted_at, direction: :desc},
     pubsub: [
       topic: "admin.user_tokens"
     ]
 
   import Ecto.Query, warn: false
+
+  @impl Backpex.LiveResource
+  def layout(_assigns), do: {DevRoundWeb.Layouts, :admin}
 
   def item_query(query, _live_action, _assigns) do
     query |> where([user_token], user_token.context == "session")

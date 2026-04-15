@@ -23,7 +23,6 @@ defmodule DevRoundWeb.Admin.Event do
       update_changeset: &DevRound.Events.Event.changeset/3,
       create_changeset: &DevRound.Events.Event.changeset/3
     ],
-    layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
       topic: "admin.events"
     ],
@@ -31,6 +30,9 @@ defmodule DevRoundWeb.Admin.Event do
     save_and_continue_button?: true
 
   import Ecto.Query
+
+  @impl Backpex.LiveResource
+  def layout(_assigns), do: {DevRoundWeb.Layouts, :admin}
 
   @impl Backpex.LiveResource
   def singular_name, do: "Event"

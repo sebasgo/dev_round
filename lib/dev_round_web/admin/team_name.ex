@@ -12,10 +12,12 @@ defmodule DevRoundWeb.Admin.TeamName do
       update_changeset: &DevRound.Hosting.TeamName.changeset/3,
       create_changeset: &DevRound.Hosting.TeamName.changeset/3
     ],
-    layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
       topic: "admin.team_names"
     ]
+
+  @impl Backpex.LiveResource
+  def layout(_assigns), do: {DevRoundWeb.Layouts, :admin}
 
   @impl Backpex.LiveResource
   def singular_name, do: "Team Name"

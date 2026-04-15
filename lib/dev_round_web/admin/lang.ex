@@ -14,12 +14,14 @@ defmodule DevRoundWeb.Admin.Lang do
       update_changeset: &DevRound.Events.Lang.changeset/3,
       create_changeset: &DevRound.Events.Lang.changeset/3
     ],
-    layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
       topic: "admin.langs"
     ]
 
   use DevRoundWeb, :verified_routes
+
+  @impl Backpex.LiveResource
+  def layout(_assigns), do: {DevRoundWeb.Layouts, :admin}
 
   @impl Backpex.LiveResource
   def singular_name, do: "Programming Language"

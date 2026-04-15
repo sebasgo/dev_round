@@ -13,11 +13,13 @@ defmodule DevRoundWeb.Admin.EventAttendees do
       update_changeset: &DevRound.Events.EventAttendee.changeset/3,
       create_changeset: &DevRound.Events.EventAttendee.changeset/3
     ],
-    layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
       topic: "admin.event_attendees"
     ],
     init_order: %{by: :begin, direction: :desc}
+
+  @impl Backpex.LiveResource
+  def layout(_assigns), do: {DevRoundWeb.Layouts, :admin}
 
   @impl Backpex.LiveResource
   def singular_name, do: "Event Attendee"

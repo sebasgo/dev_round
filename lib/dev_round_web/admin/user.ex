@@ -13,12 +13,14 @@ defmodule DevRoundWeb.Admin.User do
       create_changeset: &DevRound.Accounts.User.admin_changeset/3
     ],
     init_order: %{by: :name, direction: :asc},
-    layout: {DevRoundWeb.Layouts, :admin},
     pubsub: [
       topic: "admin.event_langs"
     ]
 
   import Ecto.Query, warn: false
+
+  @impl Backpex.LiveResource
+  def layout(_assigns), do: {DevRoundWeb.Layouts, :admin}
 
   @impl Backpex.LiveResource
   def singular_name, do: "User"

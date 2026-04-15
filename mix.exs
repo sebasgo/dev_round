@@ -62,7 +62,7 @@ defmodule DevRound.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:backpex, github: "sebasgo/backpex", branch: "fix/inline-crud-validation-messages"},
+      {:backpex, "~> 0.18.0"},
       {:earmark, "~> 1.4"},
       {:time_zone_info, "~> 0.7"},
       {:slugify, "~> 1.3"},
