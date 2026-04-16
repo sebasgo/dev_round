@@ -4,28 +4,62 @@
     <:subtitle>Discover current and archived events</:subtitle>
   </.header>
 
-  <DevRoundWeb.EventComponents.event_grid_listing
-    events={@current_events}
-    title="Current Events"
-    accent_class="primary"
-  >
-    <:placeholder>
-      <div class="card bg-base-200 shadow-sm">
-        <div class="card-body text-center py-12">
-          <div class="mb-4">
-            <img src={~p"/images/broken-heart.svg"} class="inline opacity-70 w-[128px]" />
-          </div>
-          <h3 class="text-xl font-medium text-base-content mb-2">No current events</h3>
-          <p class="text-base-content/70">Check back soon for new events!</p>
-        </div>
-      </div>
-    </:placeholder>
-  </DevRoundWeb.EventComponents.event_grid_listing>
+  <.form for={@search_form} id="search-from" phx-change="search" class="mb-12">
+    <label class="input w-full">
+      <.icon name="hero-magnifying-glass" class="w-4 h-4" />
+      <input
+        type="search"
+        name={@search_form[:query][:name]}
+        id={@search_form[:query][:id]}
+        value={@search_form[:query][:value]}
+        class="grow"
+        placeholder="Search"
+      />
+    </label>
+  </.form>
 
-  <DevRoundWeb.EventComponents.event_grid_listing
-    :if={not Enum.empty?(@archived_events)}
-    events={@archived_events}
-    title="Archived Events"
-    accent_class="neutral"
-  />
+  <%= if @search_results != nil do %>
+    <DevRoundWeb.EventComponents.event_grid_listing
+      events={@search_results}
+      title="Search Results"
+      accent_class="primary"
+    >
+      <:placeholder>
+        <div class="card bg-base-200 shadow-sm">
+          <div class="card-body text-center py-12">
+            <div class="mb-4">
+              <img src={~p"/images/broken-heart.svg"} class="inline opacity-70 w-[128px]" />
+            </div>
+            <h3 class="text-xl font-medium text-base-content mb-2">No search results.</h3>
+            <p class="text-base-content/70">Try a different search term.</p>
+          </div>
+        </div>
+      </:placeholder>
+    </DevRoundWeb.EventComponents.event_grid_listing>
+  <% else %>
+    <DevRoundWeb.EventComponents.event_grid_listing
+      events={@current_events}
+      title="Current Events"
+      accent_class="primary"
+    >
+      <:placeholder>
+        <div class="card bg-base-200 shadow-sm">
+          <div class="card-body text-center py-12">
+            <div class="mb-4">
+              <img src={~p"/images/broken-heart.svg"} class="inline opacity-70 w-[128px]" />
+            </div>
+            <h3 class="text-xl font-medium text-base-content mb-2">No current events</h3>
+            <p class="text-base-content/70">Check back soon for new events!</p>
+          </div>
+        </div>
+      </:placeholder>
+    </DevRoundWeb.EventComponents.event_grid_listing>
+
+    <DevRoundWeb.EventComponents.event_grid_listing
+      :if={not Enum.empty?(@archived_events)}
+      events={@archived_events}
+      title="Archived Events"
+      accent_class="neutral"
+    />
+  <% end %>
 </Layouts.app>

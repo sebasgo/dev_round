@@ -26,7 +26,8 @@ defmodule DevRoundWeb.Admin.Event do
     pubsub: [
       topic: "admin.events"
     ],
-    init_order: %{by: :begin, direction: :desc},
+    init_order: %{by: :begin_local, direction: :desc},
+    full_text_search: :searchable_text,
     save_and_continue_button?: true
 
   import Ecto.Query

@@ -40,6 +40,49 @@ defmodule DevRound.Events do
     |> Repo.all()
   end
 
+  @doc """
+  Search for events via fulltext search. Returns a ranked list of events
+  machting the query via a per-word prefix search.
+
+  ## Examples
+
+    iex> search_search_for_events("Py Tes")
+    [%Event{title: "Python Testing", ...} ...]
+  """
+  def search_for_events(query) do
+    from(e in Event,
+      where:
+        fragment(
+          """
+          searchable_text @@ replace(
+            websearch_to_tsquery('English', ?)::text || ' ',
+            ''' ',
+            ''':*'
+          )::tsquery
+          """,
+          ^query
+        ) and e.published,
+      order_by: {
+        :desc,
+        fragment(
+          """
+          ts_rank_cd(
+            searchable_text,
+            replace(
+              websearch_to_tsquery('English', ?)::text || ' ',
+              ''' ',
+              ''':*'
+            )::tsquery,
+            4
+          )
+          """,
+          ^query
+        )
+      }
+    )
+    |> Repo.all()
+  end
+
   def list_registered_events_for_user(user_id) do
     from(e in Event,
       join: ea in assoc(e, :events_attendees),
