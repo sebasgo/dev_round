@@ -30,7 +30,7 @@ defmodule DevRoundWeb.EventComponents do
       <%= if @events == [] do %>
         {render_slot(@placeholder)}
       <% else %>
-        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 -mx-4">
           <.link
             :for={event <- @events}
             :key={event.id}

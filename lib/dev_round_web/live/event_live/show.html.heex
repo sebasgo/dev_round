@@ -58,7 +58,7 @@
     This event is in the past and has been archived.
   </div>
 
-  <div :if={@event.live} class="alert alert-info alert-soft my-8" role="alert">
+  <div :if={@event.live} class="alert alert-info alert-soft -mx-4 my-8" role="alert">
     <div class="badge badge-info flex items-center gap-2">
       <span class="relative flex h-3 w-3">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75">
@@ -77,8 +77,8 @@
     </div>
   </div>
 
-  <div class="card bg-base-300 shadow-xl my-8">
-    <div class="card-body">
+  <div class="card bg-base-300 shadow-xl -mx-4 my-8">
+    <div class="card-body p-4">
       <dl class="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4 items-center">
         <dt class="flex items-center gap-1">
           <.icon name="hero-calendar" class="" /> Date and Time:
@@ -166,7 +166,7 @@
     </div>
   </div>
 
-  <article class="prose max-w-none prose-h1:font-mono prose-h2:font-mono prose-h3:font-mono prose-h4:font-mono">
+  <article class="prose max-w-none prose-h1:font-mono prose-h2:font-mono prose-h3:font-mono prose-h4:font-mono prose-pre:-mx-4">
     <.markdown markdown={@event.body} />
   </article>
 

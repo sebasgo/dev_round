@@ -106,7 +106,7 @@ defmodule DevRoundWeb.UserEventsLive do
 
   defp event_card(assigns) do
     ~H"""
-    <div class="rounded-lg shadow-lg overflow-hidden border border-base-content/10">
+    <div class="rounded-lg shadow-lg overflow-hidden border border-base-content/10 -mx-4">
       <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] items-start gap-4 p-4 bg-base-300">
         <div class="grow">
           <h3 class="text-lg font-mono font-semibold text-base-content">
