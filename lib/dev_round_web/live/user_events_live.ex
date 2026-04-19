@@ -40,6 +40,9 @@ defmodule DevRoundWeb.UserEventsLive do
     <Layouts.app flash={@flash} current_user={@current_user}>
       <.header>
         Your Events
+        <:subtitle>
+          Track and organize your event registrations
+        </:subtitle>
       </.header>
 
       <div class="space-y-16">
@@ -162,7 +165,11 @@ defmodule DevRoundWeb.UserEventsLive do
               />
             <% else %>
               <div class="flex items-center p-4 text-base-content/70 text-center text-sm italic">
-                The teams for this session have not been assigned yet.
+                <%= if session.teams_locked do %>
+                  The teams for this session have not been assigned yet.
+                <% else %>
+                  You did not take part in this session.
+                <% end %>
               </div>
             <% end %>
           </div>

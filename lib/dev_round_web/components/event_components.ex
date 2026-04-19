@@ -144,7 +144,7 @@ defmodule DevRoundWeb.EventComponents do
           </span>
           <.live_badge :if={@session.live} />
         </h2>
-        <div class="card grid lg:grid-cols-2 items-center gap-4">
+        <div class="card grid lg:grid-cols-2 items-start gap-4">
           <div class="">
             <div class="text-sm text-base-content/70">
               Begin & End
