@@ -31,7 +31,12 @@ defmodule DevRoundWeb.Router do
     live_session :main,
       on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}] do
       live "/user/events", UserEventsLive, :show
-      live "/users/settings", UserSettingsLive, :edit
+
+      if Application.compile_env(:dev_round, :dev_routes) do
+        # User settings is not ready for production, yet.
+        live "/user/settings", UserSettingsLive, :edit
+      end
+
       live "/events", EventLive.Index, :index
       live "/events/:slug", EventLive.Show, :show
       live "/events/:slug/live", EventSlidesLive.Show, :show

@@ -168,8 +168,8 @@ defmodule DevRoundWeb.Layouts do
             Your Events
           </.link>
         </li>
-        <li>
-          <.link href={~p"/users/settings"}>
+        <li :if={Application.get_env(:dev_round, :dev_routes)}>
+          <.link href={~p"/user/settings"}>
             Settings
           </.link>
         </li>

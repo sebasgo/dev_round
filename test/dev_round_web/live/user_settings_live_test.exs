@@ -10,13 +10,13 @@ defmodule DevRoundWeb.UserSettingsLiveTest do
       {:ok, _lv, html} =
         conn
         |> log_in_user(user_fixture())
-        |> live(~p"/users/settings")
+        |> live(~p"/user/settings")
 
       assert html =~ "Update Settings"
     end
 
     test "redirects if user is not logged in", %{conn: conn} do
-      assert {:error, redirect} = live(conn, ~p"/users/settings")
+      assert {:error, redirect} = live(conn, ~p"/user/settings")
 
       assert {:redirect, %{to: path}} = redirect
       assert path == ~p"/users/log_in"
@@ -32,7 +32,7 @@ defmodule DevRoundWeb.UserSettingsLiveTest do
     test "updates the full name", %{conn: conn, user: user} do
       new_name = unique_user_name()
 
-      {:ok, lv, _html} = live(conn, ~p"/users/settings")
+      {:ok, lv, _html} = live(conn, ~p"/user/settings")
 
       result =
         lv
