@@ -51,11 +51,10 @@
 
   <div
     :if={@archived}
-    class="alert alert-warning alert-soft flex items-center gap-2 my-8"
+    class="alert alert-warning alert-soft flex items-center -mx-4 gap-2 my-8"
     role="alert"
   >
-    <.icon name="hero-exclamation-triangle" class="h-5 w-5" />
-    This event is in the past and has been archived.
+    <.icon name="hero-exclamation-triangle" class="h-5 w-5" /> This is an archived event.
   </div>
 
   <div :if={@event.live} class="alert alert-info alert-soft -mx-4 my-8" role="alert">
