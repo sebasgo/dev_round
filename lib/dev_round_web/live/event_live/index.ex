@@ -18,14 +18,22 @@ defmodule DevRoundWeb.EventLive.Index do
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
+  def handle_params(params, _url, socket) do
+    query = Map.get(params, "query", "")
+    search_form = to_form(%{"query" => query})
+    search_results = search_for_events(query)
+
+    {:noreply,
+     assign(socket,
+       search_form: search_form,
+       search_results: search_results
+     )}
   end
 
   @impl true
-  def handle_event("search", %{"query" => query} = search_params, socket) do
-    {:noreply,
-     assign(socket, form: to_form(search_params), search_results: search_for_events(query))}
+  def handle_event("search", %{"query" => query}, socket) do
+    socket = push_patch(socket, to: "/events?#{URI.encode_query(%{query: query})}")
+    {:noreply, socket}
   end
 
   defp search_for_events("" = _query), do: nil
