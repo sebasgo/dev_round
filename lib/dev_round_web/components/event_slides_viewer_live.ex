@@ -126,7 +126,7 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
         %{event: event} = socket.assigns
 
         socket
-        |> assign(:pdf_url, DevRound.Events.get_event_pdf_url(event))
+        |> assign(:pdf_url, DevRoundWeb.Urls.event_slides_url(event))
       end
     end
   end
@@ -135,7 +135,7 @@ defmodule DevRoundWeb.EventSlidesViewerLive do
     %{event: event} = socket.assigns
 
     socket
-    |> assign(:pdf_url, Events.get_event_pdf_url(event))
+    |> assign(:pdf_url, DevRoundWeb.Urls.event_slides_url(event))
     |> assign(:pdf_initial_page_number, event.slides_page_number)
     |> assign_new(:pdf_error, fn -> nil end)
   end

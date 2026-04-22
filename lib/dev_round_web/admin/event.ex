@@ -150,8 +150,8 @@ defmodule DevRoundWeb.Admin.Event do
           assigns ->
             ~H"""
             <p>
-              <Phoenix.Component.link navigate={~p"/uploads/events/slides/#{@value}"}>
-                {Backpex.HTML.pretty_value(@value)}
+              <Phoenix.Component.link navigate={DevRoundWeb.Urls.event_slides_url(@item, download: true)}>
+                {Backpex.HTML.pretty_value(@item.slug)}.pdf
               </Phoenix.Component.link>
             </p>
             """

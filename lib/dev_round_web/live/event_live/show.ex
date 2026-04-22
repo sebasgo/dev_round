@@ -76,7 +76,7 @@ defmodule DevRoundWeb.EventLive.Show do
     |> assign(:attendance, attendance(event, socket.assigns.current_user))
     |> assign(:registration_open?, Events.event_open_for_registration?(event))
     |> assign(:multiple_langs, Events.event_has_multiple_langs?(event))
-    |> assign(:pdf_url, Events.get_event_pdf_url(event))
+    |> assign(:pdf_url, DevRoundWeb.Urls.event_slides_url(event, download: true))
     |> assign(:archived, DateTime.before?(end_dt, Events.get_event_archival_datetime_utc()))
   end
 

@@ -231,18 +231,6 @@ defmodule DevRound.EventsTest do
     end
   end
 
-  describe "get_event_pdf_url/1" do
-    test "returns correct URL for slides" do
-      event = event_fixture(%{slides_filename: "test.pdf"})
-      assert Events.get_event_pdf_url(event) =~ "/uploads/events/slides/test.pdf"
-    end
-
-    test "returns nil when no slides_filename" do
-      event = event_fixture(%{slides_filename: nil})
-      assert is_nil(Events.get_event_pdf_url(event))
-    end
-  end
-
   describe "create_lang/1" do
     test "creates a lang with valid data" do
       attrs = %{name: "Python", icon_path: "python.svg"}

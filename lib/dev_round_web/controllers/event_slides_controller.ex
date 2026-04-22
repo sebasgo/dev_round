@@ -1,11 +1,28 @@
 defmodule DevRoundWeb.EventSlidesController do
   use DevRoundWeb, :controller
 
+  alias DevRoundWeb.NotFoundError
   alias DevRound.Events
 
-  def show(conn, %{"file_name" => file_name}) do
-    {:ok, data} = read_data(file_name)
-    send_data(conn, data)
+  def show(conn, %{"slug" => slug} = params) do
+    event = Events.get_event!(slug)
+
+    case event.slides_filename do
+      nil ->
+        raise NotFoundError, "event #{event.id} has no slides"
+
+      file_name ->
+        {:ok, data} = read_data(file_name)
+
+        if Map.get(params, "download") == "1" do
+          conn =
+            put_resp_header(conn, "content-disposition", "attachment; filename=\"#{slug}.pdf\"")
+
+          send_data(conn, data)
+        else
+          send_data(conn, data)
+        end
+    end
   end
 
   defp read_data(file_name) do

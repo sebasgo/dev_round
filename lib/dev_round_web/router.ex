@@ -26,7 +26,7 @@ defmodule DevRoundWeb.Router do
     get "/", PageController, :home
     get "/avatar/:name/:avatar_hash", AvatarController, :show
     get "/lang-icon/:file_name", LangIconController, :show
-    get "/uploads/events/slides/:file_name", EventSlidesController, :show
+    get "/events/:slug/slides/:file_name", EventSlidesController, :show
 
     live_session :main,
       on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}] do

@@ -17,7 +17,7 @@ defmodule DevRoundWeb do
   those modules here.
   """
 
-  def static_paths, do: ~w(assets fonts images uploads favicon.ico robots.txt)
+  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
 
   def router do
     quote do
@@ -117,5 +117,9 @@ defmodule DevRoundWeb do
 end
 
 defmodule DevRoundWeb.PermissionError do
+  defexception [:message, plug_status: 404]
+end
+
+defmodule DevRoundWeb.NotFoundError do
   defexception [:message, plug_status: 404]
 end
