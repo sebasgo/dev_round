@@ -5,10 +5,10 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
+    "pdfjs-dist": "^5.4.624",
     "daisyui": "^5.5.19"
   },
   "dependencies": {
-    "pdfjs-dist": "^5.4.624",
     "prismjs": "^1.30.0"
   }
 }

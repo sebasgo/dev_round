@@ -56,6 +56,7 @@ defmodule DevRound.MixProject do
        compile: false,
        depth: 1},
       {:swoosh, "~> 1.16"},
+      {:gen_smtp, "~> 1.3", only: :prod},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 1.0"},
@@ -91,7 +92,15 @@ defmodule DevRound.MixProject do
         "esbuild dev_round --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
+      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"],
+      "podman.release": fn _args ->
+        version = Mix.Project.config()[:version]
+
+        case Mix.shell().cmd("podman build --tag dev_round:#{version} .") do
+          0 -> nil
+          error -> Mix.shell().error("podman error #{error} when building release container")
+        end
+      end
     ]
   end
 end

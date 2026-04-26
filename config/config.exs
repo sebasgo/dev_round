@@ -81,6 +81,9 @@ config :exldap, :settings,
   sslopts: [verify: :verify_peer, cacerts: :public_key.cacerts_get()],
   search_timeout: 10_000
 
+# Disable swoosh api client (we use SMTP)
+config :swoosh, :api_client, false
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

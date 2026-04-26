@@ -7,6 +7,8 @@ defmodule DevRound.Application do
 
   @impl true
   def start(_type, _args) do
+    create_priv_dirs!()
+
     children = [
       DevRoundWeb.Telemetry,
       DevRound.Repo,
@@ -37,5 +39,18 @@ defmodule DevRound.Application do
   defp skip_migrations?() do
     # By default, sqlite migrations are run when using a release
     System.get_env("RELEASE_NAME") != nil
+  end
+
+  defp create_priv_dirs! do
+    priv_dir = :code.priv_dir(:dev_round)
+
+    dirs = [
+      DevRound.Events.lang_icon_dir(),
+      DevRound.Events.event_slides_dir()
+    ]
+
+    Enum.each(dirs, fn dir ->
+      priv_dir |> Path.join(dir) |> File.mkdir_p!()
+    end)
   end
 end
