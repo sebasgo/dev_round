@@ -62,12 +62,12 @@ defmodule DevRoundWeb.Router do
 
     live_session :admin,
       on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}, Backpex.InitAssigns] do
-      live_resources "/events", Admin.Event
-      live_resources "/event_attendees", Admin.EventAttendees
-      live_resources "/users", Admin.User
-      live_resources "/user_tokens", Admin.UserToken
-      live_resources "/langs", Admin.Lang
-      live_resources "/team_names", Admin.TeamName
+      live_resources "/events", Admin.EventLive
+      live_resources "/event_attendees", Admin.EventAttendeesLive
+      live_resources "/users", Admin.UserLive
+      live_resources "/user_tokens", Admin.UserTokenLive
+      live_resources "/langs", Admin.LangLive
+      live_resources "/team_names", Admin.TeamNameLive
     end
 
     live_dashboard "/dashboard", metrics: DevRoundWeb.Telemetry

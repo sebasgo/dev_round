@@ -1,4 +1,4 @@
-defmodule DevRoundWeb.Admin.EventAttendees do
+defmodule DevRoundWeb.Admin.EventAttendeesLive do
   @moduledoc """
   Backpex resource configuration for managing event attendees.
 
@@ -37,14 +37,14 @@ defmodule DevRoundWeb.Admin.EventAttendees do
         module: Backpex.Fields.BelongsTo,
         label: "Event",
         display_field: :title,
-        live_resource: DevRoundWeb.Admin.Event,
+        live_resource: DevRoundWeb.Admin.EventLive,
         prompt: "Select"
       },
       user: %{
         module: Backpex.Fields.BelongsTo,
         label: "User",
         display_field: :full_name,
-        live_resource: DevRoundWeb.Admin.User,
+        live_resource: DevRoundWeb.Admin.UserLive,
         prompt: "Select"
       },
       is_remote: %{
@@ -59,7 +59,7 @@ defmodule DevRoundWeb.Admin.EventAttendees do
         module: Backpex.Fields.HasMany,
         label: "Programming Languages",
         display_field: :name,
-        live_resource: DevRoundWeb.Admin.Lang,
+        live_resource: DevRoundWeb.Admin.LangLive,
         prompt: "Select",
         not_found_text: "No languages found"
       }

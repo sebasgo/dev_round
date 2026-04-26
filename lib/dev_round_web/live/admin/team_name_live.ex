@@ -1,4 +1,4 @@
-defmodule DevRoundWeb.Admin.TeamName do
+defmodule DevRoundWeb.Admin.TeamNameLive do
   @moduledoc """
   Backpex resource configuration for managing team names.
 

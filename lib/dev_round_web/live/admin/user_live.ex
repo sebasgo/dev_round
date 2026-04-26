@@ -1,4 +1,4 @@
-defmodule DevRoundWeb.Admin.User do
+defmodule DevRoundWeb.Admin.UserLive do
   @moduledoc """
   Backpex resource configuration for managing users.
 

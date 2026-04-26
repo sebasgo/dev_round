@@ -1,4 +1,4 @@
-defmodule DevRoundWeb.Admin.UserToken do
+defmodule DevRoundWeb.Admin.UserTokenLive do
   @moduledoc """
   Admin panel for user tokens.
 
@@ -38,7 +38,7 @@ defmodule DevRoundWeb.Admin.UserToken do
         module: Backpex.Fields.BelongsTo,
         label: "User",
         display_field: :full_name,
-        live_resource: DevRoundWeb.Admin.User
+        live_resource: DevRoundWeb.Admin.UserLive
       },
       inserted_at: %{
         module: Backpex.Fields.DateTime,

@@ -1,4 +1,4 @@
-defmodule DevRoundWeb.Admin.Lang do
+defmodule DevRoundWeb.Admin.LangLive do
   @moduledoc """
   Backpex resource configuration for managing programming languages.
 
