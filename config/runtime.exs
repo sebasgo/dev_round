@@ -68,7 +68,7 @@ if config_env() == :prod do
            """)
 
   config :dev_round,
-         :mail_from,
+         :ldap_user_group,
          System.get_env("LDAP_USER_GROUP") ||
            raise("""
            environment variable LDAP_USER_GROUP is missing.
@@ -76,7 +76,7 @@ if config_env() == :prod do
            """)
 
   config :dev_round,
-         :mail_from,
+         :ldap_admin_group,
          System.get_env("LDAP_ADMIN_GROUP") ||
            raise("""
            environment variable LDAP_ADMIN_GROUP is missing.
