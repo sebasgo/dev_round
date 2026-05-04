@@ -105,7 +105,7 @@ defmodule DevRound.LDAP do
   end
 
   defp verify_credentials(ldap_conn, user_dn, password) do
-    case Exldap.verify_credentials(ldap_conn, user_dn, to_charlist(password)) do
+    case Exldap.verify_credentials(ldap_conn, user_dn, :binary.bin_to_list(password)) do
       :ok -> :ok
       {:error, _reason} -> {:error, :invalid_credentials}
     end
