@@ -79,10 +79,23 @@ defmodule DevRoundWeb.Admin.ItemActions.DuplicateEventAction do
     item = item |> Events.preload_event_assocs()
     date_diff = calculate_date_diff(data.begin_local, item.begin_local)
 
+    has_slides? = not is_nil(item.slides_filename) and item.slides_filename != ""
+
+    {new_slides_filename, slides_attrs} =
+      if has_slides? do
+        new_uuid = Ecto.UUID.generate()
+        ext = Path.extname(item.slides_filename)
+        new_filename = "#{new_uuid}#{ext}"
+        {new_filename, %{slides_filename: new_filename}}
+      else
+        {nil, %{}}
+      end
+
     attrs =
       item
       |> Map.from_struct()
       |> Map.merge(data)
+      |> Map.merge(slides_attrs)
       |> shift_event_dates(date_diff)
       |> Map.put(:sessions, Enum.map(item.sessions, &process_session(&1, date_diff)))
       |> Map.put(
@@ -104,6 +117,7 @@ defmodule DevRoundWeb.Admin.ItemActions.DuplicateEventAction do
 
     case Events.create_event(attrs, opts) do
       {:ok, _item} ->
+        maybe_copy_slides(item, has_slides?, new_slides_filename)
         {:ok, socket |> put_flash(:info, "Event has been duplicated successfully.")}
 
       {:error, _changeset} ->
@@ -138,5 +152,28 @@ defmodule DevRoundWeb.Admin.ItemActions.DuplicateEventAction do
     |> DateTime.from_naive!(DevRound.Formats.time_zone())
     |> DateTime.add(diff)
     |> DateTime.to_naive()
+  end
+
+  defp maybe_copy_slides(item, has_slides?, new_slides_filename) do
+    if has_slides? do
+      src =
+        Path.join([
+          :code.priv_dir(:dev_round),
+          Events.event_slides_dir(),
+          item.slides_filename
+        ])
+
+      dest =
+        Path.join([
+          :code.priv_dir(:dev_round),
+          Events.event_slides_dir(),
+          new_slides_filename
+        ])
+
+      if File.exists?(src) do
+        File.mkdir_p!(Path.dirname(dest))
+        File.cp!(src, dest)
+      end
+    end
   end
 end
