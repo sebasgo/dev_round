@@ -259,6 +259,11 @@ code[class*="language-"] *::selection {
 .phx-submit-loading .while-submitting { display: block; }
 .phx-submit-loading .while-not-submitting { display: none; }
 
+.prose a.footnote {
+  vertical-align: super;
+  font-size: 0.7em;
+}
+
 /*********************************************************
 * Tokens
 */
