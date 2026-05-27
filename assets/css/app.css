@@ -15,10 +15,10 @@
   name: "dark";
   default: true;
 
-  --color-base-100: oklch(25.33% 0.016 252.42);
+  --color-base-100: oklch(27.33% 0.016 252.42);
   --color-base-200: oklch(23.26% 0.014 253.1);
   --color-base-300: oklch(21.15% 0.012 254.09);
-  --color-base-content: oklch(0.9114 0.0264 264.44);
+  --color-base-content: oklch(0.9414 0.0264 264.44);
   --color-primary: oklch(0.7736 0.1375 8.93);
   --color-primary-content: oklch(13.138% .0392 275.75);
   --color-secondary: oklch(65% 0.241 354.308);
