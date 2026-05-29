@@ -32,6 +32,7 @@ defmodule DevRound.Events.EventHost do
     event_host
     |> cast(attrs, [:event_id, :user_id])
     |> change(position: position)
+    |> validate_required(:user_id, message: "Required.")
     |> unique_constraint([:event, :user],
       name: "event_hosts_event_id_user_id_index",
       message: "User is already an host for this event"
