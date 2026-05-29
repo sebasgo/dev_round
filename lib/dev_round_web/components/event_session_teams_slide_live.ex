@@ -73,10 +73,13 @@ defmodule DevRoundWeb.EventSessionTeamsSlideLive do
   end
 
   defp assign_dates(socket, event_session) do
+    begin_local = event_session.begin |> DateTime.shift_zone!(DevRound.Formats.time_zone())
+    end_local = event_session.end |> DateTime.shift_zone!(DevRound.Formats.time_zone())
+
     assign(
       socket,
       :time,
-      Formats.format_datetime_range_compact(event_session.begin, event_session.end)
+      Formats.format_datetime_range_compact(begin_local, end_local)
     )
   end
 end
