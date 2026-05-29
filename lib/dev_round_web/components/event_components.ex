@@ -28,7 +28,9 @@ defmodule DevRoundWeb.EventComponents do
       </div>
 
       <%= if @events == [] do %>
-        {render_slot(@placeholder)}
+        <div class="-mx-4">
+          {render_slot(@placeholder)}
+        </div>
       <% else %>
         <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 -mx-4">
           <.link
