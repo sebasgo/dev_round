@@ -102,7 +102,6 @@ defmodule DevRound.Events do
     next_midnight_local =
       now
       |> DateTime.to_date()
-      |> Date.shift(day: 1)
       |> DateTime.new!(~T[00:00:00], tz)
 
     DateTime.shift_zone!(next_midnight_local, "Etc/UTC")
