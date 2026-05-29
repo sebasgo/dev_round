@@ -58,9 +58,9 @@ defmodule DevRound.Accounts do
     %User{}
     |> User.upsert_changeset(attrs)
     |> Repo.insert(
-      on_conflict: {:replace_all_except, [:id, :inserted_at]},
+      on_conflict: {:replace_all_except, [:id, :inserted_at, :experience_level]},
       conflict_target: [:name],
-      returning: [:inserted_at]
+      returning: [:inserted_at, :experience_level]
     )
   end
 

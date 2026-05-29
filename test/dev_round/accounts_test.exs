@@ -210,6 +210,7 @@ defmodule DevRound.AccountsTest do
       assert user.name == "newuser"
       assert user.email == "new@example.com"
       assert user.full_name == "New User"
+      assert user.experience_level == 5
     end
 
     test "updates existing user" do
@@ -227,6 +228,22 @@ defmodule DevRound.AccountsTest do
       assert updated_user.id == user.id
       assert updated_user.email == "updated@example.com"
       assert updated_user.full_name == "Updated User"
+    end
+
+    test "preserves experience_level when updating existing user" do
+      user = user_fixture(%{name: "expuser", email: "exp@example.com", experience_level: 3})
+
+      attrs = %{
+        name: "expuser",
+        email: "updated@example.com",
+        full_name: "Updated User",
+        avatar: nil,
+        groups: MapSet.new(["dev_round_users"])
+      }
+
+      assert {:ok, %User{} = updated_user} = Accounts.upsert_user(attrs)
+      assert updated_user.id == user.id
+      assert updated_user.experience_level == 3
     end
   end
 
