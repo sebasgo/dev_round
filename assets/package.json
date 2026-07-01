@@ -4,7 +4,7 @@
     "postinstall": "npm run copy-pdfjs"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/typography": "^0.5.20",
     "pdfjs-dist": "^5.4.624",
     "daisyui": "^5.5.20"
   },
