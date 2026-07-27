@@ -60,7 +60,7 @@ defmodule DevRoundWeb.RegistrationComponent do
         <:actions>
           <.button variant="primary" phx-disable-with="Saving...">{@save_label}</.button>
           <%= if @action == :edit_registration  && @mode == :self_registration do %>
-            <.button type="button" phx-click={JS.push("delete", target: @myself)}>
+            <.button phx-click={JS.push("delete", target: @myself)}>
               Cancel Registration
             </.button>
           <% end %>

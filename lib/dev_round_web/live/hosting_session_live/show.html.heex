@@ -5,7 +5,6 @@
   <div class="grid my-8 gap-4">
     <.toolbar>
       <.button
-        type="button"
         class="btn btn-primary"
         disabled={!Enum.empty?(@messages) || @session.teams_locked}
         phx-click={JS.push("build_teams")}
@@ -13,7 +12,6 @@
         Build Teams
       </.button>
       <.button
-        type="button"
         class="btn btn-success"
         disabled={Enum.empty?(@teams) || @session.live}
         phx-click={JS.push("start_session")}
@@ -21,7 +19,6 @@
         Start Session
       </.button>
       <.button
-        type="button"
         class="btn btn-warning"
         disabled={Enum.empty?(@teams) || !@session.live}
         phx-click={JS.push("stop_session")}
@@ -30,7 +27,6 @@
       </.button>
       <div class="flex-1" />
       <.button
-        type="button"
         class="btn btn-error"
         disabled={Enum.empty?(@teams)}
         phx-click={JS.push("reset")}

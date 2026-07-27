@@ -18,7 +18,7 @@ defmodule DevRoundWeb.UserLoginLive do
           <.input field={@form[:password]} type="password" label="Password" required />
 
           <:actions>
-            <.button type="submit" class="btn btn-primary btn-block flex gap-2">
+            <.button class="btn btn-primary btn-block flex gap-2">
               <span class="loading loading-spinner loading-md while-submitting"></span>
               <span class="while-submitting">Logging in...</span>
               <span class="while-not-submitting">Log in <span aria-hidden="true">→</span></span>
