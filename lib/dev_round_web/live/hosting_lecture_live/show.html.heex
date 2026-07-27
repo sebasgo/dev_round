@@ -5,7 +5,6 @@
   <div class="grid my-8 gap-4">
     <.toolbar>
       <.button
-        type="button"
         disabled={@event.live}
         class="btn btn-success"
         phx-click={JS.push("set_live", value: %{live: true})}
@@ -13,7 +12,6 @@
         Start Presentation
       </.button>
       <.button
-        type="button"
         class="btn btn-warning"
         disabled={!@event.live}
         phx-click={JS.push("set_live", value: %{live: false})}
