@@ -105,7 +105,7 @@ defmodule DevRound.AccountsTest do
                name: username,
                email: "#{username}@dev.local",
                full_name:
-                 String.replace(username, ~r/^([a-z])([a-z]+)$/, fn _, first, rest ->
+                 Regex.replace(~r/^([a-z])([a-z]+)$/, username, fn _, first, rest ->
                    "#{String.upcase(first)} #{String.capitalize(rest)}"
                  end),
                avatar: nil,
