@@ -44,7 +44,9 @@ defmodule DevRoundWeb.EventComponents do
                 {event.title}
               </h3>
 
-              <p class="mt-3 text-sm">{event.teaser}</p>
+              <div class="mt-3 prose max-w-none text-sm">
+                <.markdown markdown={event.teaser} />
+              </div>
 
               <div class="flex flex-col gap-2 mt-3">
                 <div class="flex items-center gap-2 text-sm text-base-content/70">

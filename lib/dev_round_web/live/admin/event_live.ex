@@ -120,7 +120,7 @@ defmodule DevRoundWeb.Admin.EventLive do
       teaser: %{
         module: Backpex.Fields.Textarea,
         label: "Teaser",
-        help_text: "Shown on event listing page.",
+        help_text: "Displayed in event listings. Markdown is supported.",
         rows: 5,
         panel: :content,
         except: [:index]
