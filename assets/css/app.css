@@ -259,9 +259,21 @@ code[class*="language-"] *::selection {
 .phx-submit-loading .while-submitting { display: block; }
 .phx-submit-loading .while-not-submitting { display: none; }
 
-.prose a.footnote {
-  vertical-align: super;
-  font-size: 0.7em;
+.prose a.footnote,
+.prose .footnote-ref a {
+  font-size: 0.8em;
+  text-decoration: none;
+}
+
+.prose .footnote-ref a:hover {
+  text-decoration: underline;
+}
+
+.prose .footnotes {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid oklch(0.9414 0.0264 264.44 / 0.2);
+  font-size: 0.875rem;
 }
 
 /*********************************************************

@@ -4,7 +4,6 @@ defmodule DevRound.Events do
   """
 
   import Ecto.Query, warn: false
-  require Phoenix.VerifiedRoutes
   alias DevRound.Repo
   alias DevRound.Accounts.User
   alias DevRound.Events.Event

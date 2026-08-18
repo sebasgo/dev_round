@@ -666,7 +666,18 @@ defmodule DevRoundWeb.CoreComponents do
 
     markdown_html =
       String.trim(markdown)
-      |> Earmark.as_html!(code_class_prefix: "language-", sub_sup: true, footnotes: true)
+      |> MDEx.to_html!(
+        extension: [
+          superscript: true,
+          subscript: true,
+          footnotes: true,
+          table: true,
+          strikethrough: true,
+          autolink: true,
+          tasklist: true,
+          alerts: true
+        ]
+      )
       |> Phoenix.HTML.raw()
 
     assigns = assign(assigns, :markdown_html, markdown_html)

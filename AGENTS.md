@@ -467,7 +467,7 @@ DevRound is an event management platform for organizing coding events and progra
 - **Frontend**: Tailwind CSS v4, Heroicons v2.2
 - **JavaScript Tools**: Custom external hooks (PDF viewer, fullscreen, team slides)
 - **Real-time**: Phoenix PubSub for live updates
-- **Markdown**: Earmark for event descriptions
+- **Markdown**: MDEx for event descriptions
 - **Time Zones**: Automatic UTC/local time conversion with `time_zone_info`
 - **Other**: Slugify, BCrypt for authentication
 

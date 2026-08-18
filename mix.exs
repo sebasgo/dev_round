@@ -64,7 +64,7 @@ defmodule DevRound.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:backpex, "~> 0.18.0"},
-      {:earmark, "~> 1.4"},
+      {:mdex, "~> 0.13"},
       {:time_zone_info, "~> 0.7"},
       {:slugify, "~> 1.3"},
       {:exldap, "~> 0.6"},
