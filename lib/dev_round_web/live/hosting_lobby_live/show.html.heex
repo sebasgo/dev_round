@@ -2,6 +2,38 @@
   <DevRoundWeb.HostingComponents.header event={@event} tab={:lobby} />
   <DevRoundWeb.HostingComponents.messages messages={@messages} />
 
+  <.form for={@filter_form} id="attendees-filter-form" phx-change="filter_change" class="my-4">
+    <div class="flex flex-col sm:flex-row gap-4 items-center">
+      <label class="input w-full flex items-center gap-2">
+        <.icon name="hero-magnifying-glass" class="w-4 h-4 opacity-70" />
+        <input
+          type="search"
+          name={@filter_form[:filter][:name]}
+          id={@filter_form[:filter][:id]}
+          value={@filter_form[:filter][:value]}
+          placeholder="Filter participants by name..."
+          class="grow"
+          autocomplete="off"
+        />
+      </label>
+      <div class="join w-full sm:w-auto shrink-0">
+        <label
+          for={@filter_form[:order][:id]}
+          class="join-item bg-neutral border border-base-content/20 border-r-0 px-3 flex items-center text-sm whitespace-nowrap cursor-pointer"
+        >
+          Sort by
+        </label>
+        <select
+          name={@filter_form[:order][:name]}
+          id={@filter_form[:order][:id]}
+          class="select join-item w-full sm:w-auto"
+        >
+          {Phoenix.HTML.Form.options_for_select(@order_options, @filter_form[:order][:value])}
+        </select>
+      </div>
+    </div>
+  </.form>
+
   <div class="relative">
     <div class="bg-base-300 rounded-box my-4 overflow-hidden shadow-sm">
       <div class="overflow-x-auto">
@@ -15,7 +47,7 @@
           </thead>
           <tbody>
             <tr
-              :for={attendee <- @event.events_attendees}
+              :for={attendee <- @filtered_attendees}
               :key={attendee.id}
               class={[
                 (attendee.checked && "bg-green-900 hover:bg-green-950") || "hover:bg-zinc-950",
@@ -57,7 +89,9 @@
                   <.icon name="hero-x-circle" class="w-4 h-4" /> Check out
                 </.button>
                 <.link
-                  patch={~p"/events/#{@event}/hosting/lobby/registration/edit/#{attendee.user}"}
+                  patch={
+                    ~p"/events/#{@event}/hosting/lobby/registration/edit/#{attendee.user}?#{@query_params}"
+                  }
                   phx-click={JS.push_focus()}
                 >
                   <.button class="btn btn btn-neutral">
@@ -80,7 +114,7 @@
     :if={@live_action == :edit_registration}
     id="event-modal"
     show
-    on_cancel={JS.patch(~p"/events/#{@event}/hosting/lobby")}
+    on_cancel={JS.patch(~p"/events/#{@event}/hosting/lobby?#{@query_params}")}
   >
     <.live_component
       module={DevRoundWeb.RegistrationComponent}
@@ -88,7 +122,7 @@
       action={@live_action}
       event={@event}
       attendance={@registration_edit_attendee}
-      patch={~p"/events/#{@event}/hosting/lobby"}
+      patch={~p"/events/#{@event}/hosting/lobby?#{@query_params}"}
       user={@registration_edit_attendee.user}
       mode={:host}
     />

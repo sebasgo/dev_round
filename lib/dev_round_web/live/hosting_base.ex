@@ -12,8 +12,9 @@ defmodule DevRoundWeb.HostingBase do
   import Phoenix.Component
   alias DevRound.{Events, Hosting}
 
-  def assign_event(socket) do
-    event = Events.get_event!(socket.assigns.slug, order_attendees_by: :is_remote_and_full_name)
+  def assign_event(socket, opts \\ []) do
+    order_attendees_by = Keyword.get(opts, :order_attendees_by, :is_remote_and_full_name)
+    event = Events.get_event!(socket.assigns.slug, order_attendees_by: order_attendees_by)
 
     socket
     |> assign(:event, event)
