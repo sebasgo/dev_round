@@ -286,15 +286,52 @@ defmodule DevRound.Events do
 
   def create_event_attendee(
         %Event{} = event,
-        %User{} = user,
+        user,
         attrs \\ %{},
         mode \\ :self_registration
       ) do
     case can_change_event_attendee?(event, mode) do
       true ->
-        change_event_attendee(%EventAttendee{}, event, attrs, mode)
-        |> fill_event_attendee_initial(event, user)
-        |> Repo.insert()
+        attendee =
+          case user do
+            %User{id: user_id} = u -> %EventAttendee{user_id: user_id, user: u}
+            _ -> %EventAttendee{}
+          end
+
+        changeset = change_event_attendee(attendee, event, attrs, mode)
+
+        user =
+          case user do
+            %User{} = u ->
+              u
+
+            _ ->
+              case Ecto.Changeset.get_field(changeset, :user_id) do
+                nil -> nil
+                user_id -> DevRound.Accounts.get_user(user_id)
+              end
+          end
+
+        if user && changeset.valid? do
+          case changeset
+               |> fill_event_attendee_initial(event, user)
+               |> Repo.insert() do
+            {:ok, attendee} ->
+              {:ok, Repo.preload(attendee, :user)}
+
+            error ->
+              error
+          end
+        else
+          changeset =
+            if is_nil(user) and is_nil(changeset.errors[:user_id]) do
+              Ecto.Changeset.add_error(changeset, :user_id, "Please select a participant.")
+            else
+              changeset
+            end
+
+          {:error, %{changeset | action: :insert}}
+        end
 
       _ ->
         {:error, :registration_closed}
@@ -338,9 +375,25 @@ defmodule DevRound.Events do
     end
   end
 
+  def list_unregistered_users(%Event{id: event_id}) do
+    registered_user_ids_query =
+      from ea in EventAttendee,
+        where: ea.event_id == ^event_id,
+        select: ea.user_id
+
+    query =
+      from u in User,
+        where: u.id not in subquery(registered_user_ids_query),
+        order_by: [asc: :full_name, asc: :name]
+
+    Repo.all(query)
+  end
+
   defp fill_event_attendee_initial(changeset, event, user) do
+    exp_level = Ecto.Changeset.get_change(changeset, :experience_level) || user.experience_level
+
     changeset
-    |> Ecto.Changeset.change(event: event, user: user, experience_level: user.experience_level)
+    |> Ecto.Changeset.change(event: event, user: user, experience_level: exp_level)
   end
 
   defp can_change_event_attendee?(%Event{} = event, :self_registration = _mode),

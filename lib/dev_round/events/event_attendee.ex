@@ -25,9 +25,11 @@ defmodule DevRound.Events.EventAttendee do
     timestamps(type: :utc_datetime)
   end
 
+  @doc false
   def changeset(event_attendee, attrs, _opts \\ %{}) do
     event_attendee
     |> cast(attrs, [:event_id, :user_id, :is_remote, :experience_level])
+    |> validate_required([:is_remote, :user_id, :event_id])
     |> unique_constraint([:event_id, :user_id], message: "User already registered for this event")
     |> validate_experience_level()
   end
@@ -40,12 +42,22 @@ defmodule DevRound.Events.EventAttendee do
 
   def registration_changeset(event_attendee, attrs, :host = _mode) do
     event_attendee
-    |> cast(attrs, [:is_remote, :experience_level])
+    |> cast(attrs, [:is_remote, :experience_level, :user_id])
     |> validate_experience_level()
+    |> validate_user_selected()
   end
 
   def check_changeset(event_attendee, attrs) do
     event_attendee
     |> cast(attrs, [:checked])
+    |> validate_required([:checked])
+  end
+
+  defp validate_user_selected(changeset) do
+    if is_nil(get_field(changeset, :user_id)) and is_nil(get_field(changeset, :user)) do
+      add_error(changeset, :user_id, "Please select a participant.")
+    else
+      changeset
+    end
   end
 end

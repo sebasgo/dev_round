@@ -338,6 +338,51 @@ defmodule DevRound.EventsTest do
       event = event_fixture(%{registration_deadline_local: past_deadline})
       assert {:error, :registration_closed} = Events.create_event_attendee(event, user, %{})
     end
+
+    test "creates attendee in host mode even if registration is closed and preserves experience level" do
+      user = user_fixture(%{experience_level: 2})
+      past_deadline = NaiveDateTime.add(NaiveDateTime.local_now(), -1, :day)
+      event = event_fixture(%{registration_deadline_local: past_deadline})
+
+      attrs = %{
+        "lang_ids" => [Enum.at(event.langs, 0).id],
+        "experience_level" => "7",
+        "is_remote" => "true"
+      }
+
+      assert {:ok, %EventAttendee{experience_level: 7, is_remote: true}} =
+               Events.create_event_attendee(event, user, attrs, :host)
+    end
+  end
+
+  describe "list_unregistered_users/1" do
+    test "returns users not registered for the event sorted by full_name" do
+      future_deadline = NaiveDateTime.add(NaiveDateTime.local_now(), 12, :hour)
+      event = event_fixture(%{registration_deadline_local: future_deadline})
+      user1 = user_fixture(%{name: "zoe", full_name: "Zoe Brown", email: "zoe@example.com"})
+      user2 = user_fixture(%{name: "aaron", full_name: "Aaron Adams", email: "aaron@example.com"})
+
+      user3 =
+        user_fixture(%{name: "charlie", full_name: "Charlie Davis", email: "charlie@example.com"})
+
+      # Register user1
+      {:ok, _} =
+        Events.create_event_attendee(event, user1, %{
+          "lang_ids" => [Enum.at(event.langs, 0).id]
+        })
+
+      unregistered = Events.list_unregistered_users(event)
+      unregistered_ids = Enum.map(unregistered, & &1.id)
+
+      refute user1.id in unregistered_ids
+      assert user2.id in unregistered_ids
+      assert user3.id in unregistered_ids
+
+      # Verify ordering by full_name
+      aaron_index = Enum.find_index(unregistered, &(&1.id == user2.id))
+      charlie_index = Enum.find_index(unregistered, &(&1.id == user3.id))
+      assert aaron_index < charlie_index
+    end
   end
 
   describe "update_event_attendee/3" do

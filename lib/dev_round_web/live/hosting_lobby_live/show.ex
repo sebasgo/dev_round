@@ -45,6 +45,9 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
         :edit_registration ->
           ~p"/events/#{socket.assigns.event}/hosting/lobby/registration/edit/#{socket.assigns.registration_edit_username}?#{query_params}"
 
+        :new_registration ->
+          ~p"/events/#{socket.assigns.event}/hosting/lobby/registration/new?#{query_params}"
+
         _ ->
           ~p"/events/#{socket.assigns.event}/hosting/lobby?#{query_params}"
       end
@@ -244,5 +247,6 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
   end
 
   defp page_title(:show), do: "Hosting Lobby"
+  defp page_title(:new_registration), do: "Hosting Lobby · Add Participant"
   defp page_title(:edit_registration), do: "Hosting Lobby · Edit Registration"
 end

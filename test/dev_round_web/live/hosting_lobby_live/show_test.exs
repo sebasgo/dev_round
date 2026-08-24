@@ -316,6 +316,133 @@ defmodule DevRoundWeb.HostingLobbyLive.ShowTest do
       assert view |> element("button", "Check in") |> render()
     end
 
+    test "renders toolbar with Add participant button", %{conn: conn, event: event} do
+      {:ok, view, html} = live(conn, ~p"/events/#{event}/hosting/lobby")
+
+      assert has_element?(view, "a.btn-primary", "Add participant")
+      assert html =~ "Add participant"
+    end
+
+    test "clicking Add participant opens modal with unregistered participants", %{
+      conn: conn,
+      event: event,
+      lang: lang
+    } do
+      register_attendee(event, "RegisteredUser", false, [lang], false,
+        full_name: "Registered Alice"
+      )
+
+      unregistered_user = user_fixture(%{name: "unregistered", full_name: "Unregistered Bob"})
+
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}/hosting/lobby")
+
+      # Click Add participant button
+      view |> element("a", "Add participant") |> render_click()
+
+      assert_patch(view, ~p"/events/#{event}/hosting/lobby/registration/new?order=registration")
+      assert has_element?(view, "#event-modal")
+      assert has_element?(view, "#event-modal", "Add participant")
+
+      # Unregistered user is in select, registered user is not
+      assert has_element?(
+               view,
+               "#event-form select option[value='#{unregistered_user.id}']",
+               "Unregistered Bob"
+             )
+
+      refute has_element?(view, "#event-form select option", "Registered Alice")
+    end
+
+    test "submitting without participant selection shows validation error", %{
+      conn: conn,
+      event: event
+    } do
+      _unregistered_user = user_fixture(%{name: "unregistered", full_name: "Unregistered Bob"})
+
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}/hosting/lobby/registration/new")
+
+      assert view
+             |> form("#event-form", event_attendee: %{user_id: "", is_remote: "false"})
+             |> render_submit() =~ "Please select a participant."
+    end
+
+    test "adds participant successfully with confirmation flash and email", %{
+      conn: conn,
+      event: event
+    } do
+      import Swoosh.TestAssertions
+
+      user =
+        user_fixture(%{
+          name: "newbie",
+          full_name: "Newbie Developer",
+          email: "newbie@example.com",
+          experience_level: 3
+        })
+
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}/hosting/lobby/registration/new")
+
+      # Validate event updates experience level to user default
+      html =
+        view
+        |> form("#event-form", event_attendee: %{user_id: to_string(user.id)})
+        |> render_change()
+
+      # Experience level 3 radio button should be selected
+      assert html =~ ~s(value="3" checked)
+
+      # Submit form with custom experience level and remote attendance
+      submit_result =
+        view
+        |> form("#event-form",
+          event_attendee: %{
+            user_id: to_string(user.id),
+            experience_level: "8",
+            is_remote: "true"
+          }
+        )
+        |> render_submit()
+
+      assert submit_result =~ "Registration successful. Confirmation sent to Newbie Developer."
+
+      # Modal is closed and participant is visible in lobby
+      refute has_element?(view, "#event-modal")
+      assert has_element?(view, "#attendees", "Newbie Developer")
+
+      # Email was sent to the participant
+      assert_email_sent(to: {"Newbie Developer", "newbie@example.com"})
+
+      # Opening the modal again does not include the newly registered user
+      view |> element("a", "Add participant") |> render_click()
+      refute has_element?(view, "#event-form select option", "Newbie Developer")
+    end
+
+    test "host can cancel participant registration from the lobby", %{
+      conn: conn,
+      event: event,
+      lang: lang
+    } do
+      register_attendee(event, "Alice", false, [lang], false, full_name: "Alice Smith")
+
+      {:ok, view, _html} =
+        live(conn, ~p"/events/#{event}/hosting/lobby")
+
+      assert has_element?(view, "#attendees", "Alice Smith")
+
+      # Click edit button link for Alice
+      view |> element("a[href*='registration/edit']") |> render_click()
+
+      assert has_element?(view, "#event-modal")
+      assert has_element?(view, "button", "Cancel Registration")
+
+      # Click Cancel Registration
+      html = view |> element("button", "Cancel Registration") |> render_click()
+
+      assert html =~ "Registration canceled. Notification sent to Alice Smith"
+      refute has_element?(view, "#event-modal")
+      refute has_element?(view, "#attendees", "Alice Smith")
+    end
+
     test "edit registration modal link and cancel preserve filter and order query parameters", %{
       conn: conn,
       event: event,

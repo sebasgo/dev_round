@@ -83,6 +83,7 @@ defmodule DevRound.Accounts do
       ** (Ecto.NoResultsError)
 
   """
+  def get_user(id), do: Repo.get(User, id)
   def get_user!(id), do: Repo.get!(User, id)
 
   def change_user_profile(user, attrs \\ %{}) do
