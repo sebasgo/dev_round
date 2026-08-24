@@ -175,18 +175,17 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
       |> String.split(~r/\s+/, trim: true)
 
     case words do
-      [] ->
-        attendees
-
-      words ->
-        Enum.filter(attendees, fn attendee ->
-          full_name = String.downcase((attendee.user && attendee.user.full_name) || "")
-
-          Enum.all?(words, fn word ->
-            String.contains?(full_name, String.downcase(word))
-          end)
-        end)
+      [] -> attendees
+      words -> Enum.filter(attendees, &attendee_matches_words?(&1, words))
     end
+  end
+
+  defp attendee_matches_words?(attendee, words) do
+    full_name = String.downcase((attendee.user && attendee.user.full_name) || "")
+
+    Enum.all?(words, fn word ->
+      String.contains?(full_name, String.downcase(word))
+    end)
   end
 
   defp maybe_put_filter(params, filter) do

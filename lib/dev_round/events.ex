@@ -290,52 +290,61 @@ defmodule DevRound.Events do
         attrs \\ %{},
         mode \\ :self_registration
       ) do
-    case can_change_event_attendee?(event, mode) do
-      true ->
-        attendee =
-          case user do
-            %User{id: user_id} = u -> %EventAttendee{user_id: user_id, user: u}
-            _ -> %EventAttendee{}
-          end
-
-        changeset = change_event_attendee(attendee, event, attrs, mode)
-
-        user =
-          case user do
-            %User{} = u ->
-              u
-
-            _ ->
-              case Ecto.Changeset.get_field(changeset, :user_id) do
-                nil -> nil
-                user_id -> DevRound.Accounts.get_user(user_id)
-              end
-          end
-
-        if user && changeset.valid? do
-          case changeset
-               |> fill_event_attendee_initial(event, user)
-               |> Repo.insert() do
-            {:ok, attendee} ->
-              {:ok, Repo.preload(attendee, :user)}
-
-            error ->
-              error
-          end
-        else
-          changeset =
-            if is_nil(user) and is_nil(changeset.errors[:user_id]) do
-              Ecto.Changeset.add_error(changeset, :user_id, "Please select a participant.")
-            else
-              changeset
-            end
-
-          {:error, %{changeset | action: :insert}}
-        end
-
-      _ ->
-        {:error, :registration_closed}
+    if can_change_event_attendee?(event, mode) do
+      do_create_event_attendee(event, user, attrs, mode)
+    else
+      {:error, :registration_closed}
     end
+  end
+
+  defp do_create_event_attendee(event, user, attrs, mode) do
+    attendee = build_initial_attendee(user)
+    changeset = change_event_attendee(attendee, event, attrs, mode)
+    resolved_user = resolve_attendee_user(user, changeset)
+
+    insert_event_attendee(changeset, event, resolved_user)
+  end
+
+  defp build_initial_attendee(%User{id: user_id} = user) do
+    %EventAttendee{user_id: user_id, user: user}
+  end
+
+  defp build_initial_attendee(_user), do: %EventAttendee{}
+
+  defp resolve_attendee_user(%User{} = user, _changeset), do: user
+
+  defp resolve_attendee_user(_user, changeset) do
+    case Ecto.Changeset.get_field(changeset, :user_id) do
+      nil -> nil
+      user_id -> DevRound.Accounts.get_user(user_id)
+    end
+  end
+
+  defp insert_event_attendee(changeset, event, %User{} = user) do
+    if changeset.valid? do
+      case changeset
+           |> fill_event_attendee_initial(event, user)
+           |> Repo.insert() do
+        {:ok, attendee} ->
+          {:ok, Repo.preload(attendee, :user)}
+
+        error ->
+          error
+      end
+    else
+      {:error, %{changeset | action: :insert}}
+    end
+  end
+
+  defp insert_event_attendee(changeset, _event, nil) do
+    changeset =
+      if is_nil(changeset.errors[:user_id]) do
+        Ecto.Changeset.add_error(changeset, :user_id, "Please select a participant.")
+      else
+        changeset
+      end
+
+    {:error, %{changeset | action: :insert}}
   end
 
   def update_event_attendee(%EventAttendee{} = attendee, attrs \\ %{}, mode \\ :self_registration) do

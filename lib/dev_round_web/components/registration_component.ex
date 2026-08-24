@@ -237,16 +237,20 @@ defmodule DevRoundWeb.RegistrationComponent do
     user_id = params["user_id"]
 
     if user_id && user_id != "" && user_id != prev_id do
-      case Enum.find(users, fn u -> to_string(u.id) == to_string(user_id) end) do
-        %User{experience_level: exp} -> Map.put(params, "experience_level", to_string(exp))
-        _ -> params
-      end
+      prefill_experience_for_user(params, users, user_id)
     else
       params
     end
   end
 
   defp maybe_prefill_user_experience(params, _socket), do: params
+
+  defp prefill_experience_for_user(params, users, user_id) do
+    case Enum.find(users, fn u -> to_string(u.id) == to_string(user_id) end) do
+      %User{experience_level: exp} -> Map.put(params, "experience_level", to_string(exp))
+      _ -> params
+    end
+  end
 
   defp save_label(:new_registration), do: "Register"
   defp save_label(:edit_registration), do: "Update Registration"

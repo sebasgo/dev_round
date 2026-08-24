@@ -92,7 +92,13 @@ defmodule DevRound.MixProject do
         "esbuild dev_round --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"],
+      precommit: [
+        "compile --warnings-as-errors",
+        "deps.unlock --unused",
+        "format",
+        "test",
+        "credo"
+      ],
       "podman.release": fn _args ->
         version = Mix.Project.config()[:version]
 
