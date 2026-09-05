@@ -340,4 +340,109 @@ defmodule DevRound.Hosting do
       |> Changeset.put_assoc(:members, members)
     end)
   end
+
+  @doc """
+  Swaps two team members between different teams in a session.
+  Checks constraints:
+  - Session teams must not be locked
+  - Both members must belong to the given session
+  - Members must belong to different teams
+  - Both teams and members must have matching remote status
+  - Both teams must have at least one common language among all members after the swap
+  Updates team language to a random valid language if the existing language is no longer valid.
+  """
+  def swap_team_members(%EventSession{} = session, member_a_id, member_b_id) do
+    if session.teams_locked do
+      {:error, :teams_locked}
+    else
+      with {:ok, member_a} <- get_session_team_member(session, member_a_id),
+           {:ok, member_b} <- get_session_team_member(session, member_b_id),
+           {:ok, %{team_a_valid_langs: langs_a, team_b_valid_langs: langs_b}} <-
+             validate_team_member_swap(member_a, member_b) do
+        execute_team_member_swap(member_a, member_b, langs_a, langs_b)
+      end
+    end
+  end
+
+  @doc """
+  Validates if two team members can be swapped based on constraints:
+  - Members must belong to different teams
+  - Remote status must match between members and teams
+  - Both teams must have at least one common language shared by all members after the swap
+  """
+  def validate_team_member_swap(%TeamMember{} = member_a, %TeamMember{} = member_b) do
+    cond do
+      member_a.id == member_b.id or member_a.team_id == member_b.team_id ->
+        {:error, :same_team}
+
+      member_a.is_remote != member_b.is_remote or
+          member_a.team.is_remote != member_b.team.is_remote ->
+        {:error, :remote_mismatch}
+
+      true ->
+        team_a_other_members = Enum.reject(member_a.team.members, &(&1.id == member_a.id))
+        new_team_a_members = [member_b | team_a_other_members]
+        team_a_valid_langs = find_common_langs(new_team_a_members)
+
+        team_b_other_members = Enum.reject(member_b.team.members, &(&1.id == member_b.id))
+        new_team_b_members = [member_a | team_b_other_members]
+        team_b_valid_langs = find_common_langs(new_team_b_members)
+
+        if Enum.empty?(team_a_valid_langs) or Enum.empty?(team_b_valid_langs) do
+          {:error, :lang_mismatch}
+        else
+          {:ok, %{team_a_valid_langs: team_a_valid_langs, team_b_valid_langs: team_b_valid_langs}}
+        end
+    end
+  end
+
+  defp get_session_team_member(session, member_id) do
+    case Repo.get(TeamMember, member_id)
+         |> Repo.preload([:langs, :user, team: [:session, :lang, members: [:langs]]]) do
+      %TeamMember{team: %Team{session_id: session_id}} = member when session_id == session.id ->
+        {:ok, member}
+
+      _ ->
+        {:error, :member_not_found}
+    end
+  end
+
+  defp find_common_langs([member | rest]) do
+    member_langs = MapSet.new(member.langs, & &1.id)
+
+    common_lang_ids =
+      Enum.reduce(rest, member_langs, fn other_member, acc ->
+        MapSet.intersection(acc, MapSet.new(other_member.langs, & &1.id))
+      end)
+
+    Enum.filter(member.langs, &MapSet.member?(common_lang_ids, &1.id))
+  end
+
+  defp execute_team_member_swap(member_a, member_b, team_a_valid_langs, team_b_valid_langs) do
+    team_a = member_a.team
+    team_b = member_b.team
+
+    multi =
+      Multi.new()
+      |> Multi.update(:member_a, Changeset.change(member_a, team_id: team_b.id))
+      |> Multi.update(:member_b, Changeset.change(member_b, team_id: team_a.id))
+
+    multi =
+      if Enum.any?(team_a_valid_langs, &(&1.id == team_a.lang_id)) do
+        multi
+      else
+        new_lang = Enum.random(team_a_valid_langs)
+        Multi.update(multi, :team_a, Changeset.change(team_a, lang_id: new_lang.id))
+      end
+
+    multi =
+      if Enum.any?(team_b_valid_langs, &(&1.id == team_b.lang_id)) do
+        multi
+      else
+        new_lang = Enum.random(team_b_valid_langs)
+        Multi.update(multi, :team_b, Changeset.change(team_b, lang_id: new_lang.id))
+      end
+
+    Repo.transaction(multi)
+  end
 end

@@ -282,4 +282,249 @@ defmodule DevRound.HostingTest do
              )
     end
   end
+
+  describe "swap_team_members/3" do
+    setup do
+      lang1 = lang_fixture(%{name: "Elixir"})
+      lang2 = lang_fixture(%{name: "Python"})
+      lang3 = lang_fixture(%{name: "C++"})
+
+      future_deadline = NaiveDateTime.add(NaiveDateTime.local_now(), 12, :hour)
+
+      event =
+        event_fixture(%{
+          put_langs: [lang1, lang2, lang3],
+          registration_deadline_local: future_deadline
+        })
+
+      session = Enum.at(event.sessions, 0)
+
+      for i <- 1..5, do: team_name_fixture(%{name: "Team #{i}"})
+      team_names = Hosting.list_team_names()
+
+      {:ok,
+       event: event,
+       session: session,
+       lang1: lang1,
+       lang2: lang2,
+       lang3: lang3,
+       team_names: team_names}
+    end
+
+    test "successfully swaps compatible team members between teams", %{
+      event: event,
+      session: session,
+      lang1: lang1,
+      lang2: lang2,
+      team_names: team_names
+    } do
+      # All 4 participants know both lang1 and lang2
+      a1 = register_attendee(event, "a1", false, [lang1, lang2], true, 1)
+      a2 = register_attendee(event, "a2", false, [lang1, lang2], true, 9)
+      b1 = register_attendee(event, "b1", false, [lang1, lang2], true, 2)
+      b2 = register_attendee(event, "b2", false, [lang1, lang2], true, 8)
+
+      attendees = [a1, a2, b1, b2]
+      assert {:ok, _} = Hosting.build_teams_for_session(session, attendees, team_names, [])
+
+      teams = Hosting.list_teams_for_session(session)
+      assert length(teams) == 2
+      [team1, team2] = teams
+
+      member_a = hd(team1.members)
+      member_b = hd(team2.members)
+
+      assert {:ok, %{member_a: updated_a, member_b: updated_b}} =
+               Hosting.swap_team_members(session, member_a.id, member_b.id)
+
+      assert updated_a.team_id == team2.id
+      assert updated_b.team_id == team1.id
+
+      # Verify persisted teams have updated members
+      teams_after = Hosting.list_teams_for_session(session)
+      team1_after = Enum.find(teams_after, &(&1.id == team1.id))
+      team2_after = Enum.find(teams_after, &(&1.id == team2.id))
+
+      assert member_b.id in Enum.map(team1_after.members, & &1.id)
+      assert member_a.id in Enum.map(team2_after.members, & &1.id)
+      refute member_a.id in Enum.map(team1_after.members, & &1.id)
+      refute member_b.id in Enum.map(team2_after.members, & &1.id)
+    end
+
+    test "rejects swap when session teams are locked", %{
+      event: event,
+      session: session,
+      lang1: lang1,
+      team_names: team_names
+    } do
+      a1 = register_attendee(event, "a1", false, [lang1], true)
+      a2 = register_attendee(event, "a2", false, [lang1], true)
+      b1 = register_attendee(event, "b1", false, [lang1], true)
+      b2 = register_attendee(event, "b2", false, [lang1], true)
+
+      assert {:ok, _} = Hosting.build_teams_for_session(session, [a1, a2, b1, b2], team_names, [])
+      [team1, team2] = Hosting.list_teams_for_session(session)
+
+      locked_session = %{session | teams_locked: true}
+
+      assert {:error, :teams_locked} =
+               Hosting.swap_team_members(
+                 locked_session,
+                 hd(team1.members).id,
+                 hd(team2.members).id
+               )
+    end
+
+    test "rejects swap when members are in the same team", %{
+      event: event,
+      session: session,
+      lang1: lang1,
+      team_names: team_names
+    } do
+      a1 = register_attendee(event, "a1", false, [lang1], true)
+      a2 = register_attendee(event, "a2", false, [lang1], true)
+      b1 = register_attendee(event, "b1", false, [lang1], true)
+      b2 = register_attendee(event, "b2", false, [lang1], true)
+
+      assert {:ok, _} = Hosting.build_teams_for_session(session, [a1, a2, b1, b2], team_names, [])
+      [team1, _team2] = Hosting.list_teams_for_session(session)
+
+      [m1, m2] = team1.members
+      assert {:error, :same_team} = Hosting.swap_team_members(session, m1.id, m2.id)
+    end
+
+    test "rejects swap when remote status does not match", %{
+      event: event,
+      session: session,
+      lang1: lang1,
+      team_names: team_names
+    } do
+      r1 = register_attendee(event, "r1", true, [lang1], true)
+      r2 = register_attendee(event, "r2", true, [lang1], true)
+      l1 = register_attendee(event, "l1", false, [lang1], true)
+      l2 = register_attendee(event, "l2", false, [lang1], true)
+
+      team_rooms = [%DevRound.Events.TeamVideoConferenceRoom{url: "http://room.com"}]
+
+      assert {:ok, _} =
+               Hosting.build_teams_for_session(session, [r1, r2, l1, l2], team_names, team_rooms)
+
+      teams = Hosting.list_teams_for_session(session)
+      remote_team = Enum.find(teams, & &1.is_remote)
+      local_team = Enum.find(teams, &(!&1.is_remote))
+
+      assert {:error, :remote_mismatch} =
+               Hosting.swap_team_members(
+                 session,
+                 hd(remote_team.members).id,
+                 hd(local_team.members).id
+               )
+    end
+
+    test "updates team languages when swapping partners share different common languages", %{
+      event: _event,
+      session: session,
+      lang1: lang1,
+      lang2: lang2,
+      lang3: lang3
+    } do
+      user_a1 = user_fixture(%{name: "a1", full_name: "a1"})
+      user_a2 = user_fixture(%{name: "a2", full_name: "a2"})
+      user_b1 = user_fixture(%{name: "b1", full_name: "b1"})
+      user_b2 = user_fixture(%{name: "b2", full_name: "b2"})
+
+      # Team 1: lang1 (Elixir). Members: a1 [lang1, lang3], a2 [lang1, lang2]
+      # Team 2: lang2 (Python). Members: b1 [lang2, lang3], b2 [lang2, lang3]
+      team1 =
+        %DevRound.Hosting.Team{}
+        |> Ecto.Changeset.change(%{
+          name: "Team 1",
+          slug: "team-1",
+          is_remote: false,
+          session_id: session.id,
+          lang_id: lang1.id
+        })
+        |> Ecto.Changeset.put_assoc(:members, [
+          %DevRound.Hosting.TeamMember{
+            is_remote: false,
+            experience_level: 1,
+            user_id: user_a1.id
+          }
+          |> Ecto.Changeset.change()
+          |> Ecto.Changeset.put_assoc(:langs, [lang1, lang3]),
+          %DevRound.Hosting.TeamMember{
+            is_remote: false,
+            experience_level: 9,
+            user_id: user_a2.id
+          }
+          |> Ecto.Changeset.change()
+          |> Ecto.Changeset.put_assoc(:langs, [lang1, lang2])
+        ])
+        |> Repo.insert!()
+
+      team2 =
+        %DevRound.Hosting.Team{}
+        |> Ecto.Changeset.change(%{
+          name: "Team 2",
+          slug: "team-2",
+          is_remote: false,
+          session_id: session.id,
+          lang_id: lang2.id
+        })
+        |> Ecto.Changeset.put_assoc(:members, [
+          %DevRound.Hosting.TeamMember{
+            is_remote: false,
+            experience_level: 1,
+            user_id: user_b1.id
+          }
+          |> Ecto.Changeset.change()
+          |> Ecto.Changeset.put_assoc(:langs, [lang2, lang3]),
+          %DevRound.Hosting.TeamMember{
+            is_remote: false,
+            experience_level: 9,
+            user_id: user_b2.id
+          }
+          |> Ecto.Changeset.change()
+          |> Ecto.Changeset.put_assoc(:langs, [lang2, lang3])
+        ])
+        |> Repo.insert!()
+
+      member_a1 = Enum.find(team1.members, &(&1.user_id == user_a1.id))
+      member_b1 = Enum.find(team2.members, &(&1.user_id == user_b1.id))
+
+      assert {:ok, _} = Hosting.swap_team_members(session, member_a1.id, member_b1.id)
+
+      teams_after = Hosting.list_teams_for_session(session)
+      team1_after = Enum.find(teams_after, &(&1.id == team1.id))
+      team2_after = Enum.find(teams_after, &(&1.id == team2.id))
+
+      # Team 1 had lang1; now has a2 [lang1, lang2] + b1 [lang2, lang3] -> only lang2
+      assert team1_after.lang_id == lang2.id
+      # Team 2 had lang2; now has b2 [lang2, lang3] + a1 [lang1, lang3] -> only lang3
+      assert team2_after.lang_id == lang3.id
+    end
+
+    test "rejects swap when languages do not match", %{
+      event: event,
+      session: session,
+      lang1: lang1,
+      lang2: lang2,
+      team_names: team_names
+    } do
+      # Team 1 will be only lang1
+      a1 = register_attendee(event, "a1", false, [lang1], true, 1)
+      a2 = register_attendee(event, "a2", false, [lang1], true, 9)
+      # Team 2 will be only lang2
+      b1 = register_attendee(event, "b1", false, [lang2], true, 1)
+      b2 = register_attendee(event, "b2", false, [lang2], true, 9)
+
+      assert {:ok, _} = Hosting.build_teams_for_session(session, [a1, a2, b1, b2], team_names, [])
+
+      [team1, team2] = Hosting.list_teams_for_session(session)
+      m1 = hd(team1.members)
+      m2 = hd(team2.members)
+
+      assert {:error, :lang_mismatch} = Hosting.swap_team_members(session, m1.id, m2.id)
+    end
+  end
 end

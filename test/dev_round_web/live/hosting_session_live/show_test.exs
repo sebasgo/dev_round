@@ -129,6 +129,72 @@ defmodule DevRoundWeb.HostingSessionLive.ShowTest do
       assert html =~ "Session reset. You may build new teams now."
       assert html =~ "The teams for this session have not been assigned yet."
     end
+
+    test "manual team adjustment via swap_team_members event", %{
+      conn: conn,
+      event: event,
+      session: session,
+      lang: lang
+    } do
+      team_name_fixture(%{name: "Alpha"})
+      team_name_fixture(%{name: "Beta"})
+
+      # Register 4 checked attendees
+      register_attendee(event, "Alice", false, [lang])
+      register_attendee(event, "Bob", false, [lang])
+      register_attendee(event, "Charlie", false, [lang])
+      register_attendee(event, "Diana", false, [lang])
+
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}/hosting/session/#{session}")
+
+      # Build teams
+      view |> element("button", "Build Teams") |> render_click()
+
+      teams = DevRound.Hosting.list_teams_for_session(session)
+      assert length(teams) == 2
+      [team1, team2] = teams
+      member1 = hd(team1.members)
+      member2 = hd(team2.members)
+
+      # Verify draggable elements and data attributes exist
+      assert has_element?(view, "#hosting-session-teams-grid")
+      assert has_element?(view, "#team-member-#{member1.id}[draggable='true']")
+      assert has_element?(view, "#team-member-#{member1.id}[data-member-id='#{member1.id}']")
+      assert has_element?(view, "#team-member-#{member1.id}[data-team-id='#{team1.id}']")
+
+      # Perform swap
+      result_html =
+        render_hook(view, "swap_team_members", %{
+          "source_member_id" => member1.id,
+          "target_member_id" => member2.id
+        })
+
+      assert result_html =~ "Swapped"
+      assert result_html =~ member1.user.full_name
+      assert result_html =~ member2.user.full_name
+
+      # Verify in DB that members swapped teams
+      teams_after = DevRound.Hosting.list_teams_for_session(session)
+      team1_after = Enum.find(teams_after, &(&1.id == team1.id))
+      team2_after = Enum.find(teams_after, &(&1.id == team2.id))
+
+      assert member2.id in Enum.map(team1_after.members, & &1.id)
+      assert member1.id in Enum.map(team2_after.members, & &1.id)
+
+      # Start session to lock teams
+      view |> element("button", "Start Session") |> render_click()
+
+      # Verify draggable is no longer true
+      refute has_element?(view, "#team-member-#{member1.id}[draggable='true']")
+
+      # Attempting to swap while locked should fail
+      render_hook(view, "swap_team_members", %{
+        "source_member_id" => member1.id,
+        "target_member_id" => member2.id
+      })
+
+      assert render(view) =~ "Team adjustments are not allowed"
+    end
   end
 
   describe "PubSub events" do

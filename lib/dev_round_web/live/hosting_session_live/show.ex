@@ -105,7 +105,30 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     broadcast_set_live(event, session, true)
 
     msg = "Session \"#{session.title}\" started."
-    {:noreply, socket |> assign(event: event, session: session) |> put_flash(:info, msg)}
+
+    {:noreply,
+     socket
+     |> assign(event: event, session: session)
+     |> assign_teams()
+     |> put_flash(:info, msg)}
+  end
+
+  def handle_event(
+        "swap_team_members",
+        %{"source_member_id" => source_id, "target_member_id" => target_id},
+        socket
+      ) do
+    %{session: session, teams: teams} = socket.assigns
+
+    if session.teams_locked || Enum.empty?(teams) do
+      {:noreply, put_flash(socket, :error, "Team adjustments are not allowed at this time.")}
+    else
+      handle_swap_result(
+        Hosting.swap_team_members(session, source_id, target_id),
+        session,
+        socket
+      )
+    end
   end
 
   def handle_event("stop_session", _params, socket) do
@@ -130,6 +153,25 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
      socket |> update_assigns() |> put_flash(:info, "Session reset. You may build new teams now.")}
   end
 
+  defp handle_swap_result({:ok, %{member_a: member_a, member_b: member_b}}, session, socket) do
+    broadcast_teams_build(session)
+
+    {:noreply,
+     socket
+     |> assign_teams()
+     |> put_flash(:info, "Swapped #{member_a.user.full_name} and #{member_b.user.full_name}.")}
+  end
+
+  defp handle_swap_result({:error, reason}, _session, socket) do
+    {:noreply, put_flash(socket, :error, swap_error_message(reason))}
+  end
+
+  defp swap_error_message(:teams_locked), do: "Teams are locked. Cannot adjust teams."
+  defp swap_error_message(:same_team), do: "Cannot swap members within the same team."
+  defp swap_error_message(:remote_mismatch), do: "Cannot swap: Remote status does not match."
+  defp swap_error_message(:lang_mismatch), do: "Cannot swap: Incompatible programming languages."
+  defp swap_error_message(_), do: "Could not swap team members."
+
   defp update_assigns(socket) do
     socket
     |> assign_event()
@@ -153,8 +195,14 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
   end
 
   defp assign_teams(socket) do
+    teams = Hosting.list_teams_for_session(socket.assigns.session)
+
     socket
-    |> assign(:teams, Hosting.list_teams_for_session(socket.assigns.session))
+    |> assign(:teams, teams)
+    |> assign(
+      :allow_adjustments,
+      not Enum.empty?(teams) and not socket.assigns.session.teams_locked
+    )
   end
 
   defp assign_dates(socket) do

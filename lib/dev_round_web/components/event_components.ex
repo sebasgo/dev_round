@@ -75,6 +75,7 @@ defmodule DevRoundWeb.EventComponents do
   attr :show_member_langs, :boolean, required: true
   attr :multiple_langs, :boolean, required: true
   attr :show_video_conference_room_url, :boolean, default: false
+  attr :allow_adjustments, :boolean, default: false
   attr :class, :string, default: nil
   attr :zoom, :float, default: nil
 
@@ -95,16 +96,25 @@ defmodule DevRoundWeb.EventComponents do
           </span>
           <DevRoundWeb.CoreComponents.lang_badge :if={@multiple_langs} lang={@team.lang} />
         </h2>
-        <div
-          class="grid gap-0.5 bg-neutral-content border-neutral-content"
-          style="border-radius: 24px"
-        >
+        <div class="grid gap-0.5 bg-neutral-content border-neutral-content rounded-3xl">
           <%= for item <- Enum.intersperse(@team.members, :divider) do %>
             <%= case item do %>
               <% :divider -> %>
                 <div class="mx-1px border-t border-neutral" />
               <% member -> %>
-                <div class="">
+                <div
+                  id={"team-member-#{member.id}"}
+                  data-member-id={member.id}
+                  data-team-id={@team.id}
+                  data-team-lang-id={@team.lang_id}
+                  data-member-langs={Enum.map(member.langs, & &1.id) |> Enum.join(",")}
+                  data-is-remote={to_string(member.is_remote)}
+                  draggable={@allow_adjustments && "true"}
+                  class={[
+                    "team-member-item relative transition-all duration-150",
+                    @allow_adjustments && "team-member-draggable"
+                  ]}
+                >
                   <DevRoundWeb.AvatarComponents.user_badge
                     user={member.user}
                     remote={member.is_remote}
