@@ -188,7 +188,7 @@ defmodule DevRound.Hosting do
     member_query =
       from(m in TeamMember, join: u in assoc(m, :user), order_by: [asc: u.full_name])
 
-    from(t in Team, where: t.session_id == ^session.id)
+    from(t in Team, where: t.session_id == ^session.id, order_by: [asc: t.id])
     |> Repo.all()
     |> Repo.preload(:lang)
     |> Repo.preload(members: {member_query, [:user, :langs]})
