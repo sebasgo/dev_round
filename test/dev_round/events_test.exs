@@ -212,6 +212,25 @@ defmodule DevRound.EventsTest do
     end
   end
 
+  describe "allow_remote_participation" do
+    test "defaults to true" do
+      event = event_fixture()
+      assert event.allow_remote_participation == true
+    end
+
+    test "can be created with false" do
+      event = event_fixture(%{allow_remote_participation: false})
+      assert event.allow_remote_participation == false
+    end
+
+    test "can be toggled via update_event/2" do
+      event = event_fixture()
+
+      assert {:ok, %Event{allow_remote_participation: false}} =
+               Events.update_event(event, %{allow_remote_participation: false})
+    end
+  end
+
   describe "update_event_slides_page_number/2" do
     test "updates page number" do
       event = event_fixture()
@@ -306,6 +325,79 @@ defmodule DevRound.EventsTest do
                    :self_registration
                  )
                )
+    end
+
+    test "forces is_remote to false when the event disallows remote" do
+      event = event_fixture(%{allow_remote_participation: false})
+      attrs = %{"lang_ids" => [Enum.at(event.langs, 0).id], "is_remote" => "true"}
+
+      changeset = Events.change_event_attendee(%EventAttendee{}, event, attrs, :host)
+
+      assert Ecto.Changeset.get_change(changeset, :is_remote) == false
+    end
+
+    test "keeps is_remote when the event allows remote" do
+      event = event_fixture()
+      attrs = %{"lang_ids" => [Enum.at(event.langs, 0).id], "is_remote" => "true"}
+
+      changeset = Events.change_event_attendee(%EventAttendee{}, event, attrs, :host)
+
+      assert Ecto.Changeset.get_change(changeset, :is_remote) == true
+    end
+  end
+
+  describe "convert_remote_attendees_to_local/1" do
+    test "returns an empty list when there are no remote attendees" do
+      event = event_fixture()
+      assert [] = Events.convert_remote_attendees_to_local(event)
+    end
+
+    test "converts remote attendees to local and returns the affected users" do
+      future_deadline = NaiveDateTime.add(NaiveDateTime.local_now(), 12, :hour)
+      event = event_fixture(%{registration_deadline_local: future_deadline})
+      lang_id = Enum.at(event.langs, 0).id
+      remote_user = user_fixture()
+      local_user = user_fixture()
+
+      {:ok, remote_attendee} =
+        Events.create_event_attendee(
+          event,
+          remote_user,
+          %{"lang_ids" => [lang_id], "is_remote" => "true"}
+        )
+
+      {:ok, _local_attendee} =
+        Events.create_event_attendee(
+          event,
+          local_user,
+          %{"lang_ids" => [lang_id], "is_remote" => "false"}
+        )
+
+      assert {:ok, event} = Events.update_event(event, %{allow_remote_participation: false})
+
+      affected = Events.convert_remote_attendees_to_local(event)
+      assert Enum.map(affected, & &1.id) == [remote_user.id]
+
+      assert Repo.reload!(remote_attendee).is_remote == false
+    end
+
+    test "is idempotent" do
+      future_deadline = NaiveDateTime.add(NaiveDateTime.local_now(), 12, :hour)
+      event = event_fixture(%{registration_deadline_local: future_deadline})
+      lang_id = Enum.at(event.langs, 0).id
+      remote_user = user_fixture()
+
+      {:ok, _} =
+        Events.create_event_attendee(
+          event,
+          remote_user,
+          %{"lang_ids" => [lang_id], "is_remote" => "true"}
+        )
+
+      assert {:ok, event} = Events.update_event(event, %{allow_remote_participation: false})
+
+      assert length(Events.convert_remote_attendees_to_local(event)) == 1
+      assert [] = Events.convert_remote_attendees_to_local(event)
     end
   end
 

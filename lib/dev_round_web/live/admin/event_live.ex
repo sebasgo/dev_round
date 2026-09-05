@@ -45,6 +45,22 @@ defmodule DevRoundWeb.Admin.EventLive do
   def can?(_assigns, _action, _item), do: true
 
   @impl Backpex.LiveResource
+  def on_item_updated(socket, %DevRound.Events.Event{allow_remote_participation: false} = event) do
+    event = DevRound.Repo.preload(event, :hosts)
+    affected = DevRound.Events.convert_remote_attendees_to_local(event)
+
+    Enum.each(affected, fn user ->
+      DevRoundWeb.UserMail.attendance_changed_to_in_person(user, event)
+      |> DevRound.Mailer.deliver()
+    end)
+
+    socket
+  end
+
+  @impl Backpex.LiveResource
+  def on_item_updated(socket, _item), do: socket
+
+  @impl Backpex.LiveResource
   def item_actions(actions) do
     actions ++
       [
@@ -203,6 +219,12 @@ defmodule DevRoundWeb.Admin.EventLive do
       published: %{
         module: Backpex.Fields.Boolean,
         label: "Published",
+        panel: :settings
+      },
+      allow_remote_participation: %{
+        module: Backpex.Fields.Boolean,
+        label: "Remote Participation",
+        help_text: "Allow attendees to register for remote participation.",
         panel: :settings
       }
     ]

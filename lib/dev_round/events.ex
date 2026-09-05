@@ -277,8 +277,15 @@ defmodule DevRound.Events do
       end
 
     changeset
+    |> enforce_remote_participation(event)
     |> validate_event_attendee_langs(event)
   end
+
+  defp enforce_remote_participation(changeset, %Event{allow_remote_participation: false}) do
+    Ecto.Changeset.put_change(changeset, :is_remote, false)
+  end
+
+  defp enforce_remote_participation(changeset, _event), do: changeset
 
   def event_has_multiple_langs?(%Event{langs: langs}) do
     !Enum.empty?(tl(langs))
@@ -366,6 +373,30 @@ defmodule DevRound.Events do
     case can_change_event_attendee?(attendee.event, mode) do
       true -> Repo.delete(attendee)
       _ -> {:error, :registration_closed}
+    end
+  end
+
+  @doc """
+  Converts all remote attendees of an event to in-person attendees.
+
+  Returns the list of affected `%User{}` so the caller can notify them.
+  Intended to be invoked when remote participation is disabled for the event.
+  """
+  def convert_remote_attendees_to_local(%Event{} = event) do
+    remote_attendees =
+      from(ea in EventAttendee,
+        where: ea.event_id == ^event.id and ea.is_remote == true,
+        preload: [:user]
+      )
+      |> Repo.all()
+
+    if Enum.empty?(remote_attendees) do
+      []
+    else
+      from(ea in EventAttendee, where: ea.event_id == ^event.id and ea.is_remote == true)
+      |> Repo.update_all(set: [is_remote: false, updated_at: DateTime.utc_now(:second)])
+
+      Enum.map(remote_attendees, & &1.user)
     end
   end
 

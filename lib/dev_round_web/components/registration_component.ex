@@ -47,7 +47,16 @@ defmodule DevRoundWeb.RegistrationComponent do
           <% :host -> %>
             <p>Remote Attendance:</p>
         <% end %>
-        <.input field={@form[:is_remote]} type="checkbox" label="Attend remotely" />
+        <%= if @event.allow_remote_participation do %>
+          <.input field={@form[:is_remote]} type="checkbox" label="Attend remotely" />
+        <% else %>
+          <.input
+            field={@form[:is_remote]}
+            type="checkbox"
+            label="Remote participation is not available for this event."
+            disabled
+          />
+        <% end %>
         <%= if Enum.empty?(tl(@lang_options)) do %>
           <.input
             field={@form[:lang_ids]}

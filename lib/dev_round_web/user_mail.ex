@@ -29,6 +29,18 @@ defmodule DevRoundWeb.UserMail do
     )
   end
 
+  def attendance_changed_to_in_person(user, event) do
+    html =
+      UserMailComponents.attendance_changed_to_in_person_html(%{user: user, event: event})
+      |> heex_to_html()
+
+    new()
+    |> to({user.full_name, user.email})
+    |> from(Application.get_env(:dev_round, :mail_from))
+    |> subject("[DevRound] Your attendance for #{event.title} was changed to in-person")
+    |> html_body(html)
+  end
+
   defp heex_to_html(template) do
     template
     |> Phoenix.HTML.Safe.to_iodata()

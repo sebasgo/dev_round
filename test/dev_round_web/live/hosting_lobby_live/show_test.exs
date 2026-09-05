@@ -417,6 +417,44 @@ defmodule DevRoundWeb.HostingLobbyLive.ShowTest do
       refute has_element?(view, "#event-form select option", "Newbie Developer")
     end
 
+    test "hides remote option and forces local when remote participation is disabled", %{
+      conn: conn,
+      event: event
+    } do
+      {:ok, event} = DevRound.Events.update_event(event, %{allow_remote_participation: false})
+
+      user =
+        user_fixture(%{
+          name: "inperson",
+          full_name: "In Person User",
+          email: "inperson@example.com",
+          experience_level: 3
+        })
+
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}/hosting/lobby/registration/new")
+
+      refute has_element?(view, "#event-form", "Attend remotely")
+      assert has_element?(view, "#event-form", "Remote participation is not available")
+
+      submit_result =
+        view
+        |> form("#event-form",
+          event_attendee: %{user_id: to_string(user.id), experience_level: "3"}
+        )
+        |> render_submit()
+
+      assert submit_result =~ "Registration successful. Confirmation sent to In Person User."
+
+      attendee =
+        DevRound.Repo.get_by!(
+          DevRound.Events.EventAttendee,
+          event_id: event.id,
+          user_id: user.id
+        )
+
+      assert attendee.is_remote == false
+    end
+
     test "host can cancel participant registration from the lobby", %{
       conn: conn,
       event: event,

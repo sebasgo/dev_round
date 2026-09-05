@@ -32,6 +32,7 @@ defmodule DevRound.Events.Event do
     field :live, :boolean
     field :modified_at, :utc_datetime
     field :main_video_conference_room_url, :string
+    field :allow_remote_participation, :boolean, default: true
 
     many_to_many :langs, Lang, join_through: "event_langs", on_replace: :delete
 
@@ -66,7 +67,8 @@ defmodule DevRound.Events.Event do
       :published,
       :registration_deadline_local,
       :slides_filename,
-      :main_video_conference_room_url
+      :main_video_conference_room_url,
+      :allow_remote_participation
     ])
     |> cast_assoc(:event_hosts,
       with: &EventHost.changeset/3,
