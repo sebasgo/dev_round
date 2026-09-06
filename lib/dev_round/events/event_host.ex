@@ -24,13 +24,14 @@ defmodule DevRound.Events.EventHost do
   @primary_key false
   schema "event_hosts" do
     field :position, :integer
+    field :credited, :boolean, default: true
     belongs_to :event, Event, primary_key: true
     belongs_to :user, User, primary_key: true
   end
 
   def changeset(event_host, attrs, position) do
     event_host
-    |> cast(attrs, [:event_id, :user_id])
+    |> cast(attrs, [:event_id, :user_id, :credited])
     |> change(position: position)
     |> validate_required(:user_id, message: "Required.")
     |> unique_constraint([:event, :user],

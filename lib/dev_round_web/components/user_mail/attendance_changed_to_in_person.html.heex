@@ -26,6 +26,6 @@
 
   <p>
     Best, <br />
-    {Enum.map(@event.hosts, fn host -> host.full_name end) |> Enum.intersperse(" & ")}
+    {Enum.map(@event.credited_hosts, fn host -> host.full_name end) |> Enum.intersperse(" & ")}
   </p>
 </.layout_html>

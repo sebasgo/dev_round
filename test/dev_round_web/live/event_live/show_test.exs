@@ -44,6 +44,51 @@ defmodule DevRoundWeb.EventLive.ShowTest do
       assert Enum.all?(event.hosts, fn host -> header_html =~ host.full_name end)
     end
 
+    test "renders credited hosts and hides uncredited hosts on event page", %{
+      conn: conn,
+      event: event
+    } do
+      uncredited_host = user_fixture(%{full_name: "Hidden Uncredited Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: event.id,
+        user_id: uncredited_host.id,
+        credited: false
+      })
+
+      event = DevRound.Events.get_event!(event.id)
+
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}")
+      header_html = element(view, "main header") |> render()
+
+      assert header_html =~ event.title
+      assert Enum.all?(event.credited_hosts, fn host -> header_html =~ host.full_name end)
+      refute header_html =~ uncredited_host.full_name
+    end
+
+    test "allows uncredited host to see Host button and access hosting screens", %{
+      conn: conn,
+      event: event
+    } do
+      uncredited_host = user_fixture(%{full_name: "Secret Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: event.id,
+        user_id: uncredited_host.id,
+        credited: false
+      })
+
+      conn = log_in_user(conn, uncredited_host)
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}")
+      assert has_element?(view, ".btn", "Host")
+
+      # Can access hosting lobby
+      {:ok, _lobby_view, _html} = live(conn, ~p"/events/#{event}/hosting/lobby")
+
+      # Can access hosting lecture
+      {:ok, _lecture_view, _html} = live(conn, ~p"/events/#{event}/hosting/lecture")
+    end
+
     test "redirects if user is not logged in", %{event: event} do
       conn = build_conn()
       assert {:error, {:redirect, %{to: "/users/log_in"}}} = live(conn, ~p"/events/#{event}")

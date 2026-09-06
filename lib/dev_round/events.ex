@@ -150,6 +150,7 @@ defmodule DevRound.Events do
     |> Repo.preload([
       :langs,
       :hosts,
+      :credited_hosts,
       :last_live_session,
       :team_video_conference_rooms,
       sessions: sessions_query

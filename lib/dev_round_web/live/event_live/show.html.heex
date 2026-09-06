@@ -34,7 +34,7 @@
     <:subtitle>
       <div class="flex flex-wrap items-center justify-center gap-2 mt-4">
         <DevRoundWeb.AvatarComponents.user_badge
-          :for={user <- @event.hosts}
+          :for={user <- @event.credited_hosts}
           :key={user.id}
           user={user}
           soft={true}

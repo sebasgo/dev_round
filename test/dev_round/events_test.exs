@@ -119,6 +119,69 @@ defmodule DevRound.EventsTest do
       assert event.title == "New Event"
     end
 
+    test "supports credited and uncredited hosts" do
+      host1 = user_fixture(%{full_name: "Credited Host"})
+      host2 = user_fixture(%{full_name: "Uncredited Host"})
+      lang = lang_fixture()
+
+      now = NaiveDateTime.local_now()
+      begin = NaiveDateTime.add(now, 1, :day) |> NaiveDateTime.truncate(:second)
+
+      attrs = %{
+        title: "Event with credited and uncredited hosts",
+        teaser: "T",
+        body: "B",
+        location: "L",
+        begin_local: begin,
+        end_local: NaiveDateTime.add(begin, 1, :day),
+        registration_deadline_local: NaiveDateTime.add(begin, -1, :hour),
+        published: true,
+        event_hosts: [
+          %{user_id: host1.id, credited: true},
+          %{user_id: host2.id, credited: false}
+        ],
+        sessions: [
+          %{title: "S1", begin_local: begin, end_local: NaiveDateTime.add(begin, 1, :hour)}
+        ]
+      }
+
+      assert {:ok, %Event{} = event} = Events.create_event(attrs, put_langs: [lang])
+      loaded_event = Events.get_event!(event.id)
+
+      assert Enum.map(loaded_event.hosts, & &1.id) |> Enum.sort() ==
+               Enum.sort([host1.id, host2.id])
+
+      assert Enum.map(loaded_event.credited_hosts, & &1.id) == [host1.id]
+    end
+
+    test "fails validation when no credited host is present on creation" do
+      host = user_fixture()
+      lang = lang_fixture()
+
+      now = NaiveDateTime.local_now()
+      begin = NaiveDateTime.add(now, 1, :day) |> NaiveDateTime.truncate(:second)
+
+      attrs = %{
+        title: "Event with no credited host",
+        teaser: "T",
+        body: "B",
+        location: "L",
+        begin_local: begin,
+        end_local: NaiveDateTime.add(begin, 1, :day),
+        registration_deadline_local: NaiveDateTime.add(begin, -1, :hour),
+        published: true,
+        event_hosts: [
+          %{user_id: host.id, credited: false}
+        ],
+        sessions: [
+          %{title: "S1", begin_local: begin, end_local: NaiveDateTime.add(begin, 1, :hour)}
+        ]
+      }
+
+      assert {:error, changeset} = Events.create_event(attrs, put_langs: [lang])
+      assert %{event_hosts: ["At least one credited host is required."]} = errors_on(changeset)
+    end
+
     test "returns error with invalid data" do
       assert {:error, %Ecto.Changeset{}} = Events.create_event(%{})
     end
@@ -196,6 +259,23 @@ defmodule DevRound.EventsTest do
 
       changeset = Events.change_event(event, attrs)
       assert %{sessions: ["S1 overlaps with S2."]} = errors_on(changeset)
+    end
+
+    test "validates at least one credited host is required" do
+      host = user_fixture()
+      event = event_fixture(%{host: host}) |> Repo.preload(:event_hosts)
+
+      changeset =
+        Events.change_event(event, %{
+          "event_hosts" => %{
+            "0" => %{
+              "user_id" => host.id,
+              "credited" => false
+            }
+          }
+        })
+
+      assert %{event_hosts: ["At least one credited host is required."]} = errors_on(changeset)
     end
 
     test "requires at least one lang" do

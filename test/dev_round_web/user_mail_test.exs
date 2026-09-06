@@ -8,7 +8,7 @@ defmodule DevRoundWeb.UserMailTest do
 
   describe "attendance_changed_to_in_person/2" do
     test "builds an email to the affected user about the in-person change" do
-      event = event_fixture() |> Repo.preload(:hosts)
+      event = event_fixture() |> Repo.preload([:hosts, :credited_hosts])
       user = user_fixture(%{full_name: "Jane Doe", email: "jane@example.com"})
 
       email = UserMail.attendance_changed_to_in_person(user, event)

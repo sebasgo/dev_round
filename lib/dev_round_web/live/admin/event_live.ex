@@ -46,7 +46,7 @@ defmodule DevRoundWeb.Admin.EventLive do
 
   @impl Backpex.LiveResource
   def on_item_updated(socket, %DevRound.Events.Event{allow_remote_participation: false} = event) do
-    event = DevRound.Repo.preload(event, :hosts)
+    event = DevRound.Repo.preload(event, [:hosts, :credited_hosts])
     affected = DevRound.Events.convert_remote_attendees_to_local(event)
 
     Enum.each(affected, fn user ->
@@ -99,8 +99,14 @@ defmodule DevRoundWeb.Admin.EventLive do
             live_resource: DevRoundWeb.Admin.UserLive,
             prompt: "Select user",
             options_query: fn query, _field -> query |> order_by(asc: :full_name) end
+          },
+          credited: %{
+            module: Backpex.Fields.Boolean,
+            label: "Credited"
           }
         ],
+        help_text:
+          "All hosts can use the event hosting functions. Only credited hosts are displayed on event pages in the byline.",
         except: [:index]
       },
       begin_local: %{

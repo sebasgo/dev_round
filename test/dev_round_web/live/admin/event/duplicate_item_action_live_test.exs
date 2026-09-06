@@ -28,6 +28,46 @@ defmodule DevRoundWeb.Admin.Event.DuplicateItemActionLiveTest do
     # Verify a new event was created
     new_event = DevRound.Repo.get_by(DevRound.Events.Event, title: event.title <> " (copy)")
     assert new_event
+    new_event = DevRound.Repo.preload(new_event, :event_hosts)
+    assert Enum.map(new_event.event_hosts, & &1.credited) == [true]
+  end
+
+  test "duplicates event preserving uncredited hosts", %{conn: conn} do
+    admin = DevRound.AccountsFixtures.user_fixture(%{role: :admin})
+
+    {:ok, admin} =
+      DevRound.Accounts.User.upsert_changeset(admin, %{role: :admin}) |> DevRound.Repo.update()
+
+    host1 = DevRound.AccountsFixtures.user_fixture()
+    host2 = DevRound.AccountsFixtures.user_fixture()
+
+    event =
+      event_fixture(%{
+        event_hosts: [
+          %{user_id: host1.id, credited: true},
+          %{user_id: host2.id, credited: false}
+        ]
+      })
+
+    conn = log_in_user(conn, admin)
+    {:ok, view, _html} = live(conn, ~p"/admin/events")
+
+    view
+    |> render_click("item-action", %{"action-key" => "duplicate", "item-id" => "#{event.id}"})
+
+    view
+    |> form("#resource-form")
+    |> render_submit(%{"change" => %{"title" => event.title <> " (copy)"}})
+
+    new_event = DevRound.Repo.get_by(DevRound.Events.Event, title: event.title <> " (copy)")
+    assert new_event
+    new_event = DevRound.Repo.preload(new_event, [:event_hosts, :credited_hosts, :hosts])
+    assert length(new_event.hosts) == 2
+    assert length(new_event.credited_hosts) == 1
+
+    assert Enum.any?(new_event.event_hosts, fn eh ->
+             eh.user_id == host2.id and eh.credited == false
+           end)
   end
 
   test "duplicates event from index with slides", %{conn: conn} do

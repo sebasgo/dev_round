@@ -100,7 +100,7 @@ defmodule DevRoundWeb.Admin.ItemActions.DuplicateEventAction do
       |> Map.put(:sessions, Enum.map(item.sessions, &process_session(&1, date_diff)))
       |> Map.put(
         :event_hosts,
-        Enum.map(item.event_hosts, &Map.take(&1, [:event_id, :user_id, :position]))
+        Enum.map(item.event_hosts, &Map.take(&1, [:event_id, :user_id, :position, :credited]))
       )
       |> Map.put(
         :team_video_conference_rooms,

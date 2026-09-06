@@ -46,6 +46,12 @@ defmodule DevRound.Events.Event do
       on_delete: :delete_all
 
     has_many :hosts, through: [:event_hosts, :user]
+
+    has_many :credited_event_hosts, EventHost,
+      where: [credited: true],
+      preload_order: [asc: :position]
+
+    has_many :credited_hosts, through: [:credited_event_hosts, :user]
     has_many :events_attendees, EventAttendee, on_replace: :delete, on_delete: :delete_all
     has_many :attendees, through: [:events_attendees, :user]
     has_many :sessions, EventSession, on_replace: :delete, on_delete: :delete_all
@@ -73,7 +79,7 @@ defmodule DevRound.Events.Event do
     |> cast_assoc(:event_hosts,
       with: &EventHost.changeset/3,
       required: true,
-      required_message: "At least one session is required.",
+      required_message: "At least one host is required.",
       sort_param: :event_hosts_order,
       drop_param: :event_hosts_delete
     )
@@ -112,6 +118,7 @@ defmodule DevRound.Events.Event do
     |> validate_registration_deadline_before_begin()
     |> validate_sessions_within_event_dates()
     |> validate_sessions_do_not_overlap()
+    |> validate_at_least_one_credited_host()
     |> validate_option_selected([:langs])
     |> generate_date_title_slug()
     |> validate_change(:slides_filename, fn :slides_filename, path ->
@@ -239,6 +246,31 @@ defmodule DevRound.Events.Event do
   end
 
   defp sessions_overlap?(%EventSession{}, %EventSession{}), do: false
+
+  defp validate_at_least_one_credited_host(changeset) do
+    event_hosts = get_field(changeset, :event_hosts, [])
+
+    has_credited_host? =
+      Enum.any?(event_hosts, fn
+        %Ecto.Changeset{action: action} when action in [:delete, :replace] ->
+          false
+
+        %Ecto.Changeset{} = host_changeset ->
+          Ecto.Changeset.get_field(host_changeset, :credited) == true
+
+        %EventHost{} = event_host ->
+          event_host.credited == true
+
+        _ ->
+          false
+      end)
+
+    if has_credited_host? do
+      changeset
+    else
+      add_error(changeset, :event_hosts, "At least one credited host is required.")
+    end
+  end
 
   defimpl Phoenix.Param, for: DevRound.Events.Event do
     def to_param(%{slug: slug}), do: slug
