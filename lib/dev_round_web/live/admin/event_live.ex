@@ -231,7 +231,8 @@ defmodule DevRoundWeb.Admin.EventLive do
         module: Backpex.Fields.Boolean,
         label: "Remote Participation",
         help_text: "Allow attendees to register for remote participation.",
-        panel: :settings
+        panel: :settings,
+        except: [:index]
       }
     ]
   end
