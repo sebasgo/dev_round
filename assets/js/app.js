@@ -26,6 +26,7 @@ import { Hooks as BackpexHooks } from 'backpex'
 import { PDFViewer } from "./pdf_viewer_hook"
 import { ShowFullScreen} from "./show_fullscreen_hook"
 import { EventSessionTeamsSlideHook } from "./event_session_teams_slide_hook"
+import { initConfirmDialog } from "./confirm_dialog"
 
 import Prism from 'prismjs'
 import 'prismjs/components/prism-python'
@@ -59,6 +60,7 @@ window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
 // connect if there are any LiveViews on the page
+initConfirmDialog()
 liveSocket.connect()
 
 // expose liveSocket on window for web console debug logs and latency simulation:

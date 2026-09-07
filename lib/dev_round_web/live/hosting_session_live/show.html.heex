@@ -31,6 +31,9 @@
         disabled={Enum.empty?(@teams)}
         phx-click={JS.push("reset")}
         data-confirm="Do you really want to reset the session? The session will be stopped and its teams purged."
+        data-confirm-title="Reset Session?"
+        data-confirm-label="Reset Session"
+        data-confirm-danger
       >
         Reset Session
       </.button>
