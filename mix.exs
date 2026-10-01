@@ -61,7 +61,7 @@ defmodule DevRound.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 1.0"},
       {:jason, "~> 1.2"},
-      {:dns_cluster, "~> 0.2.0"},
+      {:dns_cluster, "~> 0.3.0"},
       {:bandit, "~> 1.5"},
       {:backpex, "~> 0.18.0"},
       {:mdex, "~> 0.13"},
