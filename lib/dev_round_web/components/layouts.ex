@@ -17,24 +17,23 @@ defmodule DevRoundWeb.Layouts do
 
   ## Examples
 
-      <Layouts.app flash={@flash}>
+      <Layouts.app assigns={assigns}>
         <h1>Content</h1>
       </Layouts.app>
 
   """
-  attr :flash, :map, required: true, doc: "the map of flash messages"
+  attr :assigns, :map,
+    required: true,
+    doc: "the live view assigns, used to derive flash/current_user/socket/toasts_sync"
 
-  attr :current_scope, :map,
-    default: nil,
-    doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
-
-  attr :current_user, DevRound.Accounts.User, default: nil
   attr :fluid, :boolean, default: false, doc: "toggles fluid layout"
 
   slot :sidebar, doc: "content to be displayed in the sidebar"
   slot :inner_block, required: true
 
-  def app(%{sidebar: []} = assigns) do
+  def app(%{assigns: lv_assigns, sidebar: []} = assigns) do
+    assigns = resolve_assigns(assigns, lv_assigns)
+
     ~H"""
     <header class="px-4 sm:px-6 lg:px-8 bg-base-300">
       <div class="navbar mx-auto max-w-3xl px-0">
@@ -51,11 +50,18 @@ defmodule DevRoundWeb.Layouts do
       </div>
     </main>
 
-    <.flash_group flash={@flash} />
+    <LiveToast.toast_group
+      flash={@flash}
+      connected={@socket != nil}
+      toasts_sync={@toasts_sync}
+      toast_class_fn={&DevRoundWeb.Layouts.toast_class_fn/1}
+    />
     """
   end
 
   def app(assigns) do
+    assigns = resolve_assigns(assigns, assigns.assigns)
+
     ~H"""
     <div class="drawer">
       <input id="menu-drawer" type="checkbox" class="drawer-toggle" />
@@ -85,7 +91,12 @@ defmodule DevRoundWeb.Layouts do
             </div>
           </main>
 
-          <.flash_group flash={@flash} />
+          <LiveToast.toast_group
+            flash={@flash}
+            connected={@socket != nil}
+            toasts_sync={@toasts_sync}
+            toast_class_fn={&DevRoundWeb.Layouts.toast_class_fn/1}
+          />
         </div>
       </div>
       <div class="drawer-side z-40">
@@ -99,11 +110,28 @@ defmodule DevRoundWeb.Layouts do
   end
 
   @doc """
+  Overrides the default LiveToast styling to use daisyUI's `alert` component
+  and severity colors (info/error), so toasts match the rest of the app.
+  """
+  def toast_class_fn(assigns) do
+    [
+      "live-toast-alert alert group/toast z-[100] pointer-events-auto relative w-full shadow-lg col-start-1 col-end-1 row-start-1 row-end-2",
+      assigns[:kind] == :info && "alert-info",
+      assigns[:kind] == :error && "alert-error",
+      if(assigns[:rest][:hidden] == true, do: "hidden", else: "flex")
+    ]
+  end
+
+  @doc """
   Shows the flash group with standard titles and content.
 
   ## Examples
 
-      <.flash_group flash={@flash} />
+          <LiveToast.toast_group
+            flash={@flash}
+            connected={@socket != nil}
+            toasts_sync={@toasts_sync}
+          />
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"
   attr :id, :string, default: "flash-group", doc: "the optional id of flash container"
@@ -139,6 +167,14 @@ defmodule DevRoundWeb.Layouts do
       </.flash>
     </div>
     """
+  end
+
+  defp resolve_assigns(assigns, lv_assigns) do
+    assigns
+    |> assign(:flash, Map.get(lv_assigns, :flash, %{}))
+    |> assign(:current_user, Map.get(lv_assigns, :current_user, nil))
+    |> assign(:socket, Map.get(lv_assigns, :socket, nil))
+    |> assign(:toasts_sync, Map.get(lv_assigns, :toasts_sync, []))
   end
 
   defp logo_brand(assigns) do

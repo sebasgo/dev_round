@@ -51,10 +51,23 @@
 @source "../../lib/dev_round_web";
 @source "../../deps/backpex/**/*.*ex";
 @source "../../deps/backpex/assets/js/**/*.*js";
+@source "../../deps/live_toast/lib";
 
 @custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
 @custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
+
+/* daisyUI's `alert` uses grid; live toasts need flex so the message grows
+   and the close button sits on the right. Kept un-layered so it wins. */
+.live-toast-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.live-toast-alert[hidden] {
+  display: none;
+}
 
 @utility badge {
   @apply rounded-full;

@@ -1,4 +1,4 @@
-<Layouts.app flash={@flash} current_user={@current_user}>
+<Layouts.app assigns={assigns}>
   <DevRoundWeb.HostingComponents.header event={@event} tab={{:session, @session.id}} />
   <DevRoundWeb.HostingComponents.messages messages={@messages} />
 

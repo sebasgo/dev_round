@@ -70,6 +70,10 @@ config :backpex,
   translator_function: {DevRoundWeb.CoreComponents, :translate_backpex},
   error_translator_function: {DevRoundWeb.CoreComponents, :translate_error}
 
+# Configure LiveToast to use the app's Gettext backend for its built-in
+# connection notices
+config :live_toast, gettext_backend: DevRoundWeb.Gettext
+
 # Configure LDAP
 config :exldap, :settings,
   server: System.get_env("LDAP_SERVER", "localhost"),

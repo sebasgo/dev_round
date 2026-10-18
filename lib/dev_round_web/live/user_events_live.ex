@@ -37,7 +37,7 @@ defmodule DevRoundWeb.UserEventsLive do
 
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash} current_user={@current_user}>
+    <Layouts.app assigns={assigns}>
       <.header>
         Your Events
         <:subtitle>

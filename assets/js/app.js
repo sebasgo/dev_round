@@ -27,6 +27,7 @@ import { PDFViewer } from "./pdf_viewer_hook"
 import { ShowFullScreen} from "./show_fullscreen_hook"
 import { EventSessionTeamsSlideHook } from "./event_session_teams_slide_hook"
 import { initConfirmDialog } from "./confirm_dialog"
+import { createLiveToastHook } from "live_toast"
 
 import Prism from 'prismjs'
 import 'prismjs/components/prism-python'
@@ -48,10 +49,11 @@ document.addEventListener('phx:update', function() {
 })
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+const liveToast = createLiveToastHook()
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {PDFViewer: PDFViewer, ShowFullScreen: ShowFullScreen, EventSessionTeamsSlideHook, ...BackpexHooks, ...colocatedHooks}
+  hooks: {PDFViewer: PDFViewer, ShowFullScreen: ShowFullScreen, EventSessionTeamsSlideHook, LiveToast: liveToast, ...BackpexHooks, ...colocatedHooks}
 })
 
 // Show progress bar on live navigation and form submits

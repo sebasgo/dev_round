@@ -5,7 +5,7 @@ defmodule DevRoundWeb.UserSettingsLive do
 
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash} current_user={@current_user}>
+    <Layouts.app assigns={assigns}>
       <.header class="text-center">
         Account Settings
         <:subtitle>Manage account settings</:subtitle>
