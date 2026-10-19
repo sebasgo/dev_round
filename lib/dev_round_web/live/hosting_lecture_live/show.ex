@@ -9,6 +9,7 @@ defmodule DevRoundWeb.HostingLectureLive.Show do
   @impl true
   def mount(_params, _session, socket) do
     DevRoundWeb.Endpoint.subscribe("admin.events")
+    DevRoundWeb.Endpoint.subscribe("registrations")
     subscribe_to_page_turn_topic()
     {:ok, socket}
   end
@@ -41,6 +42,14 @@ defmodule DevRoundWeb.HostingLectureLive.Show do
     %{event: event} = socket.assigns
     event = %{event | live: live?}
     {:noreply, socket |> assign(:event, event)}
+  end
+
+  def handle_info(%{topic: "registrations", payload: %{event: event} = payload}, socket) do
+    if event.id == socket.assigns.event.id do
+      {:noreply, maybe_registration_toast(socket, payload)}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_info(_msg, socket) do

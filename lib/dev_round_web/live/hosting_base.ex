@@ -11,6 +11,7 @@ defmodule DevRoundWeb.HostingBase do
 
   import Phoenix.Component
   alias DevRound.{Events, Hosting}
+  alias LiveToast
 
   def assign_event(socket, opts \\ []) do
     order_attendees_by = Keyword.get(opts, :order_attendees_by, :is_remote_and_full_name)
@@ -44,5 +45,50 @@ defmodule DevRoundWeb.HostingBase do
       )
 
     assign(socket, :messages, messages)
+  end
+
+  @doc """
+  Emits a toast to the current hosting view describing a registration or
+  check-in/check-out action performed by another user. The acting user is
+  never notified of their own action.
+  """
+  def maybe_registration_toast(
+        socket,
+        %{op: op, event: event, attendee: attendee, acting_user: user}
+      ) do
+    if event.id == socket.assigns.event.id and user.id != socket.assigns.current_user.id do
+      self? = user.id == attendee.user_id
+      LiveToast.put_toast(socket, :info, toast_message(op, user, attendee, self?), duration: 5000)
+    else
+      socket
+    end
+  end
+
+  defp toast_message(op, user, attendee, self?) do
+    case {op, self?} do
+      {:new, true} ->
+        "#{user.full_name} has registered"
+
+      {:new, false} ->
+        "#{user.full_name} registered #{attendee.user.full_name}"
+
+      {:edit, true} ->
+        "#{user.full_name} has updated their registration"
+
+      {:edit, false} ->
+        "#{user.full_name} updated the registration details for #{attendee.user.full_name}"
+
+      {:delete, true} ->
+        "#{user.full_name} has canceled their registration"
+
+      {:delete, false} ->
+        "#{user.full_name} canceled the registration for #{attendee.user.full_name}"
+
+      {:checkin, _} ->
+        "#{user.full_name} checked in #{attendee.user.full_name}"
+
+      {:checkout, _} ->
+        "#{user.full_name} checked out #{attendee.user.full_name}"
+    end
   end
 end

@@ -199,14 +199,6 @@ defmodule DevRoundWeb.UserEventsLive do
     {:noreply, push_patch(socket, to: ~p"/user/events?#{params}")}
   end
 
-  def handle_info({:registrations, _operation, _event, attendee}, socket) do
-    if attendee.user_id == socket.assigns.current_user.id do
-      {:noreply, socket |> assign_events()}
-    else
-      {:noreply, socket}
-    end
-  end
-
   def handle_info(_, socket) do
     {:noreply, socket |> assign_events()}
   end

@@ -502,5 +502,108 @@ defmodule DevRoundWeb.HostingLobbyLive.ShowTest do
       # Modal should be shown
       assert has_element?(view, "#event-modal")
     end
+
+    test "does not show a check-in toast to the host who performed the check-in", %{
+      conn: conn,
+      event: event,
+      lang: lang
+    } do
+      register_attendee(event, "User 1", false, [lang], false)
+
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}/hosting/lobby")
+
+      view |> element("button", "Check in") |> render_click()
+
+      refute render(view) =~ "checked in"
+    end
+
+    test "shows a toast to another host when an attendee is checked in", %{
+      event: event,
+      lang: lang,
+      host: host
+    } do
+      attendee = register_attendee(event, "User 1", false, [lang], false)
+
+      other_host = user_fixture(%{full_name: "Other Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: event.id,
+        user_id: other_host.id
+      })
+
+      conn2 = log_in_user(build_conn(), other_host)
+      {:ok, view2, _html} = live(conn2, ~p"/events/#{event}/hosting/lobby")
+
+      send(view2.pid, %{
+        topic: "registrations",
+        event: "registration",
+        payload: %{op: :checkin, event: event, attendee: attendee, acting_user: host}
+      })
+
+      assert render(view2) =~ "checked in"
+    end
+
+    test "shows a toast to another host when a host registers an attendee", %{
+      event: event,
+      lang: lang,
+      host: host
+    } do
+      other_host = user_fixture(%{full_name: "Other Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: event.id,
+        user_id: other_host.id
+      })
+
+      {:ok, attendee} =
+        DevRound.Events.create_event_attendee(
+          event,
+          user_fixture(%{full_name: "New Attendee"}),
+          %{
+            "is_remote" => false,
+            "lang_ids" => [lang.id]
+          }
+        )
+
+      conn2 = log_in_user(build_conn(), other_host)
+      {:ok, view2, _html} = live(conn2, ~p"/events/#{event}/hosting/lobby")
+
+      send(view2.pid, %{
+        topic: "registrations",
+        event: "registration",
+        payload: %{op: :new, event: event, attendee: attendee, acting_user: host}
+      })
+
+      html = render(view2)
+      assert html =~ "registered"
+      assert html =~ "New Attendee"
+    end
+
+    test "does not show a toast to a host on a different event", %{
+      event: event,
+      lang: lang,
+      host: host
+    } do
+      attendee = register_attendee(event, "User 1", false, [lang], false)
+
+      other_event = event_fixture()
+      other_host = user_fixture(%{full_name: "Other Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: other_event.id,
+        user_id: other_host.id
+      })
+
+      conn2 = log_in_user(build_conn(), other_host)
+      {:ok, view2, _html} = live(conn2, ~p"/events/#{other_event}/hosting/lobby")
+
+      send(view2.pid, %{
+        topic: "registrations",
+        event: "registration",
+        payload: %{op: :checkin, event: event, attendee: attendee, acting_user: host}
+      })
+
+      refute render(view2) =~ "checked in"
+    end
   end
 end

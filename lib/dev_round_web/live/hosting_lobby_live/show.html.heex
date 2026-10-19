@@ -137,6 +137,7 @@
       attendance={@registration_edit_attendee}
       patch={~p"/events/#{@event}/hosting/lobby?#{@query_params}"}
       user={if @registration_edit_attendee, do: @registration_edit_attendee.user, else: nil}
+      current_user={@current_user}
       mode={:host}
     />
   </.modal>

@@ -46,7 +46,7 @@ defmodule DevRoundWeb.EventLive.Show do
     end
   end
 
-  def handle_info(%{topic: "registrations", payload: {_op, event, _attendee}}, socket) do
+  def handle_info(%{topic: "registrations", payload: %{event: event}}, socket) do
     if event.id == socket.assigns.event.id do
       {:noreply, update_assigns(socket)}
     else

@@ -59,7 +59,10 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
   def handle_event("checkin", %{"id" => id}, socket) do
     socket =
       socket
-      |> assign(:event, update_attendee_confirmation(socket.assigns.event, id, true))
+      |> assign(
+        :event,
+        update_attendee_confirmation(socket.assigns.event, id, true, socket.assigns.current_user)
+      )
       |> assign_filtered_attendees()
       |> assign_messages()
 
@@ -70,7 +73,10 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
   def handle_event("checkout", %{"id" => id}, socket) do
     socket =
       socket
-      |> assign(:event, update_attendee_confirmation(socket.assigns.event, id, false))
+      |> assign(
+        :event,
+        update_attendee_confirmation(socket.assigns.event, id, false, socket.assigns.current_user)
+      )
       |> assign_filtered_attendees()
       |> assign_messages()
 
@@ -91,12 +97,17 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
     end
   end
 
-  def handle_info(%{topic: "registrations", payload: {_op, event, _attendee}}, socket) do
-    if event.id == socket.assigns.event.id do
-      {:noreply, update_assigns(socket)}
-    else
-      {:noreply, socket}
-    end
+  def handle_info(%{topic: "registrations", payload: %{event: event} = payload}, socket) do
+    socket =
+      if event.id == socket.assigns.event.id do
+        socket
+        |> update_assigns()
+        |> maybe_registration_toast(payload)
+      else
+        socket
+      end
+
+    {:noreply, socket}
   end
 
   def handle_info(_msg, socket) do
@@ -219,7 +230,7 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
     assign(socket, :registration_edit_attendee, attendee)
   end
 
-  defp update_attendee_confirmation(%Event{} = event, id, checked) do
+  defp update_attendee_confirmation(%Event{} = event, id, checked, host) do
     attendees =
       Enum.map(event.events_attendees, fn attendee ->
         case(attendee.id) do
@@ -228,7 +239,12 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
 
             broadcast_registration(
               "registration",
-              {(checked && :checkin) || :checkout, event, attendee}
+              %{
+                op: (checked && :checkin) || :checkout,
+                event: event,
+                attendee: attendee,
+                acting_user: host
+              }
             )
 
             attendee

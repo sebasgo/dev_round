@@ -228,5 +228,41 @@ defmodule DevRoundWeb.HostingSessionLive.ShowTest do
 
       assert render(view) =~ "Team Bravo"
     end
+
+    test "shows a toast to another host when an attendee is checked in", %{
+      event: event,
+      session: session,
+      host: host
+    } do
+      other_host = user_fixture(%{full_name: "Other Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: event.id,
+        user_id: other_host.id
+      })
+
+      attendee_user = user_fixture(%{full_name: "Attendee"})
+
+      attendee =
+        %DevRound.Events.EventAttendee{}
+        |> DevRound.Events.EventAttendee.changeset(%{
+          event_id: event.id,
+          user_id: attendee_user.id,
+          is_remote: false
+        })
+        |> DevRound.Repo.insert!()
+        |> DevRound.Repo.preload(:user)
+
+      conn2 = log_in_user(build_conn(), other_host)
+      {:ok, view, _html} = live(conn2, ~p"/events/#{event}/hosting/session/#{session}")
+
+      send(view.pid, %{
+        topic: "registrations",
+        event: "registration",
+        payload: %{op: :checkin, event: event, attendee: attendee, acting_user: host}
+      })
+
+      assert render(view) =~ "checked in"
+    end
   end
 end

@@ -141,7 +141,13 @@ defmodule DevRoundWeb.RegistrationComponent do
     case Events.delete_event_attendee(socket.assigns.attendance, socket.assigns.mode) do
       {:ok, attendee} ->
         event = socket.assigns.event
-        broadcast_registration("registration", {:delete, event, attendee})
+
+        broadcast_registration("registration", %{
+          op: :delete,
+          event: event,
+          attendee: attendee,
+          acting_user: socket.assigns.current_user
+        })
 
         flash_msg =
           case socket.assigns.mode do
@@ -176,7 +182,13 @@ defmodule DevRoundWeb.RegistrationComponent do
          ) do
       {:ok, attendee} ->
         event = socket.assigns.event
-        broadcast_registration("registration", {:edit, event, attendee})
+
+        broadcast_registration("registration", %{
+          op: :edit,
+          event: event,
+          attendee: attendee,
+          acting_user: socket.assigns.current_user
+        })
 
         {:noreply,
          socket
@@ -205,7 +217,14 @@ defmodule DevRoundWeb.RegistrationComponent do
          ) do
       {:ok, attendee} ->
         event = socket.assigns.event
-        broadcast_registration("registration", {:new, event, attendee})
+
+        broadcast_registration("registration", %{
+          op: :new,
+          event: event,
+          attendee: attendee,
+          acting_user: socket.assigns.current_user
+        })
+
         UserMail.confirm_registration(attendee.user, event) |> Mailer.deliver()
 
         flash_msg =

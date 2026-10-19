@@ -102,7 +102,12 @@ defmodule DevRoundWeb.UserEventsLiveTest do
         })
 
       # Broadcast
-      DevRoundWeb.Endpoint.broadcast("registrations", "created", {:created, event, attendee})
+      DevRoundWeb.Endpoint.broadcast("registrations", "created", %{
+        op: :new,
+        event: event,
+        attendee: attendee,
+        acting_user: attendee.user
+      })
 
       assert render(view) =~ "New Registration"
     end

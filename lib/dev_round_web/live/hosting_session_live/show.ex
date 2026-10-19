@@ -41,12 +41,17 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     end
   end
 
-  def handle_info(%{topic: "registrations", payload: {_op, event, _attendee}}, socket) do
-    if event.id == socket.assigns.event.id do
-      {:noreply, update_assigns(socket)}
-    else
-      {:noreply, socket}
-    end
+  def handle_info(%{topic: "registrations", payload: %{event: event} = payload}, socket) do
+    socket =
+      if event.id == socket.assigns.event.id do
+        socket
+        |> update_assigns()
+        |> maybe_registration_toast(payload)
+      else
+        socket
+      end
+
+    {:noreply, socket}
   end
 
   def handle_info(

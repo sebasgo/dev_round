@@ -369,7 +369,7 @@ defmodule DevRound.Events do
   end
 
   def delete_event_attendee(%EventAttendee{} = attendee, mode \\ :self_registration) do
-    attendee = Repo.preload(attendee, [:event])
+    attendee = Repo.preload(attendee, [:event, :user])
 
     case can_change_event_attendee?(attendee.event, mode) do
       true -> Repo.delete(attendee)
