@@ -16,7 +16,7 @@ defmodule DevRoundWeb.Admin.EventAttendeesLive do
     pubsub: [
       topic: "admin.event_attendees"
     ],
-    init_order: %{by: :begin, direction: :desc}
+    init_order: %{by: :inserted_at, direction: :desc}
 
   @impl Backpex.LiveResource
   def layout(_assigns), do: {DevRoundWeb.Layouts, :admin}
