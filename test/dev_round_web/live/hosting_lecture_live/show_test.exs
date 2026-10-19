@@ -79,5 +79,51 @@ defmodule DevRoundWeb.HostingLectureLive.ShowTest do
 
       assert render(view) =~ "checked in"
     end
+
+    test "shows a toast to another host when the presentation is started", %{
+      event: event,
+      host: host
+    } do
+      other_host = user_fixture(%{full_name: "Other Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: event.id,
+        user_id: other_host.id
+      })
+
+      conn2 = log_in_user(build_conn(), other_host)
+      {:ok, view, _html} = live(conn2, ~p"/events/#{event}/hosting/lecture")
+
+      send(view.pid, %{
+        topic: "host_actions",
+        event: "host_action",
+        payload: %{action: :set_presentation, event_id: event.id, live?: true, acting_user: host}
+      })
+
+      assert render(view) =~ "has started the lecture presentation."
+    end
+
+    test "shows a toast to another host when the presentation is stopped", %{
+      event: event,
+      host: host
+    } do
+      other_host = user_fixture(%{full_name: "Other Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: event.id,
+        user_id: other_host.id
+      })
+
+      conn2 = log_in_user(build_conn(), other_host)
+      {:ok, view, _html} = live(conn2, ~p"/events/#{event}/hosting/lecture")
+
+      send(view.pid, %{
+        topic: "host_actions",
+        event: "host_action",
+        payload: %{action: :set_presentation, event_id: event.id, live?: false, acting_user: host}
+      })
+
+      assert render(view) =~ "has stopped the lecture presentation."
+    end
   end
 end

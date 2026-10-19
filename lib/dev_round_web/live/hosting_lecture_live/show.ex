@@ -10,6 +10,7 @@ defmodule DevRoundWeb.HostingLectureLive.Show do
   def mount(_params, _session, socket) do
     DevRoundWeb.Endpoint.subscribe("admin.events")
     DevRoundWeb.Endpoint.subscribe("registrations")
+    DevRoundWeb.Endpoint.subscribe("host_actions")
     subscribe_to_page_turn_topic()
     {:ok, socket}
   end
@@ -52,6 +53,10 @@ defmodule DevRoundWeb.HostingLectureLive.Show do
     end
   end
 
+  def handle_info(%{topic: "host_actions", payload: payload}, socket) do
+    {:noreply, maybe_host_action_toast(socket, payload)}
+  end
+
   def handle_info(_msg, socket) do
     {:noreply, socket}
   end
@@ -61,6 +66,14 @@ defmodule DevRoundWeb.HostingLectureLive.Show do
     %{event: event} = socket.assigns
     {:ok, %Event{} = event} = Events.update_event_live(event, live?)
     broadcast_set_live(event, live?)
+
+    broadcast_host_action(event, %{
+      action: :set_presentation,
+      event_id: event.id,
+      live?: live?,
+      acting_user: socket.assigns.current_user
+    })
+
     msg = if live?, do: "Presentation started.", else: "Presentation stopped."
     {:noreply, socket |> assign(:event, event) |> put_flash(:info, msg)}
   end

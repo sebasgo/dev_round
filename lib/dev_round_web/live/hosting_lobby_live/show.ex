@@ -14,6 +14,7 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
   def mount(_params, _session, socket) do
     DevRoundWeb.Endpoint.subscribe("admin.events")
     DevRoundWeb.Endpoint.subscribe("registrations")
+    DevRoundWeb.Endpoint.subscribe("host_actions")
     {:ok, socket}
   end
 
@@ -108,6 +109,10 @@ defmodule DevRoundWeb.HostingLobbyLive.Show do
       end
 
     {:noreply, socket}
+  end
+
+  def handle_info(%{topic: "host_actions", payload: payload}, socket) do
+    {:noreply, maybe_host_action_toast(socket, payload)}
   end
 
   def handle_info(_msg, socket) do

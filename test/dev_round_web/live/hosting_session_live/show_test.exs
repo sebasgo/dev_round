@@ -264,5 +264,99 @@ defmodule DevRoundWeb.HostingSessionLive.ShowTest do
 
       assert render(view) =~ "checked in"
     end
+
+    test "shows a toast to another host when teams are built", %{
+      event: event,
+      session: session,
+      host: host
+    } do
+      other_host = user_fixture(%{full_name: "Other Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: event.id,
+        user_id: other_host.id
+      })
+
+      conn2 = log_in_user(build_conn(), other_host)
+      {:ok, view, _html} = live(conn2, ~p"/events/#{event}/hosting/session/#{session}")
+
+      send(view.pid, %{
+        topic: "host_actions",
+        event: "host_action",
+        payload: %{
+          action: :build_teams,
+          event_id: event.id,
+          session_title: session.title,
+          acting_user: host
+        }
+      })
+
+      assert render(view) =~ "has built teams for the session &quot;#{session.title}&quot;."
+    end
+
+    test "shows a toast to another host when team members are swapped", %{
+      event: event,
+      session: session,
+      host: host
+    } do
+      other_host = user_fixture(%{full_name: "Other Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: event.id,
+        user_id: other_host.id
+      })
+
+      user_a = user_fixture(%{full_name: "Alice"})
+      user_b = user_fixture(%{full_name: "Bob"})
+
+      conn2 = log_in_user(build_conn(), other_host)
+      {:ok, view, _html} = live(conn2, ~p"/events/#{event}/hosting/session/#{session}")
+
+      send(view.pid, %{
+        topic: "host_actions",
+        event: "host_action",
+        payload: %{
+          action: :swap_members,
+          event_id: event.id,
+          session_title: session.title,
+          acting_user: host,
+          member_a: user_a,
+          member_b: user_b
+        }
+      })
+
+      html = render(view)
+      assert html =~ "has swapped Alice and Bob in session #{session.title}."
+    end
+
+    test "shows a toast to another host when a host returns to the lecture", %{
+      event: event,
+      session: session,
+      host: host
+    } do
+      other_host = user_fixture(%{full_name: "Other Host"})
+
+      DevRound.Repo.insert!(%DevRound.Events.EventHost{
+        event_id: event.id,
+        user_id: other_host.id
+      })
+
+      conn2 = log_in_user(build_conn(), other_host)
+      {:ok, view, _html} = live(conn2, ~p"/events/#{event}/hosting/session/#{session}")
+
+      send(view.pid, %{
+        topic: "host_actions",
+        event: "host_action",
+        payload: %{
+          action: :return_to_lecture,
+          event_id: event.id,
+          session_title: session.title,
+          acting_user: host
+        }
+      })
+
+      assert render(view) =~
+               "has returned to the lecture from session &quot;#{session.title}&quot;."
+    end
   end
 end

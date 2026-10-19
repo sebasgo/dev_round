@@ -13,6 +13,7 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     DevRoundWeb.Endpoint.subscribe("admin.events")
     DevRoundWeb.Endpoint.subscribe("registrations")
     DevRoundWeb.Endpoint.subscribe("event_sessions")
+    DevRoundWeb.Endpoint.subscribe("host_actions")
     {:ok, socket}
   end
 
@@ -78,6 +79,10 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     {:noreply, socket |> update_assigns()}
   end
 
+  def handle_info(%{topic: "host_actions", payload: payload}, socket) do
+    {:noreply, maybe_host_action_toast(socket, payload)}
+  end
+
   def handle_info(_msg, socket) do
     {:noreply, socket}
   end
@@ -97,6 +102,13 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
 
     broadcast_teams_build(session)
 
+    broadcast_host_action(event, %{
+      action: :build_teams,
+      event_id: event.id,
+      session_title: session.title,
+      acting_user: socket.assigns.current_user
+    })
+
     {:noreply,
      socket
      |> assign_teams()
@@ -108,6 +120,13 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     false = Enum.empty?(teams)
     {:ok, %{event: event, session: session}} = Events.start_event_session(event, session)
     broadcast_set_live(event, session, true)
+
+    broadcast_host_action(event, %{
+      action: :start_session,
+      event_id: event.id,
+      session_title: session.title,
+      acting_user: socket.assigns.current_user
+    })
 
     msg = "Session \"#{session.title}\" started."
 
@@ -142,6 +161,13 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     {:ok, %EventSession{} = session} = Events.stop_event_session(session)
     broadcast_set_live(event, session, false)
 
+    broadcast_host_action(event, %{
+      action: :return_to_lecture,
+      event_id: event.id,
+      session_title: session.title,
+      acting_user: socket.assigns.current_user
+    })
+
     {:noreply,
      socket
      |> assign(:session, session)
@@ -154,12 +180,29 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     {:ok, _} = Events.reset_event_session(session)
     broadcast_reset(event, session)
 
+    broadcast_host_action(event, %{
+      action: :reset_session,
+      event_id: event.id,
+      session_title: session.title,
+      acting_user: socket.assigns.current_user
+    })
+
     {:noreply,
      socket |> update_assigns() |> put_flash(:info, "Session reset. You may build new teams now.")}
   end
 
   defp handle_swap_result({:ok, %{member_a: member_a, member_b: member_b}}, session, socket) do
     broadcast_teams_build(session)
+    %{event: event} = socket.assigns
+
+    broadcast_host_action(event, %{
+      action: :swap_members,
+      event_id: event.id,
+      session_title: session.title,
+      acting_user: socket.assigns.current_user,
+      member_a: member_a.user,
+      member_b: member_b.user
+    })
 
     {:noreply,
      socket
