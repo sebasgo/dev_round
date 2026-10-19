@@ -50,12 +50,16 @@ defmodule DevRoundWeb.UserLoginLive do
       {:error, reason} when reason in [:invalid_credentials, :user_not_found] ->
         {:noreply,
          socket
-         |> put_flash(:error, "Invalid user name or password!")}
+         |> LiveToast.put_toast(:error, "Invalid user name or password!", duration: 5000)}
 
       {:error, :access_denied} ->
         {:noreply,
          socket
-         |> put_flash(:error, "Access to this service is not permitted for your account.")}
+         |> LiveToast.put_toast(
+           :error,
+           "Access to this service is not permitted for your account.",
+           duration: 5000
+         )}
     end
   end
 end

@@ -112,7 +112,9 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     {:noreply,
      socket
      |> assign_teams()
-     |> put_flash(:info, "Teams generated. You may start the session now.")}
+     |> LiveToast.put_toast(:info, "Teams generated. You may start the session now.",
+       duration: 5000
+     )}
   end
 
   def handle_event("start_session", _params, socket) do
@@ -134,7 +136,7 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
      socket
      |> assign(event: event, session: session)
      |> assign_teams()
-     |> put_flash(:info, msg)}
+     |> LiveToast.put_toast(:info, msg, duration: 5000)}
   end
 
   def handle_event(
@@ -145,7 +147,10 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     %{session: session, teams: teams} = socket.assigns
 
     if session.teams_locked || Enum.empty?(teams) do
-      {:noreply, put_flash(socket, :error, "Team adjustments are not allowed at this time.")}
+      {:noreply,
+       LiveToast.put_toast(socket, :error, "Team adjustments are not allowed at this time.",
+         duration: 5000
+       )}
     else
       handle_swap_result(
         Hosting.swap_team_members(session, source_id, target_id),
@@ -171,7 +176,7 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     {:noreply,
      socket
      |> assign(:session, session)
-     |> put_flash(:info, "Session \"#{session.title}\" stopped.")
+     |> LiveToast.put_toast(:info, "Session \"#{session.title}\" stopped.", duration: 5000)
      |> push_navigate(to: ~p"/events/#{event}/hosting/lecture")}
   end
 
@@ -188,7 +193,9 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     })
 
     {:noreply,
-     socket |> update_assigns() |> put_flash(:info, "Session reset. You may build new teams now.")}
+     socket
+     |> update_assigns()
+     |> LiveToast.put_toast(:info, "Session reset. You may build new teams now.", duration: 5000)}
   end
 
   defp handle_swap_result({:ok, %{member_a: member_a, member_b: member_b}}, session, socket) do
@@ -207,11 +214,15 @@ defmodule DevRoundWeb.HostingSessionLive.Show do
     {:noreply,
      socket
      |> assign_teams()
-     |> put_flash(:info, "Swapped #{member_a.user.full_name} and #{member_b.user.full_name}.")}
+     |> LiveToast.put_toast(
+       :info,
+       "Swapped #{member_a.user.full_name} and #{member_b.user.full_name}.",
+       duration: 5000
+     )}
   end
 
   defp handle_swap_result({:error, reason}, _session, socket) do
-    {:noreply, put_flash(socket, :error, swap_error_message(reason))}
+    {:noreply, LiveToast.put_toast(socket, :error, swap_error_message(reason), duration: 5000)}
   end
 
   defp swap_error_message(:teams_locked), do: "Teams are locked. Cannot adjust teams."

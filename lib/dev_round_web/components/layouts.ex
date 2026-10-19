@@ -55,6 +55,7 @@ defmodule DevRoundWeb.Layouts do
       connected={@socket != nil}
       toasts_sync={@toasts_sync}
       toast_class_fn={&DevRoundWeb.Layouts.toast_class_fn/1}
+      flash_duration={5000}
     />
     """
   end
@@ -96,6 +97,7 @@ defmodule DevRoundWeb.Layouts do
             connected={@socket != nil}
             toasts_sync={@toasts_sync}
             toast_class_fn={&DevRoundWeb.Layouts.toast_class_fn/1}
+            flash_duration={5000}
           />
         </div>
       </div>

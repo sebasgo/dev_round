@@ -23,7 +23,7 @@ defmodule DevRoundWeb.EventLive.Show do
          !socket.assigns.registration_open? do
       {:noreply,
        socket
-       |> put_flash(:error, "Registration for this event is closed.")
+       |> LiveToast.put_toast(:error, "Registration for this event is closed.", duration: 5000)
        |> push_patch(to: ~p"/events/#{socket.assigns.event}")}
     else
       {:noreply, socket}
@@ -34,7 +34,12 @@ defmodule DevRoundWeb.EventLive.Show do
   def handle_info({"updated", %Event{} = event}, socket) do
     if event.id == socket.assigns.event.id do
       socket =
-        put_flash(socket, :info, "This page has been reloaded to reflect the latest update.")
+        LiveToast.put_toast(
+          socket,
+          :info,
+          "This page has been reloaded to reflect the latest update.",
+          duration: 5000
+        )
 
       if event.slug != socket.assigns.event.slug do
         {:noreply, push_patch(socket, to: ~p"/events/#{event}")}

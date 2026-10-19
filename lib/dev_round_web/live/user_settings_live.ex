@@ -61,7 +61,7 @@ defmodule DevRoundWeb.UserSettingsLive do
     case Accounts.apply_user_profile(user, user_params) do
       {:ok, _applied_user} ->
         info = "Profile updated."
-        {:noreply, socket |> put_flash(:info, info)}
+        {:noreply, socket |> LiveToast.put_toast(:info, info, duration: 5000)}
 
       {:error, changeset} ->
         {:noreply, assign(socket, :profile_form, to_form(Map.put(changeset, :action, :insert)))}
