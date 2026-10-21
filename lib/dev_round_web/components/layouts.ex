@@ -36,7 +36,7 @@ defmodule DevRoundWeb.Layouts do
 
     ~H"""
     <header class="px-4 sm:px-6 lg:px-8 bg-base-300">
-      <div class="navbar mx-auto max-w-3xl px-0">
+      <div class={["navbar mx-auto px-0", !@fluid && "max-w-3xl"]}>
         <.logo_brand />
         <div :if={@current_user} class="flex-none">
           <.user_dropdown current_user={@current_user} />
@@ -45,7 +45,7 @@ defmodule DevRoundWeb.Layouts do
     </header>
 
     <main class="px-4 py-5 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-3xl">
+      <div class={["mx-auto", !@fluid && "max-w-3xl"]}>
         {render_slot(@inner_block)}
       </div>
     </main>

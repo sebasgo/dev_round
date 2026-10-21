@@ -14,6 +14,19 @@ defmodule DevRound.Events.Event do
   alias DevRound.Events.EventHost
   alias DevRound.Events.EventSession
 
+  # Fields that event hosts (non-admins) are not allowed to change. Admins are
+  # unrestricted. Enforced here so crafted requests cannot bypass the UI.
+  @host_restricted_attrs ~w(
+    title begin_local end_local registration_deadline_local
+    event_hosts event_hosts_order event_hosts_delete
+    langs langs_select_all langs_deselect_all
+    published allow_remote_participation
+    location main_video_conference_room_url
+    team_video_conference_rooms
+    team_video_conference_rooms_order
+    team_video_conference_rooms_delete
+  )
+
   schema "events" do
     field :title, :string
     field :location, :string
@@ -62,7 +75,10 @@ defmodule DevRound.Events.Event do
 
   @doc false
   def changeset(event, attrs, opts \\ []) do
+    attrs = restrict_attrs_for_host(attrs, opts)
+
     event
+    |> discard_host_restricted_assocs(opts)
     |> cast(attrs, [
       :title,
       :teaser,
@@ -131,6 +147,47 @@ defmodule DevRound.Events.Event do
     |> unique_constraint(:slug)
     |> change(modified_at: DateTime.utc_now(:second))
   end
+
+  # Admins may change every attribute. Hosts (any other acting user) must not be
+  # able to modify the protected attributes, even via a crafted request.
+  defp restrict_attrs_for_host(attrs, opts) when is_map(attrs) do
+    if host_acting?(opts), do: Map.drop(attrs, @host_restricted_attrs), else: attrs
+  end
+
+  defp restrict_attrs_for_host(attrs, _opts), do: attrs
+
+  # `Backpex.Fields.HasMany` applies the association changes in its
+  # `before_changeset/6` callback, which runs before this changeset. Drop that
+  # change again for hosts so crafted requests cannot alter the languages.
+  defp discard_host_restricted_assocs(changeset, opts) do
+    if host_acting?(opts) do
+      changeset
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.delete_change(:langs)
+    else
+      changeset
+    end
+  end
+
+  # True when a non-admin user (i.e. an event host) is performing the change.
+  # Context calls without an authenticated actor (e.g. seeds, context functions)
+  # return false and are therefore never restricted.
+  defp host_acting?(opts) do
+    case acting_user(opts) do
+      %{role: :admin} -> false
+      nil -> false
+      _user -> true
+    end
+  end
+
+  defp acting_user(opts) when is_list(opts) do
+    case Keyword.get(opts, :assigns) do
+      %{current_user: %{} = user} -> user
+      _ -> nil
+    end
+  end
+
+  defp acting_user(_opts), do: nil
 
   def slides_page_number_changeset(event, attrs) do
     event

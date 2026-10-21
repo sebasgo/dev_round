@@ -237,6 +237,22 @@ defmodule DevRoundWeb.UserAuth do
     end
   end
 
+  @doc """
+  Allows access to admins and users that host at least one event.
+
+  Used for routes that event hosts may access in addition to admins
+  (e.g. the admin events live view).
+  """
+  def require_admin_or_host(conn, _opts) do
+    user = conn.assigns.current_user
+
+    if user.role == :admin or DevRound.Events.user_is_host?(user) do
+      conn
+    else
+      raise DevRoundWeb.PermissionError, "admin or host permissions required"
+    end
+  end
+
   defp put_token_in_session(conn, token) do
     conn
     |> put_session(:user_token, token)

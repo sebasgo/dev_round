@@ -10,6 +10,7 @@ defmodule DevRound.Events do
   alias DevRound.Events.EventSession
   alias DevRound.Events.Lang
   alias DevRound.Events.EventAttendee
+  alias DevRound.Events.EventHost
 
   @doc """
   Returns the list of events.
@@ -91,6 +92,13 @@ defmodule DevRound.Events do
     )
     |> Repo.all()
     |> Repo.preload([:langs, sessions: from(s in EventSession, order_by: s.begin)])
+  end
+
+  @doc """
+  Returns whether the given user hosts at least one event.
+  """
+  def user_is_host?(%User{id: user_id}) do
+    Repo.exists?(from eh in EventHost, where: eh.user_id == ^user_id)
   end
 
   def get_event_archival_datetime_utc do

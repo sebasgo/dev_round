@@ -58,15 +58,23 @@ defmodule DevRoundWeb.Router do
   end
 
   scope "/admin", DevRoundWeb do
-    pipe_through [:browser, :require_authenticated_user, :require_admin]
+    pipe_through [:browser, :require_authenticated_user, :require_admin_or_host]
 
     backpex_routes()
 
     get "/", Admin.HomeController, :index
 
-    live_session :admin,
+    live_session :admin_events,
       on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}, Backpex.InitAssigns] do
       live_resources "/events", Admin.EventLive
+    end
+  end
+
+  scope "/admin", DevRoundWeb do
+    pipe_through [:browser, :require_authenticated_user, :require_admin]
+
+    live_session :admin,
+      on_mount: [{DevRoundWeb.UserAuth, :ensure_authenticated}, Backpex.InitAssigns] do
       live_resources "/event_attendees", Admin.EventAttendeesLive
       live_resources "/users", Admin.UserLive
       live_resources "/user_tokens", Admin.UserTokenLive

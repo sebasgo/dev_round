@@ -1,5 +1,5 @@
 <Layouts.app assigns={assigns} fluid={true}>
-  <:sidebar>
+  <:sidebar :if={@current_user && @current_user.role == :admin}>
     <h2 class="text-lg font-mono font-semibold px-3 py-2">Admin Panel</h2>
     <Backpex.HTML.Layout.sidebar_item current_url={@current_url} navigate={~p"/admin/events"}>
       <.icon name="hero-calendar" class="h-5 w-5" /> Events

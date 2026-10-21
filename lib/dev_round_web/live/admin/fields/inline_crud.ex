@@ -19,6 +19,11 @@ defmodule DevRoundWeb.Admin.Fields.InlineCRUD do
       """,
       type: :keyword_list,
       required: true
+    ],
+    readonly: [
+      doc:
+        "Sets the field to readonly. When `true`, the association is rendered as a read-only table.",
+      type: {:or, [:boolean, {:fun, 1}]}
     ]
   ]
 
@@ -155,6 +160,42 @@ defmodule DevRoundWeb.Admin.Fields.InlineCRUD do
           </tr>
         </tbody>
       </table>
+    </div>
+    """
+  end
+
+  defp preload_child_assocs(rows, child_fields, repo) when is_list(rows) do
+    assocs =
+      child_fields
+      |> Enum.filter(fn field -> elem(field, 1).module.association?(field) end)
+      |> Enum.map(fn {name, _field_options} -> name end)
+
+    repo.preload(rows, assocs)
+  end
+
+  defp preload_child_assocs(rows, _child_fields, _repo), do: rows
+
+  @impl Backpex.Field
+  def render_form(%{readonly: true} = assigns) do
+    rows =
+      assigns.item
+      |> Map.get(assigns.name, [])
+      |> preload_child_assocs(assigns.child_fields, assigns.live_resource.adapter_config(:repo))
+
+    assigns = assign(assigns, :value, rows)
+
+    ~H"""
+    <div>
+      <Layout.field_container>
+        <:label align={Backpex.Field.align_label(@field_options, assigns, :top)}>
+          <Layout.input_label
+            id={"inline-crud-label-#{@name}"}
+            as="span"
+            text={@field_options[:label]}
+          />
+        </:label>
+        {render_value(assigns)}
+      </Layout.field_container>
     </div>
     """
   end

@@ -5,9 +5,14 @@
         <.link
           patch={~p"/events/#{@event}/hosting/lobby"}
           class="btn btn-default"
-          phx-click={JS.push_focus()}
         >
           <.button class="btn btn-default">Host</.button>
+        </.link>
+        <.link
+          navigate={~p"/admin/events/#{@event.id}/edit"}
+          class="btn btn-default"
+        >
+          <.button class="btn btn-default">Edit</.button>
         </.link>
       <% end %>
       <%= if @registration_open? do %>

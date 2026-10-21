@@ -22,6 +22,9 @@ defmodule DevRoundWeb.HostingComponents do
     <.breadcrumbs items={[:events, @event]} />
     <DevRoundWeb.CoreComponents.header>
       Hosting
+      <:actions>
+        <.link navigate={~p"/admin/events/#{@event.id}/edit"} class="btn btn-default">Edit Event</.link>
+      </:actions>
     </DevRoundWeb.CoreComponents.header>
     <.tabs event={@event} tab={@tab} />
     """
