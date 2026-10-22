@@ -45,7 +45,7 @@ defmodule DevRoundWeb.Admin.EventLive do
   @impl Backpex.LiveResource
   def can?(%{current_user: %{role: :admin}}, _action, _item), do: true
 
-  def can?(%{current_user: %{}}, action, _item) when action in [:index, :edit], do: true
+  def can?(%{current_user: %{}}, action, _item) when action in [:index, :edit, :view], do: true
 
   def can?(_assigns, _action, _item), do: false
 
@@ -170,7 +170,15 @@ defmodule DevRoundWeb.Admin.EventLive do
 
   @impl Backpex.LiveResource
   def item_actions(actions) do
-    actions ++
+    actions = Keyword.delete(actions, :show)
+
+    [
+      view: %{
+        module: DevRoundWeb.Admin.ItemActions.ViewEventAction,
+        only: [:row]
+      }
+    ] ++
+      actions ++
       [
         duplicate: %{
           module: DevRoundWeb.Admin.ItemActions.DuplicateEventAction,

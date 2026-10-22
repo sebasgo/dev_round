@@ -72,7 +72,7 @@ defmodule DevRoundWeb.EventLive.Show do
 
   defp update_assigns(socket) do
     slug = socket.assigns.slug
-    event = Events.get_event!(slug)
+    event = Events.get_event_for_viewer!(slug, socket.assigns.current_user)
     %{end: end_dt} = event
 
     socket

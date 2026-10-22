@@ -129,16 +129,57 @@ defmodule DevRound.Events do
 
   """
   def get_event!(slug_or_id, opts \\ [order_attendees_by: :registration]) do
-    query =
-      case(slug_or_id) do
-        id when is_integer(id) -> [id: id, published: true]
-        slug when is_binary(slug) -> [slug: slug, published: true]
-      end
-
     Event
-    |> Repo.get_by!(query)
+    |> Repo.get_by!(event_lookup(slug_or_id) ++ [published: true])
     |> preload_event_assocs(opts)
   end
+
+  @doc """
+  Gets a single event for the given viewer.
+
+  Published events are visible to everyone. Unpublished events are only visible
+  to admins and to the event's hosts.
+
+  Raises `Ecto.NoResultsError` if the event does not exist or is not visible to
+  the viewer.
+
+  ## Examples
+
+      iex> get_event_for_viewer!("some-slug", %User{role: :admin})
+      %Event{}
+
+      iex> get_event_for_viewer!("unpublished-slug", %User{role: :user})
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_event_for_viewer!(
+        slug_or_id,
+        %User{} = viewer,
+        opts \\ [order_attendees_by: :registration]
+      ) do
+    event =
+      Event
+      |> Repo.get_by!(event_lookup(slug_or_id))
+      |> preload_event_assocs(opts)
+
+    if viewable?(event, viewer) do
+      event
+    else
+      raise Ecto.NoResultsError, queryable: Event
+    end
+  end
+
+  defp event_lookup(slug_or_id) do
+    case slug_or_id do
+      id when is_integer(id) -> [id: id]
+      slug when is_binary(slug) -> [slug: slug]
+    end
+  end
+
+  defp viewable?(%Event{published: true}, _viewer), do: true
+  defp viewable?(_event, %User{role: :admin}), do: true
+  defp viewable?(%Event{hosts: hosts}, %User{id: id}), do: Enum.any?(hosts, &(&1.id == id))
+  defp viewable?(_event, _viewer), do: false
 
   def preload_event_assocs(%Event{} = event, opts \\ [order_attendees_by: :registration]) do
     attendee_query =

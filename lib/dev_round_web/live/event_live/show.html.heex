@@ -3,11 +3,14 @@
     <:actions>
       <%= if @current_user in @event.hosts do %>
         <.link
+          :if={@event.published}
           patch={~p"/events/#{@event}/hosting/lobby"}
           class="btn btn-default"
         >
           <.button class="btn btn-default">Host</.button>
         </.link>
+      <% end %>
+      <%= if @current_user in @event.hosts or @current_user.role == :admin do %>
         <.link
           navigate={~p"/admin/events/#{@event.id}/edit"}
           class="btn btn-default"
@@ -15,7 +18,7 @@
           <.button class="btn btn-default">Edit</.button>
         </.link>
       <% end %>
-      <%= if @registration_open? do %>
+      <%= if @registration_open? and @event.published do %>
         <%= if @attendance == nil do %>
           <.link
             patch={~p"/events/#{@event}/registration/new"}
@@ -55,6 +58,15 @@
   </.header>
 
   <div
+    :if={not @event.published}
+    class="alert alert-warning alert-soft flex items-center -mx-4 gap-2 my-8"
+    role="alert"
+  >
+    <.icon name="hero-eye-slash" class="h-5 w-5" />
+    This event has not been published yet. Only hosts and admins can see this page.
+  </div>
+
+  <div
     :if={@archived}
     class="alert alert-warning alert-soft flex items-center -mx-4 gap-2 my-8"
     role="alert"
@@ -73,7 +85,7 @@
     <div class="mt-px">
       This event is currently in progress.
     </div>
-    <div>
+    <div :if={@event.published}>
       <a href={~p"/events/#{@event}/live"} class="btn btn-sm btn-info">
         <.icon name="hero-eye" class="w-4 h-4" /> Follow Presentation
       </a>

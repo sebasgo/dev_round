@@ -60,6 +60,28 @@ defmodule DevRoundWeb.Admin.Event.HostAccessTest do
       refute has_element?(view, "#row-item-#{other_event.id}")
     end
 
+    test "index links to the public event page instead of the admin show view", %{
+      conn: conn,
+      host: host,
+      event: event
+    } do
+      conn = log_in_user(conn, host)
+
+      {:ok, view, _html} = live(conn, ~p"/admin/events")
+
+      assert has_element?(view, "#item-action-view-#{event.id}[href='/events/#{event.slug}']")
+      refute has_element?(view, "#item-action-show-#{event.id}")
+    end
+
+    test "admins also get the public event view link", %{conn: conn, event: event} do
+      conn = log_in_user(conn, user_fixture(%{role: :admin}))
+
+      {:ok, view, _html} = live(conn, ~p"/admin/events")
+
+      assert has_element?(view, "#item-action-view-#{event.id}[href='/events/#{event.slug}']")
+      refute has_element?(view, "#item-action-show-#{event.id}")
+    end
+
     test "host can access the edit action for their own event", %{
       conn: conn,
       host: host,

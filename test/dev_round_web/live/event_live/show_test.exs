@@ -189,4 +189,57 @@ defmodule DevRoundWeb.EventLive.ShowTest do
                live(conn, ~p"/events/#{event}/registration/new")
     end
   end
+
+  describe "unpublished events" do
+    test "host can view their unpublished event with a warning and only the Edit action", %{
+      conn: conn
+    } do
+      host = user_fixture(%{full_name: "Hidden Host"})
+      event = event_fixture(%{host: host, published: false})
+      conn = log_in_user(conn, host)
+
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}")
+
+      assert has_element?(view, ".alert-warning", "has not been published yet")
+      assert has_element?(view, "a[href='/admin/events/#{event.id}/edit']")
+      refute has_element?(view, "a[href='/events/#{event.slug}/hosting/lobby']")
+      refute has_element?(view, "a[href='/events/#{event.slug}/registration/new']")
+    end
+
+    test "admin can view an unpublished event with a warning and an Edit action", %{conn: conn} do
+      event = event_fixture(%{published: false})
+      conn = log_in_user(conn, user_fixture(%{role: :admin}))
+
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}")
+
+      assert has_element?(view, ".alert-warning", "has not been published yet")
+      assert has_element?(view, "a[href='/admin/events/#{event.id}/edit']")
+      refute has_element?(view, "a[href='/events/#{event.slug}/hosting/lobby']")
+    end
+
+    test "non-hosts cannot view an unpublished event", %{conn: conn} do
+      event = event_fixture(%{published: false})
+      conn = log_in_user(conn, user_fixture())
+
+      assert_raise Ecto.NoResultsError, fn ->
+        live(conn, ~p"/events/#{event}")
+      end
+    end
+
+    test "hosts cannot use the hosting screens for an unpublished event", %{conn: conn} do
+      host = user_fixture()
+      event = event_fixture(%{host: host, published: false})
+      conn = log_in_user(conn, host)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        live(conn, ~p"/events/#{event}/hosting/lobby")
+      end
+    end
+
+    test "published events do not show the unpublished warning", %{conn: conn, event: event} do
+      {:ok, view, _html} = live(conn, ~p"/events/#{event}")
+
+      refute render(view) =~ "has not been published yet"
+    end
+  end
 end
