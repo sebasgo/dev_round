@@ -474,6 +474,10 @@ code[class*="language-"] *::selection {
 .token.table {
   display: inline;  /* clash with daisyui table class */
 }
+
+.token.list {
+  display: inline;  /* clash with daisyui list class */
+}
 /*********************************************************
 * Language Specific
 */
@@ -506,3 +510,5 @@ code[class*="language-html"] {
 .language-html .token.punctuation {
 	color: #808080;
 }
+
+

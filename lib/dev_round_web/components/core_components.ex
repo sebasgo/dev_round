@@ -662,25 +662,7 @@ defmodule DevRoundWeb.CoreComponents do
   attr :markdown, :string, required: true
 
   def markdown(assigns) do
-    markdown = if assigns.markdown == nil, do: "", else: assigns.markdown
-
-    markdown_html =
-      String.trim(markdown)
-      |> MDEx.to_html!(
-        extension: [
-          superscript: true,
-          subscript: true,
-          footnotes: true,
-          table: true,
-          strikethrough: true,
-          autolink: true,
-          tasklist: true,
-          alerts: true
-        ]
-      )
-      |> Phoenix.HTML.raw()
-
-    assigns = assign(assigns, :markdown_html, markdown_html)
+    assigns = assign(assigns, :markdown_html, DevRound.Markdown.to_html(assigns.markdown))
 
     ~H"""
     {@markdown_html}

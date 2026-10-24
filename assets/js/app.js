@@ -30,6 +30,7 @@ import { initConfirmDialog } from "./confirm_dialog"
 import { createLiveToastHook } from "live_toast"
 
 import Prism from 'prismjs'
+import 'prismjs/components/prism-markdown'
 import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-c'
 import 'prismjs/components/prism-cpp'

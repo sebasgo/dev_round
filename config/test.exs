@@ -41,3 +41,10 @@ config :phoenix, :plug_init_mode, :runtime
 # Enable helpful, but potentially expensive runtime checks
 config :phoenix_live_view,
   enable_expensive_runtime_checks: true
+
+# Backpex's `HasMany` field renders duplicate DOM ids for selected options (see
+# `Backpex.Fields.HasMany.option/1` and `hidden_option/1`). This is an upstream
+# issue unrelated to our own markup, but LiveView's test harness treats duplicate
+# ids as fatal, which breaks any test that re-renders the admin form after a
+# change. Warn about them instead of raising.
+config :phoenix_live_view, test_warnings: [duplicate_id: :ignore]

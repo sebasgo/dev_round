@@ -263,7 +263,7 @@ defmodule DevRoundWeb.Admin.EventLive do
         except: [:index]
       },
       teaser: %{
-        module: Backpex.Fields.Textarea,
+        module: DevRoundWeb.Admin.Fields.MarkdownEditor,
         label: "Teaser",
         help_text: "Displayed in event listings. Markdown is supported.",
         rows: 5,
@@ -271,7 +271,7 @@ defmodule DevRoundWeb.Admin.EventLive do
         except: [:index]
       },
       body: %{
-        module: Backpex.Fields.Textarea,
+        module: DevRoundWeb.Admin.Fields.MarkdownEditor,
         label: "Body",
         help_text: "Markdown is supported.",
         rows: 15,
