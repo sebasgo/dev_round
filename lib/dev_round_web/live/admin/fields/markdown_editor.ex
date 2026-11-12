@@ -141,7 +141,12 @@ defmodule DevRoundWeb.Admin.Fields.MarkdownEditor do
           pointer-events: none;
         }
 
-        .markdown-editor-pre,
+        /* The .markdown-editor-pane prefix keeps these rules above the vendored
+           Prism theme in app.css, whose pre[class*="language-"] selector
+           (specificity 0,1,1) would otherwise force white-space: pre,
+           word-break: normal and tab-size: 4 onto the overlay and break
+           alignment with the textarea. */
+        .markdown-editor-pane .markdown-editor-pre,
         .markdown-editor-textarea {
           box-sizing: border-box;
           margin: 0;
@@ -162,7 +167,7 @@ defmodule DevRoundWeb.Admin.Fields.MarkdownEditor do
           background-color: transparent;
         }
 
-        .markdown-editor-pre code {
+        .markdown-editor-pane .markdown-editor-pre code {
           display: block;
           padding: 0;
           font: inherit;
